@@ -1,0 +1,367 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ═══════════════════════════════════════════════════════════════════
+   RUVICODE DESIGN SYSTEM — CSS VARIABLES
+   Warm dark mode + Anthropic-inspired Clay accent
+
+   Strategy: Ruvicode owns its semantic token layer (bg-canvas, accent,
+   text-primary, etc.) for use in custom components. These are ALSO
+   mapped onto the shadcn/ui standard token layer (background, primary,
+   foreground, etc.) so every shadcn component inherits the Ruvicode
+   palette without per-component overrides.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root,
+:root[data-theme="dark"] {
+  /* ── Ruvicode Backgrounds ── */
+  --bg-canvas: #0f0f0e; /* Page background — warm near-black */
+  --bg-surface: #1a1a18; /* Cards, elevated panels */
+  --bg-surface-2: #252521; /* Hover states, inputs */
+  --bg-surface-3: #2e2e2a; /* Active states, pressed */
+  --bg-inset: #0a0a09; /* Code blocks, inset areas */
+
+  /* ── Ruvicode Borders ── */
+  --border-default: #2e2e2a; /* Default 1px borders */
+  --border-subtle: #222220; /* Barely visible separators */
+  --border-strong: #3d3d38; /* Emphasized borders */
+
+  /* ── Ruvicode Text ── */
+  --text-primary: #faf9f5; /* Ivory — headings, body */
+  --text-secondary: #b0aea5; /* Warm gray — labels, captions */
+  --text-muted: #6b6a63; /* Dimmed — placeholders, disabled */
+  --text-inverse: #141413; /* Text on Clay accent */
+
+  /* ── Ruvicode Accent (Clay) ── */
+  --accent: #d97757; /* Primary CTA, links, highlights */
+  --accent-hover: #e8896b; /* Lighter for dark-mode pop */
+  --accent-pressed: #c6613f; /* Pressed/active state */
+  --accent-subtle: rgba(217, 119, 87, 0.12); /* Tint backgrounds */
+  --accent-text: #e8896b; /* Accent-colored text on dark */
+
+  /* ── Ruvicode Semantic ── */
+  --success: #8fa876; /* Olive — lightened for dark */
+  --success-subtle: rgba(143, 168, 118, 0.12);
+  --error: #d67896; /* Fig — lightened for dark */
+  --error-subtle: rgba(214, 120, 150, 0.12);
+  --warning: #d4a27f; /* Kraft amber */
+  --warning-subtle: rgba(212, 162, 127, 0.12);
+  --info: #6a9bcc; /* Sky — secondary accent */
+  --info-subtle: rgba(106, 155, 204, 0.12);
+
+  /* ── Chart Colors ── */
+  --chart-1: #d97757; /* Clay — primary series */
+  --chart-2: #6a9bcc; /* Sky — comparison series */
+  --chart-3: #8fa876; /* Olive — savings series */
+  --chart-4: #d4a27f; /* Kraft — tertiary */
+  --chart-5: #c46686; /* Fig — quaternary */
+  --chart-grid: #222220; /* Grid lines */
+  --chart-axis: #6b6a63; /* Axis labels */
+
+  /* ── Code Blocks ── */
+  --code-bg: #0a0a09;
+  --code-text: #faf9f5;
+  --code-comment: #6b6a63;
+  --code-keyword: #d97757; /* Clay */
+  --code-string: #8fa876; /* Olive */
+  --code-number: #d4a27f; /* Kraft */
+  --code-function: #6a9bcc; /* Sky */
+
+  /* ── Radius (Tailwind v4 maps --radius-* to utilities) ── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-popover: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.5);
+
+  /* ═────────────────────────────────────────────────────────────═══
+     shadcn/ui TOKEN MAPPING (dark)
+     Map Ruvicode tokens onto shadcn's expected variable names so
+     every shadcn component uses the warm Ruvicode palette.
+     ═────────────────────────────────────────────────────────────═══ */
+
+  --background: var(--bg-canvas);
+  --foreground: var(--text-primary);
+
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-primary);
+
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+
+  --primary: var(--accent);
+  --primary-foreground: var(--text-inverse);
+
+  --secondary: var(--bg-surface-2);
+  --secondary-foreground: var(--text-primary);
+
+  --muted: var(--bg-surface-2);
+  --muted-foreground: var(--text-secondary);
+
+  --accent-muted: var(--accent-subtle);
+  --accent-muted-foreground: var(--accent-text);
+
+  --destructive: var(--error);
+  --destructive-foreground: var(--text-primary);
+
+  --border: var(--border-default);
+  --input: var(--bg-surface-2);
+  --ring: var(--accent);
+
+  /* For charts slot used by shadcn chart components (future) */
+  --chart-1-fg: var(--chart-1);
+  --chart-2-fg: var(--chart-2);
+  --chart-3-fg: var(--chart-3);
+  --chart-4-fg: var(--chart-4);
+  --chart-5-fg: var(--chart-5);
+
+  /* Sidebar (dashboard) */
+  --sidebar: var(--bg-canvas);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--text-inverse);
+  --sidebar-accent: var(--accent-subtle);
+  --sidebar-accent-foreground: var(--accent-text);
+  --sidebar-border: var(--border-subtle);
+  --sidebar-ring: var(--accent);
+}
+
+:root[data-theme="light"] {
+  /* ── Ruvicode Backgrounds ── */
+  --bg-canvas: #faf9f5; /* Ivory canvas */
+  --bg-surface: #f0eee6; /* Ivory medium — cards */
+  --bg-surface-2: #e8e6dc; /* Ivory dark — hover */
+  --bg-surface-3: #d1cfc5; /* Stone — active */
+  --bg-inset: #f0eee6;
+
+  /* ── Ruvicode Borders ── */
+  --border-default: #d1cfc5; /* Stone */
+  --border-subtle: #e8e6dc;
+  --border-strong: #b0aea5;
+
+  /* ── Ruvicode Text ── */
+  --text-primary: #141413; /* Slate dark */
+  --text-secondary: #3d3d3a; /* Slate medium */
+  --text-muted: #87867f; /* Cloud dark */
+  --text-inverse: #faf9f5;
+
+  /* ── Accent (same Clay, adjusted) ── */
+  --accent: #c6613f; /* Clay deep — stronger on light */
+  --accent-hover: #d97757;
+  --accent-pressed: #b5553a;
+  --accent-subtle: rgba(198, 97, 63, 0.08);
+  --accent-text: #c6613f;
+
+  /* ── Semantic ── */
+  --success: #788c5d; /* Olive */
+  --success-subtle: rgba(120, 140, 93, 0.1);
+  --error: #c46686; /* Fig */
+  --error-subtle: rgba(196, 102, 134, 0.1);
+  --warning: #d4a27f; /* Kraft */
+  --warning-subtle: rgba(212, 162, 127, 0.1);
+  --info: #6a9bcc; /* Sky */
+  --info-subtle: rgba(106, 155, 204, 0.1);
+
+  /* ── Chart ── */
+  --chart-grid: #e8e6dc;
+  --chart-axis: #87867f;
+
+  /* ── Code Blocks ── */
+  --code-bg: #1a1a18;
+  --code-text: #faf9f5;
+  --code-comment: #87867f;
+
+  /* ── Radius / Shadow (same) ── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-popover: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.16);
+
+  /* ═─ shadcn/ui mapping (light) ─═ */
+  --background: var(--bg-canvas);
+  --foreground: var(--text-primary);
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--accent);
+  --primary-foreground: var(--text-inverse);
+  --secondary: var(--bg-surface-2);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--bg-surface-2);
+  --muted-foreground: var(--text-secondary);
+  --accent-muted: var(--accent-subtle);
+  --accent-muted-foreground: var(--accent-text);
+  --destructive: var(--error);
+  --destructive-foreground: var(--text-primary);
+  --border: var(--border-default);
+  --input: var(--bg-surface-2);
+  --ring: var(--accent);
+  --sidebar: var(--bg-canvas);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--text-inverse);
+  --sidebar-accent: var(--accent-subtle);
+  --sidebar-accent-foreground: var(--accent-text);
+  --sidebar-border: var(--border-subtle);
+  --sidebar-ring: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TAILWIND v4 THEME — expose Ruvicode tokens as Tailwind utilities.
+   `@theme inline` maps CSS variables to Tailwind utility classes so
+   `bg-canvas`, `text-text-primary`, `border-border-default`, etc. work.
+   ═══════════════════════════════════════════════════════════════════ */
+@theme inline {
+  /* Fonts (set via next/font in layout.tsx) */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Colors → utilities like bg-canvas, text-text-primary, bg-accent */
+  --color-canvas: var(--bg-canvas);
+  --color-surface: var(--bg-surface);
+  --color-surface-2: var(--bg-surface-2);
+  --color-surface-3: var(--bg-surface-3);
+  --color-inset: var(--bg-inset);
+
+  --color-border-default: var(--border-default);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-inverse: var(--text-inverse);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-pressed: var(--accent-pressed);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-text: var(--accent-text);
+
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-error: var(--error);
+  --color-error-subtle: var(--error-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-info: var(--info);
+  --color-info-subtle: var(--info-subtle);
+
+  /* Chart tokens */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Border radius */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* Max widths (custom) */
+  --breakpoint-prose: 680px;
+  --container-prose: 680px;
+  --container-content: 1024px;
+  --container-wide: 1440px;
+
+  /* Custom shadows */
+  --shadow-card: var(--shadow-card);
+  --shadow-popover: var(--shadow-popover);
+  --shadow-modal: var(--shadow-modal);
+
+  /* Animations */
+  --animate-shimmer: shimmer 1.5s infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GLOBAL BASE STYLES
+   ═══════════════════════════════════════════════════════════════════ */
+
+* {
+  border-color: var(--border-default);
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Mono tabular figures for financial numbers */
+.tabular {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--accent-subtle);
+  color: var(--text-primary);
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar (dark mode) */
+:root[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+:root[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+}
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--bg-surface-3);
+  border-radius: var(--radius-sm);
+}
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SHIMMER SKELETON (PAGES.md §9)
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(250, 249, 245, 0.04) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
