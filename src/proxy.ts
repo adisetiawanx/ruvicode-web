@@ -8,6 +8,7 @@ import type { NextRequest } from "next/server";
  * session validation comes in the authentication ADR.
  */
 export function proxy(_request: NextRequest) {
+  void _request;
   return NextResponse.next();
 }
 
