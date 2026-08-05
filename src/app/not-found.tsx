@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Container } from "@/components/layout/container";
+import { LinkButton } from "@/components/shared/link-button";
 
 export default function NotFound() {
   return (
@@ -11,12 +10,12 @@ export default function NotFound() {
         The page you&apos;re looking for doesn&apos;t exist or has been moved.
       </p>
       <div className="flex gap-3">
-        <Button variant="primary" render={<Link href="/" />}>
+        <LinkButton href="/" variant="primary">
           Go Home
-        </Button>
-        <Button variant="outline" render={<Link href="/dashboard" />}>
+        </LinkButton>
+        <LinkButton href="/dashboard" variant="outline">
           Go to Dashboard
-        </Button>
+        </LinkButton>
       </div>
     </Container>
   );

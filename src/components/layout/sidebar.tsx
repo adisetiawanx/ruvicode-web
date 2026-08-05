@@ -20,6 +20,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Logo } from "@/components/shared/logo";
+import { LinkButton } from "@/components/shared/link-button";
 
 interface NavItem {
   href: string;
@@ -114,14 +115,14 @@ function BalanceSidebarCard() {
       <div className="space-y-2 rounded-lg bg-surface p-4">
         <p className="text-xs text-text-secondary">Balance</p>
         <p className="font-mono text-2xl tabular text-text-primary">$12.50</p>
-        <Button
+        <LinkButton
+          href="/dashboard/topup"
           variant="primary"
           size="sm"
           className="w-full"
-          render={<Link href="/dashboard/topup" />}
         >
           Top Up
-        </Button>
+        </LinkButton>
       </div>
     </div>
   );

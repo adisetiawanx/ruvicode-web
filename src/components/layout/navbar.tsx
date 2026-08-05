@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Logo } from "@/components/shared/logo";
+import { LinkButton } from "@/components/shared/link-button";
 
 const navLinks = [
   { href: "/models", label: "Models" },
@@ -51,12 +52,12 @@ export function Navbar() {
           {/* Right actions (desktop) */}
           <div className="hidden items-center gap-2 md:flex">
             <ThemeToggle />
-            <Button variant="ghost" size="sm" render={<Link href="/login" />}>
+            <LinkButton href="/login" variant="ghost" size="sm">
               Sign in
-            </Button>
-            <Button variant="primary" size="sm" render={<Link href="/register" />}>
+            </LinkButton>
+            <LinkButton href="/register" variant="primary" size="sm">
               Get Started
-            </Button>
+            </LinkButton>
           </div>
 
           {/* Mobile actions */}
@@ -96,15 +97,12 @@ export function Navbar() {
                     ))}
                   </nav>
                   <div className="flex flex-col gap-3 border-t border-border-subtle pt-4">
-                    <Button variant="outline" render={<Link href="/login" />}>
+                    <LinkButton href="/login" variant="outline">
                       Sign in
-                    </Button>
-                    <Button
-                      variant="primary"
-                      render={<Link href="/register" />}
-                    >
+                    </LinkButton>
+                    <LinkButton href="/register" variant="primary">
                       Get Started
-                    </Button>
+                    </LinkButton>
                   </div>
                 </div>
               </SheetContent>
