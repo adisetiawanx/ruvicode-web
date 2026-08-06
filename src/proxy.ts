@@ -2,16 +2,42 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * Proxy (formerly middleware in Next.js 15) — protects /dashboard routes.
+ * Proxy (Next.js 16 — formerly middleware) — handles route protection.
  *
- * Placeholder for now (ADR-001). Real implementation with better-auth
- * session validation comes in the authentication ADR.
+ * - Protects /dashboard/* — redirects to /login if no session cookie
+ * - Redirects authenticated users away from /login and /register
  */
-export function proxy(_request: NextRequest) {
-  void _request;
+
+// Paths that require authentication
+const protectedPaths = ["/dashboard"];
+
+// Paths that should NOT be accessible when logged in
+const authPaths = ["/login", "/register"];
+
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Check session cookie presence (Better-auth sets this)
+  const sessionToken = request.cookies.get("better-auth.session_token");
+
+  const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
+  const isAuthPage = authPaths.some((p) => pathname.startsWith(p));
+
+  // Protect dashboard — redirect to login if no session
+  if (isProtected && !sessionToken) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Redirect authenticated users away from auth pages
+  if (isAuthPage && sessionToken) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/login", "/register"],
 };

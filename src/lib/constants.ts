@@ -129,3 +129,28 @@ export const SHOWCASE_MODELS: readonly ShowcaseModel[] = [
     savings_pct: 70,
   },
 ] as const;
+
+// Common disposable email domains — blocked at registration
+export const DISPOSABLE_EMAIL_DOMAINS = [
+  "10minutemail.com",
+  "guerrillamail.com",
+  "mailinator.com",
+  "tempmail.com",
+  "throwawaymail.com",
+  "yopmail.com",
+  "getnada.com",
+  "temp-mail.org",
+  "sharklasers.com",
+  "guerrillamailblock.com",
+  "spam.com",
+  "trashmail.com",
+  "fakeinbox.com",
+  "mailcatch.com",
+  "dispostable.com",
+  "mintemail.com",
+];
+
+export function isDisposableEmail(email: string): boolean {
+  const domain = email.split("@")[1]?.toLowerCase();
+  return domain ? DISPOSABLE_EMAIL_DOMAINS.includes(domain) : false;
+}
