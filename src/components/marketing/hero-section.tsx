@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/layout/container";
-import { CodeDemo } from "./code-demo";
+import { CodeDemo, type CodeTab } from "./code-demo";
 import { LinkButton } from "@/components/shared/link-button";
 
 const container = {
@@ -19,7 +19,11 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
 };
 
-export function HeroSection() {
+interface HeroSectionProps {
+  codeTabs: CodeTab[];
+}
+
+export function HeroSection({ codeTabs }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden">
       {/* Subtle radial glow — Clay tint, NOT gradient slop */}
@@ -32,63 +36,65 @@ export function HeroSection() {
       />
 
       <Container size="wide" className="relative pb-24 pt-20 md:pb-32 md:pt-32">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="max-w-3xl"
-        >
-          <motion.div variants={item}>
-            <Badge
-              variant="outline"
-              className="mb-6 border-accent/30 text-accent-text"
-            >
-              Save up to 77% vs OpenRouter
-            </Badge>
-          </motion.div>
-
-          <motion.h1
-            variants={item}
-            className="mb-6 text-5xl font-bold tracking-tight md:text-6xl"
-          >
-            One API Key.
-            <br />
-            Every AI Model.
-            <br />
-            <span className="text-accent">Transparent Pricing.</span>
-          </motion.h1>
-
-          <motion.p
-            variants={item}
-            className="mb-8 max-w-xl text-lg text-text-secondary"
-          >
-            Pay per request, see exact costs in real-time, set hard spend
-            limits. No credit card required to start.
-          </motion.p>
-
+        {/* Desktop: text left, code demo right — side-by-side at lg+ */}
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          {/* Left column — text content */}
           <motion.div
-            variants={item}
-            className="flex flex-col gap-4 sm:flex-row"
+            variants={container}
+            initial="hidden"
+            animate="show"
           >
-            <LinkButton href="/register" variant="primary" size="lg">
-              Get Started Free →
-            </LinkButton>
-            <LinkButton href="/models" variant="outline" size="lg">
-              View Models
-            </LinkButton>
-          </motion.div>
-        </motion.div>
+            <motion.div variants={item}>
+              <Badge
+                variant="outline"
+                className="mb-6 border-accent/30 text-accent-text"
+              >
+                Save up to 77% vs OpenRouter
+              </Badge>
+            </motion.div>
 
-        {/* Code demo below hero text */}
-        <motion.div
-          variants={item}
-          initial="hidden"
-          animate="show"
-          transition={{ delay: 0.6 }}
-          className="mt-16 max-w-2xl"
-        >
-          <CodeDemo />
-        </motion.div>
+            <motion.h1
+              variants={item}
+              className="mb-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl"
+            >
+              One API Key.
+              <br />
+              Every AI Model.
+              <br />
+              <span className="text-accent">Transparent Pricing.</span>
+            </motion.h1>
+
+            <motion.p
+              variants={item}
+              className="mb-8 max-w-xl text-lg text-text-secondary"
+            >
+              Pay per request, see exact costs in real-time, set hard spend
+              limits. No credit card required to start.
+            </motion.p>
+
+            <motion.div
+              variants={item}
+              className="flex flex-col gap-4 sm:flex-row"
+            >
+              <LinkButton href="/register" variant="primary" size="lg">
+                Get Started Free →
+              </LinkButton>
+              <LinkButton href="/models" variant="outline" size="lg">
+                View Models
+              </LinkButton>
+            </motion.div>
+          </motion.div>
+
+          {/* Right column — code demo with Shiki highlighting */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
+            className="lg:pl-4"
+          >
+            <CodeDemo tabs={codeTabs} />
+          </motion.div>
+        </div>
       </Container>
     </section>
   );

@@ -34,14 +34,98 @@ export const STATS = [
   { value: "30K", label: "Requests/min Capacity" },
 ] as const;
 
-/** Static top models for the showcase (MVP — replaced by DB in later ADR). */
-export const SHOWCASE_MODELS = [
-  { model: "claude-opus-4.7", display_name: "Claude Opus 4.7", user_input: 3.95 },
-  { model: "claude-sonnet-5", display_name: "Claude Sonnet 5", user_input: 1.7 },
-  { model: "gpt-5.6-sol", display_name: "GPT-5.6-Sol", user_input: 1.15 },
-  { model: "gpt-5.4", display_name: "GPT-5.4", user_input: 1.0 },
-  { model: "gemini-3.1-pro", display_name: "Gemini 3.1 Pro", user_input: 1.39 },
-  { model: "glm-5.2", display_name: "GLM-5.2", user_input: 0.218 },
-  { model: "kimi-k3", display_name: "Kimi K3", user_input: 2.05 },
-  { model: "deepseek-v4-flash", display_name: "DeepSeek V4 Flash", user_input: 0.027 },
+interface ShowcaseModel {
+  model: string;
+  display_name: string;
+  provider: string;
+  user_input: number;
+  user_output: number;
+  ref_input: number;
+  context: string;
+  savings_pct: number;
+}
+
+/** Static top models for the showcase (MVP — replaced by DB in later ADR).
+ *  Pricing data from PROJECT.md §6 verified margin table. */
+export const SHOWCASE_MODELS: readonly ShowcaseModel[] = [
+  {
+    model: "claude-opus-4.7",
+    display_name: "Claude Opus 4.7",
+    provider: "Anthropic",
+    user_input: 3.95,
+    user_output: 19.75,
+    ref_input: 5.0,
+    context: "200K",
+    savings_pct: 21,
+  },
+  {
+    model: "claude-sonnet-5",
+    display_name: "Claude Sonnet 5",
+    provider: "Anthropic",
+    user_input: 1.7,
+    user_output: 8.5,
+    ref_input: 2.0,
+    context: "200K",
+    savings_pct: 15,
+  },
+  {
+    model: "gpt-5.6-sol",
+    display_name: "GPT-5.6-Sol",
+    provider: "OpenAI",
+    user_input: 1.15,
+    user_output: 4.6,
+    ref_input: 5.0,
+    context: "128K",
+    savings_pct: 77,
+  },
+  {
+    model: "gpt-5.4",
+    display_name: "GPT-5.4",
+    provider: "OpenAI",
+    user_input: 1.0,
+    user_output: 4.0,
+    ref_input: 2.5,
+    context: "128K",
+    savings_pct: 60,
+  },
+  {
+    model: "gemini-3.1-pro",
+    display_name: "Gemini 3.1 Pro",
+    provider: "Google",
+    user_input: 1.39,
+    user_output: 5.56,
+    ref_input: 2.0,
+    context: "1M",
+    savings_pct: 31,
+  },
+  {
+    model: "glm-5.2",
+    display_name: "GLM-5.2",
+    provider: "Zhipu",
+    user_input: 0.218,
+    user_output: 0.872,
+    ref_input: 0.95,
+    context: "128K",
+    savings_pct: 77,
+  },
+  {
+    model: "kimi-k3",
+    display_name: "Kimi K3",
+    provider: "Moonshot",
+    user_input: 2.05,
+    user_output: 8.2,
+    ref_input: 3.0,
+    context: "256K",
+    savings_pct: 32,
+  },
+  {
+    model: "deepseek-v4-flash",
+    display_name: "DeepSeek V4 Flash",
+    provider: "DeepSeek",
+    user_input: 0.027,
+    user_output: 0.108,
+    ref_input: 0.09,
+    context: "64K",
+    savings_pct: 70,
+  },
 ] as const;

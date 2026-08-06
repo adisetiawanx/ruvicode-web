@@ -8,6 +8,9 @@ import { HowItWorks } from "@/components/marketing/how-it-works";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { FAQS } from "@/lib/constants";
+import { CODE_SAMPLES } from "@/lib/code-samples";
+import { highlightCode } from "@/lib/shiki";
+import type { CodeTab } from "@/components/marketing/code-demo";
 
 export const revalidate = 3600; // SSG — hourly refresh for model data
 
@@ -30,7 +33,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // Pre-highlight code samples with Shiki (server-side, zero client JS)
+  const codeTabs: CodeTab[] = await Promise.all(
+    CODE_SAMPLES.map(async (sample) => ({
+      label: sample.label,
+      highlightedHtml: await highlightCode(sample.code, sample.lang as never),
+      rawCode: sample.code,
+    })),
+  );
+
   const orgJsonLd: WithContext<Organization> = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -60,7 +72,7 @@ export default function LandingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <HeroSection />
+      <HeroSection codeTabs={codeTabs} />
       <StatBar />
       <FeatureGrid />
       <ModelShowcase />

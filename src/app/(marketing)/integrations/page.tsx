@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import type { BreadcrumbList, WithContext } from "schema-dts";
 import { Container } from "@/components/layout/container";
-import { CodeDemo } from "@/components/marketing/code-demo";
+import { CodeDemo, type CodeTab } from "@/components/marketing/code-demo";
+import { CODE_SAMPLES } from "@/lib/code-samples";
+import { highlightCode } from "@/lib/shiki";
 
 export const metadata: Metadata = {
   title: "Integrations — Works with your tools",
@@ -53,7 +55,16 @@ api_key: rvcd_...`,
   },
 ];
 
-export default function IntegrationsPage() {
+export default async function IntegrationsPage() {
+  // Pre-highlight code samples with Shiki (server-side)
+  const codeTabs: CodeTab[] = await Promise.all(
+    CODE_SAMPLES.map(async (sample) => ({
+      label: sample.label,
+      highlightedHtml: await highlightCode(sample.code, sample.lang as never),
+      rawCode: sample.code,
+    })),
+  );
+
   const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -129,7 +140,7 @@ export default function IntegrationsPage() {
 
         <div className="mt-16">
           <h2 className="mb-6 text-2xl font-semibold">Try it now</h2>
-          <CodeDemo />
+          <CodeDemo tabs={codeTabs} />
         </div>
       </Container>
     </>
