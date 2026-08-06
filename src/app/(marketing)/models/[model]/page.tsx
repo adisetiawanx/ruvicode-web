@@ -10,9 +10,9 @@ import { QuickstartCode } from "@/components/shared/quickstart-code";
 
 export const revalidate = 300; // SSR — 5 minute revalidation
 
-/** SECURITY: validate slug format — only allow alphanumeric + hyphens.
- * Prevents path traversal. */
-const SLUG_REGEX = /^[a-z0-9-]+$/;
+/** SECURITY: validate slug format — only allow alphanumeric, hyphens, and dots.
+ * Prevents path traversal. Dots are needed for model names like "glm-5.2". */
+const SLUG_REGEX = /^[a-z0-9.-]+$/;
 
 /** Pre-generate all model detail pages at build time. */
 export function generateStaticParams() {
