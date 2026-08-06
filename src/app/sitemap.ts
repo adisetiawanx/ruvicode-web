@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
+import { getAllActiveModels } from "@/lib/db/queries/models";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://ruvicode.com";
 
   const staticPages = [
@@ -23,6 +24,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1 : 0.8,
   }));
 
-  // Blog posts will be added here once content/ is populated (ADR blog ADR)
-  return [...staticPages];
+  // Model detail pages
+  const models = await getAllActiveModels();
+  const modelPages = models.map((m) => ({
+    url: `${baseUrl}/models/${m.model}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...modelPages];
 }

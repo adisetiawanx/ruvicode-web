@@ -7,7 +7,12 @@ import {
 import { Container } from "@/components/layout/container";
 import { FAQS } from "@/lib/constants";
 
-export function FaqSection() {
+interface FaqItem {
+  q: string;
+  a: string;
+}
+
+export function FaqSection({ faqs = FAQS }: { faqs?: readonly FaqItem[] }) {
   return (
     <section className="border-t border-border-subtle py-24">
       <Container size="content">
@@ -15,7 +20,7 @@ export function FaqSection() {
           Frequently Asked Questions
         </h2>
         <Accordion defaultValue={["0"]} className="mx-auto max-w-2xl">
-          {FAQS.map((faq, i) => (
+          {faqs.map((faq, i) => (
             <AccordionItem
               key={i}
               value={String(i)}
