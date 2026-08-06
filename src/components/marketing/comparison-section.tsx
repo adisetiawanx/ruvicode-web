@@ -20,7 +20,7 @@ export function ComparisonSection() {
           Ruvicode vs OpenRouter
         </h2>
         <p className="mb-12 text-center text-text-secondary">
-          Built from the ground up to fix OpenRouter's biggest problems.
+          Built from the ground up to fix OpenRouter&apos;s biggest problems.
         </p>
         <div className="overflow-hidden rounded-lg border border-border-default">
           <table className="w-full">

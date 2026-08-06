@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useQueryStates, parseAsStringEnum, parseAsString } from "nuqs";
+import { useQueryStates, parseAsStringEnum } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { ModelWithPricing } from "@/lib/db/queries/models";

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPostsByTag } from "@/lib/content/blog";
 import { Container } from "@/components/layout/container";
-import { Badge } from "@/components/ui/badge";
 
 export async function generateMetadata({
   params,
