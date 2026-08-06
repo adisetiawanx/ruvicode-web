@@ -1,0 +1,71 @@
+---
+title: "Streaming"
+slug: streaming
+description: "Stream responses in real-time using Server-Sent Events."
+section: "API Reference"
+order: 2
+---
+
+Streaming lets you receive tokens as they're generated, providing a better user experience for chat and long-form generation.
+
+## Enabling streaming
+
+Set `stream: true` in your request body:
+
+```bash
+curl https://api.ruvicode.com/v1/chat/completions \
+  -H "Authorization: Bearer rvcd_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "glm-5.2",
+    "messages": [{"role": "user", "content": "Write a poem"}],
+    "stream": true
+  }'
+```
+
+## SSE format
+
+Streaming responses use Server-Sent Events. Each line starts with `data: `:
+
+```
+data: {"choices":[{"delta":{"content":"Hello"}}]}
+
+data: {"choices":[{"delta":{"content":" world"}}]}
+
+data: {"choices":[{"finish_reason":"stop"}]}
+
+data: [DONE]
+```
+
+## Python streaming
+
+```python
+stream = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[{"role": "user", "content": "Hello!"}],
+    stream=True
+)
+for chunk in stream:
+    content = chunk.choices[0].delta.content
+    if content:
+        print(content, end="", flush=True)
+```
+
+## Node.js streaming
+
+```typescript
+const stream = await client.chat.completions.create({
+  model: "glm-5.2",
+  messages: [{ role: "user", content: "Hello!" }],
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  const content = chunk.choices[0]?.delta?.content;
+  if (content) process.stdout.write(content);
+}
+```
+
+## Usage and cost
+
+When streaming, usage data (token counts) is included in the final chunk before `[DONE]`. The `X-Cost` header is sent with the final chunk.

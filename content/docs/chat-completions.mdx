@@ -1,0 +1,100 @@
+---
+title: "Chat Completions"
+slug: chat-completions
+description: "The /v1/chat/completions endpoint — OpenAI-compatible chat API."
+section: "API Reference"
+order: 1
+---
+
+The chat completions endpoint is OpenAI-compatible. Send a list of messages and receive a model-generated response.
+
+## Endpoint
+
+```
+POST https://api.ruvicode.com/v1/chat/completions
+```
+
+## Request body
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `model` | string | Yes | Model ID (e.g., `glm-5.2`) |
+| `messages` | array | Yes | List of message objects |
+| `temperature` | number | No | 0–2, default 1 |
+| `max_tokens` | number | No | Max output tokens |
+| `stream` | boolean | No | Enable streaming (default false) |
+
+## Example
+
+```bash
+curl https://api.ruvicode.com/v1/chat/completions \
+  -H "Authorization: Bearer rvcd_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "glm-5.2",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "What is 2+2?"}
+    ],
+    "max_tokens": 100
+  }'
+```
+
+## Response
+
+```json
+{
+  "id": "chatcmpl-...",
+  "object": "chat.completion",
+  "model": "glm-5.2",
+  "choices": [{
+    "index": 0,
+    "message": {
+      "role": "assistant",
+      "content": "2 + 2 = 4"
+    },
+    "finish_reason": "stop"
+  }],
+  "usage": {
+    "prompt_tokens": 25,
+    "completion_tokens": 7,
+    "total_tokens": 32
+  }
+}
+```
+
+## Cost header
+
+Every response includes an `X-Cost` header showing the exact charge in USD:
+
+```
+X-Cost: 0.00000698
+```
+
+This is the amount deducted from your wallet for this request.
+
+## Using with SDKs
+
+### Python
+
+```python
+from openai import OpenAI
+
+client = OpenAI(api_key="rvcd_...", base_url="https://api.ruvicode.com/v1")
+response = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+```
+
+### Node.js
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({ apiKey: "rvcd_...", baseURL: "https://api.ruvicode.com/v1" });
+const response = await client.chat.completions.create({
+  model: "glm-5.2",
+  messages: [{ role: "user", content: "Hello!" }],
+});
+```

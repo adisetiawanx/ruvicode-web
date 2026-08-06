@@ -1,0 +1,44 @@
+---
+title: "Quickstart"
+slug: quickstart
+description: "Get started with Ruvicode in under 2 minutes."
+section: "Getting Started"
+order: 1
+---
+
+Get your first AI response from Ruvicode in under 2 minutes.
+
+## 1. Create an account
+
+[Sign up](/register) with your email or GitHub/Google account. Verify your email to activate your account.
+
+## 2. Top up your wallet
+
+Add credit to your wallet via card (Paddle) or USDC deposit. Minimum top-up is $5. Your balance never expires.
+
+## 3. Generate an API key
+
+Go to **Dashboard → API Keys** and create a new key. Copy it immediately — it's shown only once. Set a spend limit to protect against runaway costs.
+
+## 4. Make your first request
+
+Use any OpenAI-compatible SDK. Just change the base URL:
+
+```bash
+curl https://api.ruvicode.com/v1/chat/completions \
+  -H "Authorization: Bearer rvcd_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "glm-5.2",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+That's it. You'll get a response with an `X-Cost` header showing exactly what you were charged.
+
+## Next steps
+
+- [Browse available models](/models)
+- [Check pricing](/pricing)
+- [Read the API reference](/docs/chat-completions)
+- [Set up streaming](/docs/streaming)

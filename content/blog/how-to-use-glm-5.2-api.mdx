@@ -1,0 +1,104 @@
+---
+title: "How to Use the GLM-5.2 API: Quickstart Guide"
+slug: how-to-use-glm-5.2-api
+description: "Get started with the GLM-5.2 API in under 2 minutes. OpenAI-compatible endpoint, code examples in curl, Python, and Node.js."
+date: 2026-08-14
+author: "Adi"
+tags: ["tutorial", "glm", "zhipu", "quickstart"]
+category: "Tutorial"
+published: true
+featured: false
+---
+
+GLM-5.2 is one of the most cost-effective AI models available today — and at $0.22/1M tokens on Ruvicode (77% cheaper than OpenRouter), it's an excellent choice for high-volume tasks.
+
+## What is GLM-5.2?
+
+GLM-5.2 is a frontier model from Zhipu AI with a 128K context window, strong reasoning capabilities, and tool-use support. It's particularly good at:
+
+- General chat and conversation
+- Code generation and debugging
+- Document analysis with long context
+- Multi-step reasoning
+
+## Quickstart
+
+Ruvicode provides an OpenAI-compatible endpoint, so you can use any OpenAI SDK — just change the base URL and API key.
+
+### curl
+
+```bash
+curl https://api.ruvicode.com/v1/chat/completions \
+  -H "Authorization: Bearer rvcd_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "glm-5.2",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+### Python
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="rvcd_...",
+    base_url="https://api.ruvicode.com/v1"
+)
+
+response = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+print(response.choices[0].message.content)
+```
+
+### Node.js
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "rvcd_...",
+  baseURL: "https://api.ruvicode.com/v1",
+});
+
+const response = await client.chat.completions.create({
+  model: "glm-5.2",
+  messages: [{ role: "user", content: "Hello!" }],
+});
+```
+
+## Streaming
+
+For streaming responses, set `stream: true`:
+
+```python
+stream = client.chat.completions.create(
+    model="glm-5.2",
+    messages=[{"role": "user", "content": "Write a haiku about APIs"}],
+    stream=True
+)
+for chunk in stream:
+    print(chunk.choices[0].delta.content or "", end="")
+```
+
+## Using GLM-5.2 with Cursor
+
+Point Cursor at Ruvicode by setting the base URL in your settings:
+
+1. Open Cursor Settings → Models
+2. Set OpenAI Base URL to `https://api.ruvicode.com/v1`
+3. Enter your Ruvicode API key
+4. Add `glm-5.2` to the model list
+
+## Cost estimation
+
+At $0.22/1M input and $0.88/1M output, a typical chat request (1,000 input + 500 output tokens) costs about **$0.00065**. You can run thousands of requests for under a dollar.
+
+Every response includes an `X-Cost` header showing the exact charge.
+
+## Get started
+
+[Sign up](/register) to get your API key, or [try GLM-5.2 in the playground](/playground) first — no account needed.
