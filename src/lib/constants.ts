@@ -154,3 +154,26 @@ export function isDisposableEmail(email: string): boolean {
   const domain = email.split("@")[1]?.toLowerCase();
   return domain ? DISPOSABLE_EMAIL_DOMAINS.includes(domain) : false;
 }
+
+// ── Chart colors (PAGES.md §13.1) ──
+
+export const CHART_COLORS = {
+  primary: "#D97757", // Clay — primary cost series
+  secondary: "#6A9BCC", // Sky — comparison
+  tertiary: "#8FA876", // Olive — savings
+  quaternary: "#D4A27F", // Kraft
+  quinary: "#C46686", // Fig
+} as const;
+
+export const CHART_COLOR_ARRAY = [
+  CHART_COLORS.primary,
+  CHART_COLORS.secondary,
+  CHART_COLORS.tertiary,
+  CHART_COLORS.quaternary,
+  CHART_COLORS.quinary,
+] as const;
+
+/** Map a zero-based index to a chart color, cycling through the palette. */
+export function getChartColor(index: number): string {
+  return CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length] ?? CHART_COLORS.primary;
+}
