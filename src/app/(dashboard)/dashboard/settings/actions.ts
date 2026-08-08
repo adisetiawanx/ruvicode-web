@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getSession } from "@/lib/session";
 import { updateProfileSchema } from "@/lib/validations/keys";
+import { changePasswordSchema } from "@/lib/validations/auth";
 
 export async function updateProfileAction(input: unknown) {
   const session = await getSession();
@@ -34,6 +35,54 @@ export async function updateProfileAction(input: unknown) {
       ok: false,
       message: "Failed to update profile. Please try again.",
     };
+  }
+}
+
+export async function changePasswordAction(input: {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}): Promise<
+  | { ok: true }
+  | { ok: false; errors?: Record<string, string[]>; message: string }
+> {
+  const session = await getSession();
+  if (!session) return { ok: false, message: "Unauthorized" };
+
+  const result = changePasswordSchema.safeParse(input);
+  if (!result.success) {
+    return {
+      ok: false,
+      errors: result.error.flatten().fieldErrors,
+      message: "Please fix the highlighted fields.",
+    } as const;
+  }
+
+  try {
+    const h = await headers();
+    await auth.api.changePassword({
+      headers: h,
+      body: {
+        currentPassword: result.data.currentPassword,
+        newPassword: result.data.newPassword,
+      },
+    });
+
+    revalidatePath("/dashboard/settings");
+    return { ok: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes("Invalid password") || message.includes("incorrect")) {
+      return {
+        ok: false,
+        errors: { currentPassword: ["Current password is incorrect"] },
+        message: "Current password is incorrect.",
+      } as const;
+    }
+    return {
+      ok: false,
+      message: "Failed to change password. Please try again.",
+    } as const;
   }
 }
 

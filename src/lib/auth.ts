@@ -4,20 +4,23 @@ import { env } from "@/lib/env";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { resend, FROM_EMAIL } from "@/lib/email";
-import { renderVerifyEmail, renderPasswordReset } from "@/lib/email/render";
+import { renderPasswordReset } from "@/lib/email/render";
 
 /**
- * Better-auth configuration.
+ * Better-auth configuration (ADR-008 revised — OAuth-First).
  *
- * Uses email/password + OAuth (Google/GitHub) with session-based auth.
- * When DATABASE_URL is configured, uses Drizzle adapter against Postgres.
- * When not configured (local dev without Docker), falls back to
- * memory adapter — auth operations work but don't persist.
+ * Registration is OAuth-only (Google + GitHub). Email/password login
+ * is available for users who set a password after OAuth registration.
  *
- * Email verification (ADR-014): When RESEND_API_KEY is set, verification
- * emails are sent via Resend. Without it, verification URLs are logged
- * to console (local dev fallback).
+ * Account linking (email binding): users who sign in with Google and
+ * GitHub using the same email are automatically linked to one account.
+ * `trustedProviders` ensures OAuth emails are treated as verified.
+ *
+ * Password reset / set: the "forgot password" flow is dual-purpose —
+ * it sets a password for OAuth-only users and resets for users who
+ * have one. Resend sends the reset email.
  */
+
 export const auth = betterAuth({
   database: env.DATABASE_URL
     ? drizzleAdapter(db, {
@@ -29,14 +32,17 @@ export const auth = betterAuth({
           verification: schema.verification,
         },
       })
-    : undefined, // Falls back to memory adapter
+    : undefined, // Falls back to memory adapter in dev without Docker
   secret: env.BETTER_AUTH_SECRET ?? "dev-only-insecure-secret-not-for-prod",
   baseURL: env.BETTER_AUTH_URL,
+
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    // No email verification required — all users register via trusted OAuth
+    requireEmailVerification: false,
     minPasswordLength: 8,
     maxPasswordLength: 128,
+    // Dual-purpose: sends reset/set password email via Resend
     sendResetPassword: async ({ user, url }) => {
       if (!resend) {
         console.log(`[DEV] Password reset email for ${user.email}: ${url}`);
@@ -48,11 +54,12 @@ export const auth = betterAuth({
       await resend.emails.send({
         from: FROM_EMAIL,
         to: user.email,
-        subject: "Reset your password — Ruvicode",
+        subject: "Set your password — Ruvicode",
         html,
       });
     },
   },
+
   socialProviders: {
     google: env.GOOGLE_CLIENT_ID
       ? {
@@ -67,33 +74,24 @@ export const auth = betterAuth({
         }
       : undefined,
   },
+
+  // Email binding — same email across providers = same account
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "github"],
+    },
+  },
+
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // Update session every 24h
   },
+
   rateLimit: {
     enabled: true,
     window: 10, // 10 seconds between requests
     max: 5, // Max 5 requests per window per IP
-  },
-  // Email verification — hooked into Resend (ADR-014)
-  emailVerification: {
-    sendVerificationEmail: async ({ user, url }) => {
-      if (!resend) {
-        // Local dev fallback — log to console instead of sending
-        console.log(`[DEV] Verification email for ${user.email}: ${url}`);
-        return;
-      }
-
-      const html = await renderVerifyEmail(url, user.name);
-
-      await resend.emails.send({
-        from: FROM_EMAIL,
-        to: user.email,
-        subject: "Verify your email — Ruvicode",
-        html,
-      });
-    },
   },
 });
 

@@ -12,7 +12,7 @@ import type { NextRequest } from "next/server";
 const protectedPaths = ["/dashboard"];
 
 // Paths that should NOT be accessible when logged in
-const authPaths = ["/login", "/register"];
+const authPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -39,5 +39,11 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: [
+    "/dashboard/:path*",
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+  ],
 };

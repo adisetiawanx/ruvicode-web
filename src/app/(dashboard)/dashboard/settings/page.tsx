@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { getSession } from "@/lib/session";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { ProfileForm } from "@/components/dashboard/profile-form";
+import { SecuritySection } from "@/components/dashboard/security-section";
 import { DeleteAccountButton } from "@/components/dashboard/delete-account-button";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 
@@ -17,6 +20,20 @@ export default async function SettingsPage() {
 
   const user = session.user;
 
+  // Fetch linked accounts to show which providers are connected
+  let linkedProviders: string[] = [];
+  let hasPassword = false;
+  try {
+    const h = await headers();
+    const accounts = await auth.api.listUserAccounts({ headers: h });
+    linkedProviders = accounts.map((a: { providerId: string }) => a.providerId);
+    hasPassword = accounts.some(
+      (a: { providerId: string }) => a.providerId === "credential",
+    );
+  } catch {
+    // Non-critical — just don't show provider list
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold text-text-primary">Settings</h1>
@@ -30,6 +47,17 @@ export default async function SettingsPage() {
           initialName={user.name ?? ""}
           initialEmail={user.email}
           emailVerified={user.emailVerified ?? false}
+        />
+      </section>
+
+      {/* Security */}
+      <section className="rounded-lg border border-border-default bg-surface p-6">
+        <h2 className="mb-4 text-lg font-semibold text-text-primary">
+          Security
+        </h2>
+        <SecuritySection
+          hasPassword={hasPassword}
+          linkedProviders={linkedProviders}
         />
       </section>
 
