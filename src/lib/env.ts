@@ -21,6 +21,12 @@ export const env = createEnv({
     PROVIDER_BASE_URL: z.string().url().optional(),
     UPSTASH_REDIS_REST_URL: z.string().optional(),
     UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+    // Paddle (ADR-015)
+    PADDLE_API_KEY: z.string().optional(),
+    PADDLE_WEBHOOK_SECRET: z.string().optional(),
+    PADDLE_ENV: z.enum(["sandbox", "production"]).optional().default("sandbox"),
+    // Resend (ADR-014)
+    RESEND_API_KEY: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -38,6 +44,10 @@ export const env = createEnv({
     PROVIDER_BASE_URL: process.env.PROVIDER_BASE_URL,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    PADDLE_API_KEY: process.env.PADDLE_API_KEY,
+    PADDLE_WEBHOOK_SECRET: process.env.PADDLE_WEBHOOK_SECRET,
+    PADDLE_ENV: process.env.PADDLE_ENV,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },

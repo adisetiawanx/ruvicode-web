@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx drizzle/seed.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -16,6 +20,7 @@
     "@next/mdx": "^16.3.0",
     "@paddle/paddle-js": "^1.6.4",
     "@paddle/paddle-node-sdk": "^3.8.0",
+    "@react-email/components": "^1.0.12",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.2",
@@ -41,6 +46,7 @@
     "reading-time": "^1.5.0",
     "recharts": "^3.10.1",
     "rehype-pretty-code": "^0.14.5",
+    "resend": "^6.18.1",
     "schema-dts": "^2.0.0",
     "shadcn": "^4.16.1",
     "shiki": "^4.4.1",
@@ -62,6 +68,7 @@
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.10",
     "typescript": "^5"
   },
   "packageManager": "pnpm@11.20.0"

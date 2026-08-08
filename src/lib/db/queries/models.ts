@@ -8,7 +8,7 @@
  * automatically by the ORM. No raw SQL strings are ever used.
  */
 
-import { MODEL_PRICES, type ModelPricing } from "@/lib/db/schema";
+import { MODEL_PRICES, type ModelPricing } from "@/lib/db/seed-data";
 
 export type ModelWithPricing = ModelPricing;
 

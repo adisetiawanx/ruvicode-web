@@ -1,280 +1,404 @@
 /**
- * Model pricing data — static seed data for local development.
+ * Drizzle ORM schema — canonical database schema for Ruvicode.
  *
- * This mirrors the `model_prices` table schema (DESIGN.md §12) and will be
- * replaced by Drizzle ORM queries once Postgres is provisioned.
- * The query interface in `src/lib/db/queries/models.ts` stays identical so
- * the swap is a one-file change.
+ * This file is the single source of truth for both the Next.js dashboard
+ * (Drizzle ORM) and the Go gateway (structs matching these table/column names).
+ * The Go backend uses golang-migrate with SQL files generated from this schema.
  *
- * Pricing data sourced from PROJECT.md §6 verified margin table.
+ * Better-auth manages 4 core tables: user, session, account, verification.
+ * We define them here so Drizzle relations work and migrations are unified.
+ * Reference: https://www.better-auth.com/docs/concepts/database
+ *
+ * Business tables (9): api_keys, wallets, usage_records, topups, model_prices,
+ * deposit_addresses, usage_hourly, provider_keys.
+ *
+ * Security: keyHash is unique (prevents duplicate keys), paddleTransactionId
+ * and usdcTxHash are unique (idempotency for webhooks/deposits).
  */
 
-export interface ModelPricing {
-  model: string;
-  display_name: string;
-  provider: string;
-  ref_input: number; // OpenRouter reference $/1M input
-  ref_output: number; // OpenRouter reference $/1M output
-  user_input: number; // Ruvicode user $/1M input
-  user_output: number; // Ruvicode user $/1M output
-  discount_pct: number; // Provider discount %
-  user_discount_pct: number; // User discount % (provider - 20pp)
-  context: string; // Context window
-  capabilities: string[]; // e.g. ["text", "vision", "tools", "reasoning"]
-  is_active: boolean;
-}
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  integer,
+  decimal,
+  pgEnum,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 
-export const MODEL_PRICES: readonly ModelPricing[] = [
+// ════════════════════════════════════════════════════════
+// ENUMS
+// ════════════════════════════════════════════════════════
+
+export const topupMethodEnum = pgEnum("topup_method", ["paddle", "usdc"]);
+export const topupStatusEnum = pgEnum("topup_status", [
+  "pending",
+  "completed",
+  "failed",
+]);
+export const usageStatusEnum = pgEnum("usage_status", [
+  "completed",
+  "failed",
+  "partial",
+]);
+
+// ════════════════════════════════════════════════════════
+// USERS — Better-auth core table
+// Better-auth creates this on first run; we define it here for
+// Drizzle relations and unified migrations.
+// Reference: https://www.better-auth.com/docs/concepts/database#user
+// ════════════════════════════════════════════════════════
+
+export const user = pgTable("user", {
+  id: text("id").primaryKey(), // Better-auth uses text IDs
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  name: text("name"),
+  image: text("image"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const userRelations = relations(user, ({ many }) => ({
+  apiKeys: many(apiKeys),
+  wallet: many(wallets),
+  usageRecords: many(usageRecords),
+  topups: many(topups),
+  depositAddresses: many(depositAddresses),
+}));
+
+// ════════════════════════════════════════════════════════
+// SESSION — Better-auth core table
+// ════════════════════════════════════════════════════════
+
+export const session = pgTable("session", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, { fields: [session.userId], references: [user.id] }),
+}));
+
+// ════════════════════════════════════════════════════════
+// ACCOUNT — Better-auth core table (OAuth + credential accounts)
+// ════════════════════════════════════════════════════════
+
+export const account = pgTable("account", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  scope: text("scope"),
+  idToken: text("id_token"),
+  password: text("password"), // Hashed — for email/password accounts
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, { fields: [account.userId], references: [user.id] }),
+}));
+
+// ════════════════════════════════════════════════════════
+// VERIFICATION — Better-auth core table (email verification, reset tokens)
+// ════════════════════════════════════════════════════════
+
+export const verification = pgTable("verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ════════════════════════════════════════════════════════
+// API KEYS
+// Written by: Next.js dashboard (create/revoke)
+// Read by: Go gateway (validate at runtime via Redis cache)
+// ════════════════════════════════════════════════════════
+
+export const apiKeys = pgTable(
+  "api_keys",
   {
-    model: "claude-opus-4.7",
-    display_name: "Claude Opus 4.7",
-    provider: "Anthropic",
-    ref_input: 5.0,
-    ref_output: 25.0,
-    user_input: 3.95,
-    user_output: 19.75,
-    discount_pct: 41.0,
-    user_discount_pct: 21.0,
-    context: "200K",
-    capabilities: ["text", "vision", "tools", "reasoning"],
-    is_active: true,
+    id: text("id").primaryKey(), // UUID string — better-auth style
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    label: text("label").notNull().default("Default"),
+    keyPrefix: text("key_prefix").notNull(), // first 8 chars after rvcd_ for identification
+    keyHash: text("key_hash").notNull().unique(), // SHA-256 of full key
+    rateLimitRpm: integer("rate_limit_rpm").notNull().default(60),
+    spendLimitDaily: decimal("spend_limit_daily", { precision: 10, scale: 4 }),
+    spendLimitMonthly: decimal("spend_limit_monthly", {
+      precision: 10,
+      scale: 4,
+    }),
+    isActive: boolean("is_active").notNull().default(true),
+    lastUsedAt: timestamp("last_used_at"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    revokedAt: timestamp("revoked_at"),
   },
+  (table) => ({
+    // Only index active keys for fast gateway lookup
+    hashIdx: uniqueIndex("idx_api_keys_hash").on(table.keyHash),
+    userIdx: index("idx_api_keys_user").on(table.userId),
+  }),
+);
+
+export const apiKeysRelations = relations(apiKeys, ({ one, many }) => ({
+  user: one(user, { fields: [apiKeys.userId], references: [user.id] }),
+  usageRecords: many(usageRecords),
+}));
+
+// ════════════════════════════════════════════════════════
+// WALLETS
+// One wallet per user. Source of truth for balance.
+// Written by: Go gateway (deduct on API call), Next.js (credit on top-up)
+// ════════════════════════════════════════════════════════
+
+export const wallets = pgTable("wallets", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  balance: decimal("balance", { precision: 12, scale: 6 })
+    .notNull()
+    .default("0"),
+  held: decimal("held", { precision: 12, scale: 6 }).notNull().default("0"),
+  totalLoaded: decimal("total_loaded", { precision: 12, scale: 6 })
+    .notNull()
+    .default("0"),
+  totalSpent: decimal("total_spent", { precision: 12, scale: 6 })
+    .notNull()
+    .default("0"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const walletsRelations = relations(wallets, ({ one }) => ({
+  user: one(user, { fields: [wallets.userId], references: [user.id] }),
+}));
+
+// ════════════════════════════════════════════════════════
+// USAGE RECORDS
+// Written by: Go gateway ONLY (after each API request completes)
+// Read by: Next.js dashboard (usage history, charts)
+// ════════════════════════════════════════════════════════
+
+export const usageRecords = pgTable(
+  "usage_records",
   {
-    model: "claude-sonnet-5",
-    display_name: "Claude Sonnet 5",
-    provider: "Anthropic",
-    ref_input: 2.0,
-    ref_output: 10.0,
-    user_input: 1.7,
-    user_output: 8.5,
-    discount_pct: 35.0,
-    user_discount_pct: 15.0,
-    context: "200K",
-    capabilities: ["text", "vision", "tools", "reasoning"],
-    is_active: true,
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    apiKeyId: text("api_key_id")
+      .notNull()
+      .references(() => apiKeys.id),
+    model: text("model").notNull(),
+    promptTokens: integer("prompt_tokens").notNull(),
+    completionTokens: integer("completion_tokens").notNull(),
+    reasoningTokens: integer("reasoning_tokens").default(0),
+    cost: decimal("cost", { precision: 12, scale: 8 }).notNull(), // amount charged to user
+    upstreamCost: decimal("upstream_cost", { precision: 12, scale: 8 })
+      .notNull()
+      .default("0"), // provider cost
+    // margin = cost - upstream_cost (computed on read; Drizzle doesn't
+    // support GENERATED columns directly, so we calculate in queries)
+    requestId: text("request_id"), // Ruvicode internal trace ID
+    status: usageStatusEnum("status").notNull().default("completed"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
   },
+  (table) => ({
+    userCreatedIdx: index("idx_usage_user_created").on(
+      table.userId,
+      table.createdAt,
+    ),
+    apiKeyIdx: index("idx_usage_api_key").on(table.apiKeyId, table.createdAt),
+    modelIdx: index("idx_usage_model").on(table.model, table.createdAt),
+  }),
+);
+
+export const usageRecordsRelations = relations(usageRecords, ({ one }) => ({
+  user: one(user, { fields: [usageRecords.userId], references: [user.id] }),
+  apiKey: one(apiKeys, {
+    fields: [usageRecords.apiKeyId],
+    references: [apiKeys.id],
+  }),
+}));
+
+// ════════════════════════════════════════════════════════
+// TOPUPS (Billing)
+// Written by: Next.js webhook handler (on Paddle payment success)
+// Read by: Next.js dashboard (billing history)
+// ════════════════════════════════════════════════════════
+
+export const topups = pgTable(
+  "topups",
   {
-    model: "claude-sonnet-4.6",
-    display_name: "Claude Sonnet 4.6",
-    provider: "Anthropic",
-    ref_input: 3.0,
-    ref_output: 15.0,
-    user_input: 2.05,
-    user_output: 10.25,
-    discount_pct: 51.7,
-    user_discount_pct: 31.7,
-    context: "200K",
-    capabilities: ["text", "vision", "tools", "reasoning"],
-    is_active: true,
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+    method: topupMethodEnum("method").notNull(),
+    paddleTransactionId: text("paddle_transaction_id"), // for idempotency
+    usdcTxHash: text("usdc_tx_hash"), // for idempotency
+    status: topupStatusEnum("status").notNull().default("pending"),
+    fee: decimal("fee", { precision: 10, scale: 4 }).notNull().default("0"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    completedAt: timestamp("completed_at"),
   },
+  (table) => ({
+    userCreatedIdx: index("idx_topups_user_created").on(
+      table.userId,
+      table.createdAt,
+    ),
+    paddleIdx: uniqueIndex("idx_topups_paddle").on(table.paddleTransactionId),
+    usdcIdx: uniqueIndex("idx_topups_usdc").on(table.usdcTxHash),
+  }),
+);
+
+export const topupsRelations = relations(topups, ({ one }) => ({
+  user: one(user, { fields: [topups.userId], references: [user.id] }),
+}));
+
+// ════════════════════════════════════════════════════════
+// MODEL PRICES
+// Written by: Go gateway cron (every 2 min from provider market API)
+// Read by: Next.js dashboard (pricing page, model catalog)
+// ════════════════════════════════════════════════════════
+
+export const modelPrices = pgTable(
+  "model_prices",
   {
-    model: "gpt-5.6-sol",
-    display_name: "GPT-5.6-Sol",
-    provider: "OpenAI",
-    ref_input: 5.0,
-    ref_output: 20.0,
-    user_input: 1.15,
-    user_output: 4.6,
-    discount_pct: 97.0,
-    user_discount_pct: 77.0,
-    context: "128K",
-    capabilities: ["text", "tools", "reasoning"],
-    is_active: true,
+    model: text("model").primaryKey(), // e.g., "glm-5.2"
+    displayName: text("display_name"), // e.g., "GLM-5.2"
+    provider: text("provider").notNull().default("provider"),
+    refInput: decimal("ref_input", { precision: 10, scale: 6 }).notNull(),
+    refOutput: decimal("ref_output", { precision: 10, scale: 6 }).notNull(),
+    providerInput: decimal("provider_input", {
+      precision: 10,
+      scale: 6,
+    }).notNull(),
+    providerOutput: decimal("provider_output", {
+      precision: 10,
+      scale: 6,
+    }).notNull(),
+    userInput: decimal("user_input", { precision: 10, scale: 6 }).notNull(),
+    userOutput: decimal("user_output", { precision: 10, scale: 6 }).notNull(),
+    discountPct: decimal("discount_pct", { precision: 5, scale: 2 }).notNull(),
+    userDiscountPct: decimal("user_discount_pct", {
+      precision: 5,
+      scale: 2,
+    }).notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
+  (table) => ({
+    providerIdx: index("idx_model_prices_provider").on(
+      table.provider,
+      table.isActive,
+    ),
+  }),
+);
+
+// ════════════════════════════════════════════════════════
+// DEPOSIT ADDRESSES (USDC)
+// Written by: Next.js (generate on first top-up page visit)
+// Read by: Next.js + Go (monitor for incoming USDC)
+// ════════════════════════════════════════════════════════
+
+export const depositAddresses = pgTable(
+  "deposit_addresses",
   {
-    model: "gpt-5.4",
-    display_name: "GPT-5.4",
-    provider: "OpenAI",
-    ref_input: 2.5,
-    ref_output: 10.0,
-    user_input: 1.0,
-    user_output: 4.0,
-    discount_pct: 80.0,
-    user_discount_pct: 60.0,
-    context: "128K",
-    capabilities: ["text", "vision", "tools", "reasoning"],
-    is_active: true,
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    chain: integer("chain").notNull().default(8453), // Base
+    address: text("address").notNull(),
+    derivationIndex: integer("derivation_index").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
   },
+  (table) => ({
+    uniqueAddress: uniqueIndex("idx_deposit_address").on(
+      table.userId,
+      table.address,
+    ),
+    addressLookup: index("idx_deposit_addr").on(table.address),
+  }),
+);
+
+export const depositAddressesRelations = relations(
+  depositAddresses,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [depositAddresses.userId],
+      references: [user.id],
+    }),
+  }),
+);
+
+// ════════════════════════════════════════════════════════
+// USAGE HOURLY (Aggregation)
+// Written by: Go gateway cron (every 15 min)
+// Read by: Next.js dashboard (charts — fast aggregated reads)
+// ════════════════════════════════════════════════════════
+
+export const usageHourly = pgTable(
+  "usage_hourly",
   {
-    model: "gpt-5.4-mini",
-    display_name: "GPT-5.4 Mini",
-    provider: "OpenAI",
-    ref_input: 0.75,
-    ref_output: 3.0,
-    user_input: 0.315,
-    user_output: 1.26,
-    discount_pct: 78.0,
-    user_discount_pct: 58.0,
-    context: "128K",
-    capabilities: ["text", "vision", "tools"],
-    is_active: true,
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    hourBucket: timestamp("hour_bucket").notNull(), // truncated to hour
+    model: text("model").notNull(),
+    requestCount: integer("request_count").notNull().default(0),
+    totalTokens: integer("total_tokens").notNull().default(0),
+    totalCost: decimal("total_cost", { precision: 12, scale: 6 })
+      .notNull()
+      .default("0"),
   },
-  {
-    model: "gpt-5.5",
-    display_name: "GPT-5.5",
-    provider: "OpenAI",
-    ref_input: 5.0,
-    ref_output: 20.0,
-    user_input: 1.05,
-    user_output: 4.2,
-    discount_pct: 99.0,
-    user_discount_pct: 79.0,
-    context: "128K",
-    capabilities: ["text", "tools", "reasoning"],
-    is_active: true,
-  },
-  {
-    model: "gpt-4o",
-    display_name: "GPT-4o",
-    provider: "OpenAI",
-    ref_input: 2.5,
-    ref_output: 10.0,
-    user_input: 1.125,
-    user_output: 4.5,
-    discount_pct: 75.0,
-    user_discount_pct: 55.0,
-    context: "128K",
-    capabilities: ["text", "vision", "tools"],
-    is_active: true,
-  },
-  {
-    model: "gemini-3.1-pro",
-    display_name: "Gemini 3.1 Pro",
-    provider: "Google",
-    ref_input: 2.0,
-    ref_output: 8.0,
-    user_input: 1.39,
-    user_output: 5.56,
-    discount_pct: 50.5,
-    user_discount_pct: 30.5,
-    context: "1M",
-    capabilities: ["text", "vision", "tools", "reasoning"],
-    is_active: true,
-  },
-  {
-    model: "gemini-3-flash",
-    display_name: "Gemini 3 Flash",
-    provider: "Google",
-    ref_input: 0.5,
-    ref_output: 2.0,
-    user_input: 0.35,
-    user_output: 1.4,
-    discount_pct: 50.0,
-    user_discount_pct: 30.0,
-    context: "1M",
-    capabilities: ["text", "vision", "tools"],
-    is_active: true,
-  },
-  {
-    model: "glm-5.2",
-    display_name: "GLM-5.2",
-    provider: "Zhipu",
-    ref_input: 0.95,
-    ref_output: 3.8,
-    user_input: 0.218,
-    user_output: 0.872,
-    discount_pct: 97.0,
-    user_discount_pct: 77.0,
-    context: "128K",
-    capabilities: ["text", "tools", "reasoning"],
-    is_active: true,
-  },
-  {
-    model: "kimi-k3",
-    display_name: "Kimi K3",
-    provider: "Moonshot",
-    ref_input: 3.0,
-    ref_output: 12.0,
-    user_input: 2.05,
-    user_output: 8.2,
-    discount_pct: 51.7,
-    user_discount_pct: 31.7,
-    context: "256K",
-    capabilities: ["text", "tools", "reasoning"],
-    is_active: true,
-  },
-  {
-    model: "kimi-k2.5",
-    display_name: "Kimi K2.5",
-    provider: "Moonshot",
-    ref_input: 0.375,
-    ref_output: 1.5,
-    user_input: 0.222,
-    user_output: 0.888,
-    discount_pct: 60.8,
-    user_discount_pct: 40.8,
-    context: "256K",
-    capabilities: ["text", "tools"],
-    is_active: true,
-  },
-  {
-    model: "deepseek-v4-flash",
-    display_name: "DeepSeek V4 Flash",
-    provider: "DeepSeek",
-    ref_input: 0.09,
-    ref_output: 0.36,
-    user_input: 0.027,
-    user_output: 0.108,
-    discount_pct: 90.0,
-    user_discount_pct: 70.0,
-    context: "64K",
-    capabilities: ["text", "reasoning"],
-    is_active: true,
-  },
-  {
-    model: "deepseek-v4-pro",
-    display_name: "DeepSeek V4 Pro",
-    provider: "DeepSeek",
-    ref_input: 0.435,
-    ref_output: 1.74,
-    user_input: 0.13,
-    user_output: 0.52,
-    discount_pct: 90.1,
-    user_discount_pct: 70.1,
-    context: "64K",
-    capabilities: ["text", "reasoning"],
-    is_active: true,
-  },
-  {
-    model: "grok-4.5",
-    display_name: "Grok 4.5",
-    provider: "xAI",
-    ref_input: 2.0,
-    ref_output: 8.0,
-    user_input: 1.6,
-    user_output: 6.4,
-    discount_pct: 40.0,
-    user_discount_pct: 20.0,
-    context: "128K",
-    capabilities: ["text", "tools", "reasoning"],
-    is_active: true,
-  },
-  {
-    model: "qwen-3-max",
-    display_name: "Qwen 3 Max",
-    provider: "Alibaba",
-    ref_input: 1.6,
-    ref_output: 6.4,
-    user_input: 0.8,
-    user_output: 3.2,
-    discount_pct: 70.0,
-    user_discount_pct: 50.0,
-    context: "128K",
-    capabilities: ["text", "tools", "reasoning"],
-    is_active: true,
-  },
-  {
-    model: "qwen-3-coder",
-    display_name: "Qwen 3 Coder",
-    provider: "Alibaba",
-    ref_input: 0.7,
-    ref_output: 2.8,
-    user_input: 0.35,
-    user_output: 1.4,
-    discount_pct: 65.0,
-    user_discount_pct: 45.0,
-    context: "256K",
-    capabilities: ["text", "tools"],
-    is_active: true,
-  },
-] as const;
+  (table) => ({
+    pk: uniqueIndex("idx_usage_hourly_pk").on(
+      table.userId,
+      table.hourBucket,
+      table.model,
+    ),
+  }),
+);
+
+// ════════════════════════════════════════════════════════
+// PROVIDER KEYS (Operational)
+// Written by: Manual (DB seed or admin)
+// Read by: Go gateway (key pool rotation)
+// Named "provider_keys" (not "provider_keys") per provider-abstraction rule
+// ════════════════════════════════════════════════════════
+
+export const providerKeys = pgTable("provider_keys", {
+  id: text("id").primaryKey(),
+  keyLabel: text("key_label").notNull(),
+  keyPrefix: text("key_prefix").notNull(), // first 8 chars after inf_
+  isActive: boolean("is_active").notNull().default(true),
+  lastHealthCheck: timestamp("last_health_check"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
