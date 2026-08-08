@@ -287,8 +287,33 @@
    GLOBAL BASE STYLES
    ═══════════════════════════════════════════════════════════════════ */
 
+/* Only elements that explicitly have a border get our warm border color.
+   Don't apply border-color to * (causes visible outlines on native elements). */
 * {
-  border-color: var(--border-default);
+  border-color: var(--border-subtle);
+}
+
+/* Remove default outlines on native elements (buttons, inputs) — we use
+   custom focus rings instead. Prevents white/blue native outlines. */
+button,
+input,
+textarea,
+select,
+a,
+summary {
+  outline: none;
+}
+
+/* Focus ring — Clay accent, visible only on keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Mouse users don't see outline */
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 body {
@@ -307,12 +332,6 @@ body {
 ::selection {
   background-color: var(--accent-subtle);
   color: var(--text-primary);
-}
-
-/* Focus ring */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 /* Custom scrollbar (dark mode) */
@@ -390,9 +409,4 @@ body {
 }
 [data-sonner-toast][data-type="info"] {
   border-left: 3px solid var(--info) !important;
-}
-
-/* Focus indicator — mouse users don't see outline */
-:focus:not(:focus-visible) {
-  outline: none;
 }

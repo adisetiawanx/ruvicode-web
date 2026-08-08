@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Copy, Check, Coins, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import QRCode from "qrcode";
 
 interface TopUpUSDCProps {
   address: string;
@@ -10,6 +11,21 @@ interface TopUpUSDCProps {
 
 export function TopUpUSDC({ address }: TopUpUSDCProps) {
   const [copied, setCopied] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+
+  // Generate QR code from deposit address on mount
+  useEffect(() => {
+    QRCode.toDataURL(address, {
+      width: 192,
+      margin: 1,
+      color: {
+        dark: "#0F0F0E", // warm near-black
+        light: "#FAF9F5", // ivory
+      },
+    })
+      .then(setQrDataUrl)
+      .catch(() => setQrDataUrl(null));
+  }, [address]);
 
   const handleCopy = async () => {
     try {
@@ -29,16 +45,27 @@ export function TopUpUSDC({ address }: TopUpUSDCProps) {
         <h3 className="font-semibold text-text-primary">Pay by USDC</h3>
       </div>
 
-      {/* QR Code placeholder — in production, generate from address */}
+      {/* QR Code — scan with mobile wallet to deposit */}
       <div className="mb-4 flex justify-center">
-        <div className="flex h-48 w-48 items-center justify-center rounded-lg border border-border-default bg-canvas p-3">
-          <div className="flex h-full w-full items-center justify-center rounded border border-dashed border-border-strong text-center">
-            <span className="px-4 text-xs text-text-muted">
-              QR code will appear here
-            </span>
-          </div>
+        <div className="rounded-lg border border-border-default bg-canvas p-3">
+          {qrDataUrl ? (
+            <img
+              src={qrDataUrl}
+              alt="Deposit address QR code"
+              className="h-44 w-44 rounded"
+              width={176}
+              height={176}
+            />
+          ) : (
+            <div className="flex h-44 w-44 items-center justify-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-border-default border-t-accent" />
+            </div>
+          )}
         </div>
       </div>
+      <p className="mb-4 text-center text-xs text-text-muted">
+        Scan with your wallet app to deposit
+      </p>
 
       {/* Address */}
       <div className="mb-4 flex items-center gap-2 rounded-md border border-border-default bg-canvas p-3">

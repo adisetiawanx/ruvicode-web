@@ -55,9 +55,9 @@ export function getAllPosts(): BlogPost[] {
 }
 
 export function getPostBySlug(slug: string): BlogPost | null {
-  // SECURITY: Validate slug format — only allow alphanumeric + hyphens.
-  // Prevents path traversal (../../../etc/passwd).
-  if (!/^[a-z0-9-]+$/.test(slug)) return null;
+  // SECURITY: Validate slug format — allow alphanumeric, hyphens, and dots
+  // (for model names like glm-5.2). Prevents path traversal (../../../etc/passwd).
+  if (!/^[a-z0-9.-]+$/.test(slug) || slug.includes("..")) return null;
 
   const fullPath = path.join(BLOG_DIR, `${slug}.mdx`);
   if (!fs.existsSync(fullPath)) return null;

@@ -5,7 +5,6 @@ import { headers } from "next/headers";
 import { ProfileForm } from "@/components/dashboard/profile-form";
 import { SecuritySection } from "@/components/dashboard/security-section";
 import { DeleteAccountButton } from "@/components/dashboard/delete-account-button";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -59,22 +58,6 @@ export default async function SettingsPage() {
           hasPassword={hasPassword}
           linkedProviders={linkedProviders}
         />
-      </section>
-
-      {/* Preferences */}
-      <section className="rounded-lg border border-border-default bg-surface p-6">
-        <h2 className="mb-4 text-lg font-semibold text-text-primary">
-          Preferences
-        </h2>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-text-primary">Theme</p>
-            <p className="text-xs text-text-muted">
-              Toggle between dark and light mode
-            </p>
-          </div>
-          <ThemeToggle />
-        </div>
       </section>
 
       {/* Danger zone */}

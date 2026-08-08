@@ -10,6 +10,8 @@ import {
   Wallet,
   Settings,
   Menu,
+  LogOut,
+  Tags,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,6 +23,8 @@ import {
 } from "@/components/ui/sheet";
 import { Logo } from "@/components/shared/logo";
 import { LinkButton } from "@/components/shared/link-button";
+import { authClient } from "@/lib/auth-client";
+import { BalanceRefreshButton } from "@/components/dashboard/balance-refresh-button";
 
 interface NavItem {
   href: string;
@@ -34,22 +38,35 @@ const navItems: NavItem[] = [
   { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/dashboard/topup", label: "Top Up", icon: Wallet },
+  { href: "/dashboard/models", label: "Models & Pricing", icon: Tags },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 /** Desktop sidebar (persistent, md+). */
-export function DashboardSidebar() {
+export function DashboardSidebar({
+  balance,
+  userId,
+}: {
+  balance: string;
+  userId: string;
+}) {
   const pathname = usePathname();
 
   return (
     <aside className="sticky top-0 hidden h-screen w-60 flex-col border-r border-border-subtle bg-canvas md:flex">
-      <SidebarContent pathname={pathname} />
+      <SidebarContent pathname={pathname} balance={balance} userId={userId} />
     </aside>
   );
 }
 
 /** Mobile sidebar trigger + slide-in sheet. */
-export function MobileSidebarTrigger() {
+export function MobileSidebarTrigger({
+  balance,
+  userId,
+}: {
+  balance: string;
+  userId: string;
+}) {
   const pathname = usePathname();
 
   return (
@@ -67,13 +84,21 @@ export function MobileSidebarTrigger() {
         <Menu className="h-5 w-5" />
       </SheetTrigger>
       <SheetContent side="left" className="w-60 bg-canvas p-0">
-        <SidebarContent pathname={pathname} />
+        <SidebarContent pathname={pathname} balance={balance} userId={userId} />
       </SheetContent>
     </Sheet>
   );
 }
 
-function SidebarContent({ pathname }: { pathname: string }) {
+function SidebarContent({
+  pathname,
+  balance,
+  userId,
+}: {
+  pathname: string;
+  balance: string;
+  userId: string;
+}) {
   return (
     <div className="flex h-full flex-col">
       {/* Logo header */}
@@ -110,18 +135,38 @@ function SidebarContent({ pathname }: { pathname: string }) {
         })}
       </nav>
 
+      {/* Logout button */}
+      <div className="px-3 pb-1">
+        <button
+          onClick={async () => {
+            await authClient.signOut();
+            window.location.href = "/login";
+          }}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary"
+        >
+          <LogOut className="h-4 w-4" />
+          Sign Out
+        </button>
+      </div>
+
       {/* Balance card at bottom */}
-      <BalanceSidebarCard />
+      <BalanceSidebarCard balance={balance} userId={userId} />
     </div>
   );
 }
 
-function BalanceSidebarCard() {
+function BalanceSidebarCard({
+  balance,
+  userId,
+}: {
+  balance: string;
+  userId: string;
+}) {
   return (
     <div className="border-t border-border-subtle p-3">
       <div className="space-y-2 rounded-lg bg-surface p-4">
         <p className="text-xs text-text-secondary">Balance</p>
-        <p className="font-mono text-2xl tabular text-text-primary">$12.50</p>
+        <BalanceRefreshButton initialBalance={balance} userId={userId} />
         <LinkButton
           href="/dashboard/topup"
           variant="primary"
