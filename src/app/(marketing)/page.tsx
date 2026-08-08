@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import type { Organization, FAQPage, WithContext } from "schema-dts";
 import { HeroSection } from "@/components/marketing/hero-section";
 import { StatBar } from "@/components/marketing/stat-bar";
 import { FeatureGrid } from "@/components/marketing/feature-grid";
@@ -11,6 +10,11 @@ import { FAQS } from "@/lib/constants";
 import { CODE_SAMPLES } from "@/lib/code-samples";
 import { highlightCode } from "@/lib/shiki";
 import type { CodeTab } from "@/components/marketing/code-demo";
+import {
+  organizationJsonLd,
+  faqJsonLd,
+  JsonLdScript,
+} from "@/lib/seo/json-ld";
 
 export const revalidate = 3600; // SSG — hourly refresh for model data
 
@@ -43,35 +47,10 @@ export default async function LandingPage() {
     })),
   );
 
-  const orgJsonLd: WithContext<Organization> = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Ruvicode",
-    url: "https://ruvicode.com",
-    description:
-      "Transparent AI API gateway with unified access to 20+ AI models.",
-  };
-
-  const faqJsonLd: WithContext<FAQPage> = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQS.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
+      <JsonLdScript data={organizationJsonLd()} />
+      <JsonLdScript data={faqJsonLd(FAQS as unknown as Array<{ q: string; a: string }>)} />
       <HeroSection codeTabs={codeTabs} />
       <StatBar />
       <FeatureGrid />

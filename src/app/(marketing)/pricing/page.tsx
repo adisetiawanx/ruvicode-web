@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import type { FAQPage, Product, BreadcrumbList, WithContext } from "schema-dts";
 import { getAllActiveModels } from "@/lib/db/queries/models";
 import { PricingHero } from "@/components/marketing/pricing-hero";
 import { HowPricingWorks } from "@/components/marketing/how-pricing-works";
@@ -9,6 +8,12 @@ import { TopUpTiers } from "@/components/marketing/topup-tiers";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { Container } from "@/components/layout/container";
 import { PRICING_FAQS } from "@/lib/pricing-faqs";
+import {
+  productJsonLd,
+  faqJsonLd,
+  breadcrumbJsonLd,
+  JsonLdScript,
+} from "@/lib/seo/json-ld";
 
 export const revalidate = 300; // SSR — 5 minute revalidation
 
@@ -35,63 +40,24 @@ export const metadata: Metadata = {
 export default async function PricingPage() {
   const models = await getAllActiveModels();
 
-  const productJsonLd: WithContext<Product> = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: "Ruvicode AI API Access",
-    description:
-      "Unified API access to 20+ AI models with transparent per-request pricing.",
-    brand: { "@type": "Brand", name: "Ruvicode" },
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "USD",
-      price: "0.00",
-      description: "Pay-per-request. Top up starting at $5.",
-    },
-  };
-
-  const faqJsonLd: WithContext<FAQPage> = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: PRICING_FAQS.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
-
-  const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://ruvicode.com",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Pricing",
-        item: "https://ruvicode.com/pricing",
-      },
-    ],
-  };
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      <JsonLdScript
+        data={productJsonLd({
+          name: "Ruvicode AI API Access",
+          description:
+            "Unified API access to 20+ AI models with transparent per-request pricing.",
+          price: "0.00",
+        })}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      <JsonLdScript
+        data={faqJsonLd(PRICING_FAQS as unknown as Array<{ q: string; a: string }>)}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      <JsonLdScript
+        data={breadcrumbJsonLd([
+          { name: "Home", url: "" },
+          { name: "Pricing", url: "/pricing" },
+        ])}
       />
       <PricingHero />
       <HowPricingWorks />
