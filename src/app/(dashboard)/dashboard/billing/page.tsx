@@ -4,6 +4,7 @@ import { getTopups } from "@/lib/db/queries/management";
 import { getWallet } from "@/lib/db/queries/dashboard";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { BalanceCard } from "@/components/dashboard/balance-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Receipt } from "lucide-react";
 
@@ -29,8 +30,9 @@ export default async function BillingPage() {
         Billing History
       </h1>
 
-      {/* Summary cards */}
+      {/* Summary cards — Balance first (same style as overview) */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <BalanceCard balance={wallet.balance} held={wallet.held} />
         <StatCard
           label="Total Loaded"
           value={`$${Number(wallet.totalLoaded).toFixed(2)}`}
@@ -38,11 +40,6 @@ export default async function BillingPage() {
         <StatCard
           label="Total Spent"
           value={`$${Number(wallet.totalSpent).toFixed(2)}`}
-        />
-        <StatCard
-          label="Current Balance"
-          value={`$${(Number(wallet.balance) - Number(wallet.held)).toFixed(2)}`}
-          accent
         />
       </div>
 

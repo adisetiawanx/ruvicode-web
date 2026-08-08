@@ -3,6 +3,10 @@ import type { BreadcrumbList, WithContext } from "schema-dts";
 import { getAllActiveModels } from "@/lib/db/queries/models";
 import { PlaygroundChat } from "@/components/marketing/playground-chat";
 import { Container } from "@/components/layout/container";
+import {
+  PageEntrance,
+  PageEntranceItem,
+} from "@/components/shared/page-entrance";
 
 export const metadata: Metadata = {
   title: "AI Playground — Try 20+ Models Free | Ruvicode",
@@ -52,11 +56,17 @@ export default async function PlaygroundPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Container size="wide" className="py-12">
-        <h1 className="mb-2 text-h1 font-semibold">AI Playground</h1>
-        <p className="mb-8 text-text-secondary">
-          Try any model. No account needed. 5 free requests per hour.
-        </p>
-        <PlaygroundChat models={models} />
+        <PageEntrance>
+          <PageEntranceItem>
+            <h1 className="mb-2 text-h1 font-semibold">AI Playground</h1>
+            <p className="mb-8 text-text-secondary">
+              Try any model. No account needed. 5 free requests per hour.
+            </p>
+          </PageEntranceItem>
+          <PageEntranceItem>
+            <PlaygroundChat models={models} />
+          </PageEntranceItem>
+        </PageEntrance>
       </Container>
     </>
   );

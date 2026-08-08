@@ -20,7 +20,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen">
-      <DashboardSidebar balance={wallet.balance} userId={session.user.id} />
+      <DashboardSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <DashboardHeader balance={wallet.balance} userId={session.user.id} />
         <main id="main-content" className="flex-1 p-6 md:p-8">

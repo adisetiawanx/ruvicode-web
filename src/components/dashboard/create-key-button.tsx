@@ -93,7 +93,7 @@ export function CreateKeyButton() {
           </Button>
         }
       />
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         {createdKey ? (
           <>
             <DialogHeader>
@@ -108,10 +108,10 @@ export function CreateKeyButton() {
           </>
         ) : (
           <form onSubmit={handleSubmit}>
-            <DialogHeader>
+            <DialogHeader className="mb-2">
               <DialogTitle>Create API Key</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {/* Label */}
               <div className="space-y-1.5">
                 <Label htmlFor="key-label">Label</Label>
@@ -219,7 +219,7 @@ export function CreateKeyButton() {
                 </div>
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="mt-6">
               <DialogClose render={<Button variant="outline" />}>
                 Cancel
               </DialogClose>

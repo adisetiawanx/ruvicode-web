@@ -7,6 +7,10 @@ import { ComparisonSection } from "@/components/marketing/comparison-section";
 import { TopUpTiers } from "@/components/marketing/topup-tiers";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { Container } from "@/components/layout/container";
+import {
+  PageEntrance,
+  PageEntranceItem,
+} from "@/components/shared/page-entrance";
 import { PRICING_FAQS } from "@/lib/pricing-faqs";
 import {
   productJsonLd,
@@ -59,19 +63,33 @@ export default async function PricingPage() {
           { name: "Pricing", url: "/pricing" },
         ])}
       />
-      <PricingHero />
-      <HowPricingWorks />
-      <section className="border-b border-border-subtle py-20">
-        <Container size="wide">
-          <h2 className="mb-12 text-center text-3xl font-semibold">
-            Model pricing
-          </h2>
-          <PricingTable models={models} />
-        </Container>
-      </section>
-      <ComparisonSection />
-      <TopUpTiers />
-      <FaqSection faqs={PRICING_FAQS} />
+      <PageEntrance>
+        <PageEntranceItem>
+          <PricingHero />
+        </PageEntranceItem>
+        <PageEntranceItem>
+          <HowPricingWorks />
+        </PageEntranceItem>
+        <PageEntranceItem>
+          <section className="border-b border-border-subtle py-20">
+            <Container size="wide">
+              <h2 className="mb-12 text-center text-3xl font-semibold">
+                Model pricing
+              </h2>
+              <PricingTable models={models} />
+            </Container>
+          </section>
+        </PageEntranceItem>
+        <PageEntranceItem>
+          <ComparisonSection />
+        </PageEntranceItem>
+        <PageEntranceItem>
+          <TopUpTiers />
+        </PageEntranceItem>
+        <PageEntranceItem>
+          <FaqSection faqs={PRICING_FAQS} />
+        </PageEntranceItem>
+      </PageEntrance>
     </>
   );
 }

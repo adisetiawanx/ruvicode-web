@@ -3,17 +3,14 @@ import { cn } from "@/lib/utils";
 /**
  * Skeleton loading placeholder with shimmer animation (PAGES.md §9).
  *
- * Uses `skeleton-shimmer` class (defined in globals.css) for a left-to-right
- * gradient sweep. Background is surface-2 (dark warm tone, not gray).
+ * The `skeleton-shimmer` class (defined in globals.css) uses a
+ * background-position sweep — no pseudo-element, no overflow clipping.
  */
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="skeleton"
-      className={cn(
-        "skeleton-shimmer relative overflow-hidden rounded-md bg-surface-2",
-        className,
-      )}
+      className={cn("skeleton-shimmer rounded-md", className)}
       {...props}
     />
   );
