@@ -365,3 +365,34 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SONNER TOAST OVERRIDES (PAGES.md §8.7)
+   Dark theme styling with colored left borders per toast type.
+   ═══════════════════════════════════════════════════════════════════ */
+[data-sonner-toast] {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-default) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-popover) !important;
+  border-radius: var(--radius-lg) !important;
+  font-family: var(--font-geist-sans), system-ui, sans-serif !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  border-left: 3px solid var(--success) !important;
+}
+[data-sonner-toast][data-type="error"] {
+  border-left: 3px solid var(--error) !important;
+}
+[data-sonner-toast][data-type="warning"] {
+  border-left: 3px solid var(--warning) !important;
+}
+[data-sonner-toast][data-type="info"] {
+  border-left: 3px solid var(--info) !important;
+}
+
+/* Focus indicator — mouse users don't see outline */
+:focus:not(:focus-visible) {
+  outline: none;
+}

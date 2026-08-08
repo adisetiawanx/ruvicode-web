@@ -1,22 +1,35 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { ErrorState } from "@/components/shared/error-state";
 
+/**
+ * Global error boundary (ADR-012 §4).
+ * Catches unhandled errors in any route segment.
+ * Logs to console (MVP) — will forward to Sentry/Axiom in production.
+ *
+ * SECURITY: Does NOT expose stack trace or error.message to the user.
+ * Only generic message + retry action.
+ */
 export default function GlobalError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    // Log to observability (console for MVP, Sentry/Axiom later)
+    console.error("Global error boundary:", error.digest ?? "unknown error");
+  }, [error]);
+
   return (
-    <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
-      <h1 className="mb-2 text-2xl font-semibold">Something went wrong.</h1>
-      <p className="mb-8 max-w-md text-text-secondary">
-        An unexpected error occurred. You can try again.
-      </p>
-      <Button variant="primary" onClick={reset}>
-        Try again
-      </Button>
+    <div className="flex min-h-[80vh] items-center justify-center">
+      <ErrorState
+        title="Something went wrong"
+        description="An unexpected error occurred. Our team has been notified. You can try again."
+        retryAction={reset}
+      />
     </div>
   );
 }

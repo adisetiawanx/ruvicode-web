@@ -55,7 +55,14 @@ export function MobileSidebarTrigger() {
   return (
     <Sheet>
       <SheetTrigger
-        render={<Button variant="ghost" size="icon" className="md:hidden" />}
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            aria-label="Open navigation menu"
+          />
+        }
       >
         <Menu className="h-5 w-5" />
       </SheetTrigger>
