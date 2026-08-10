@@ -390,7 +390,7 @@ export const usageHourly = pgTable(
 // PROVIDER KEYS (Operational)
 // Written by: Manual (DB seed or admin)
 // Read by: Go gateway (key pool rotation)
-// Named "provider_keys" (not "provider_keys") per provider-abstraction rule
+// Named "provider_keys" (per the provider-abstraction rule)
 // ════════════════════════════════════════════════════════
 
 export const providerKeys = pgTable("provider_keys", {

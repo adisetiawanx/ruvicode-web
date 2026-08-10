@@ -71,7 +71,8 @@ export async function playgroundChat(input: unknown): Promise<PlaygroundResult> 
 
   // 3. Forward to provider (server-side — API key never exposed to browser)
   const providerKey = process.env.PROVIDER_PLAYGROUND_KEY;
-  if (!providerKey) {
+  const baseUrl = process.env.PROVIDER_BASE_URL;
+  if (!providerKey || !baseUrl) {
     return {
       ok: false,
       error: "Playground is not configured. Please try again later.",
@@ -80,8 +81,6 @@ export async function playgroundChat(input: unknown): Promise<PlaygroundResult> 
   }
 
   try {
-    const baseUrl =
-      process.env.PROVIDER_BASE_URL ?? "https://api.example.com";
     const response = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: "POST",
       headers: {
