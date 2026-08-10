@@ -362,12 +362,6 @@ body {
   color: var(--text-primary);
 }
 
-/* Label → input spacing: add 1px breathing room below every label.
-   Forms use space-y-1.5 (6px) between label and field; this makes it 7px. */
-[data-slot="label"] {
-  margin-bottom: 1px;
-}
-
 /* Custom scrollbar (dark mode) */
 :root[data-theme="dark"] ::-webkit-scrollbar {
   width: 8px;
