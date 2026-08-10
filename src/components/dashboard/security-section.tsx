@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Lock, Key, Mail, Check, ExternalLink } from "lucide-react";
+import { Loader2, Lock, Key, Mail, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { changePasswordAction } from "@/app/(dashboard)/dashboard/settings/actions";
+import {
+  changePasswordAction,
+  setPasswordAction,
+} from "@/app/(dashboard)/dashboard/settings/actions";
 
 interface SecuritySectionProps {
   hasPassword: boolean;
@@ -23,7 +26,7 @@ export function SecuritySection({
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -54,6 +57,36 @@ export function SecuritySection({
     toast.success("Password updated");
     setShowForm(false);
     setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
+  const handleSetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const result = await setPasswordAction({
+      newPassword,
+      confirmPassword,
+    });
+
+    setLoading(false);
+
+    if (!result.ok) {
+      if ("errors" in result && result.errors) {
+        if (result.errors.newPassword?.[0]) {
+          toast.error(result.errors.newPassword[0]);
+        }
+        if (result.errors.confirmPassword?.[0]) {
+          toast.error(result.errors.confirmPassword[0]);
+        }
+      }
+      toast.error(result.message);
+      return;
+    }
+
+    toast.success("Password set! You can now sign in with email and password.");
+    setShowForm(false);
     setNewPassword("");
     setConfirmPassword("");
   };
@@ -107,7 +140,7 @@ export function SecuritySection({
               Change Password
             </Button>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleChangePassword} className="space-y-3">
               <div className="space-y-1.5">
                 <Label htmlFor="current-password">Current Password</Label>
                 <Input
@@ -172,21 +205,58 @@ export function SecuritySection({
             Set a password to have an alternative login method if you lose
             access to your OAuth provider.
           </p>
-          <Button
-            variant="outline"
-            size="sm"
-            nativeButton={false}
-            render={
-              <a
-                href="/forgot-password"
-                aria-label="Set a password via forgot password flow"
-              />
-            }
-          >
-            <Lock className="mr-2 h-4 w-4" />
-            Set Password
-            <ExternalLink className="ml-2 h-3 w-3" />
-          </Button>
+          {!showForm ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowForm(true)}
+            >
+              <Lock className="mr-2 h-4 w-4" />
+              Set Password
+            </Button>
+          ) : (
+            <form onSubmit={handleSetPassword} className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="set-new-password">New Password</Label>
+                <Input
+                  id="set-new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Min 8 characters, 1 letter, 1 number"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="set-confirm-password">Confirm Password</Label>
+                <Input
+                  id="set-confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" variant="primary" size="sm" disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : null}
+                  Set Password
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowForm(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       )}
     </div>

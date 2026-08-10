@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getSession } from "@/lib/session";
 import { updateProfileSchema } from "@/lib/validations/keys";
-import { changePasswordSchema } from "@/lib/validations/auth";
+import { changePasswordSchema, setPasswordSchema } from "@/lib/validations/auth";
 
 export async function updateProfileAction(input: unknown) {
   const session = await getSession();
@@ -82,6 +82,45 @@ export async function changePasswordAction(input: {
     return {
       ok: false,
       message: "Failed to change password. Please try again.",
+    } as const;
+  }
+}
+
+export async function setPasswordAction(input: {
+  newPassword: string;
+  confirmPassword: string;
+}): Promise<
+  | { ok: true }
+  | { ok: false; errors?: Record<string, string[]>; message: string }
+> {
+  const session = await getSession();
+  if (!session) return { ok: false, message: "Unauthorized" };
+
+  const result = setPasswordSchema.safeParse(input);
+  if (!result.success) {
+    return {
+      ok: false,
+      errors: result.error.flatten().fieldErrors,
+      message: "Please fix the highlighted fields.",
+    } as const;
+  }
+
+  try {
+    const h = await headers();
+    // user is already authenticated — set a password directly (no current password)
+    await auth.api.setPassword({
+      headers: h,
+      body: {
+        newPassword: result.data.newPassword,
+      },
+    });
+
+    revalidatePath("/dashboard/settings");
+    return { ok: true };
+  } catch {
+    return {
+      ok: false,
+      message: "Failed to set password. Please try again.",
     } as const;
   }
 }
