@@ -70,12 +70,12 @@ export function ProfileForm({
         <Input
           id="settings-email"
           value={initialEmail}
-          disabled
+          readOnly
           className="opacity-60"
         />
         <p className="text-xs text-text-muted">
-          {emailVerified ? "✓ Verified" : "Not verified"} · Email changes
-          require re-verification
+          {emailVerified ? "✓ Verified" : "Not verified"} · Email is bound to
+          your Google/GitHub account and cannot be changed
         </p>
       </div>
 
