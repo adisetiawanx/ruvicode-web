@@ -42,11 +42,10 @@ This repository is the Next.js web application. It contains the marketing site, 
 
 ## Getting Started
 
-Prerequisites are Node.js 22, pnpm, and Docker for PostgreSQL and Redis.
+Prerequisites are Node.js 22 and pnpm. The app needs a PostgreSQL and a Redis instance. These are shared infrastructure across the Ruvicode services and are intentionally not bundled in this repository. Start your own instances (or reuse existing ones) and point `DATABASE_URL` and `REDIS_URL` at them in `.env.local`.
 
 ```bash
 pnpm install
-docker compose up -d
 cp .env.example .env.local
 pnpm db:migrate
 pnpm dev
