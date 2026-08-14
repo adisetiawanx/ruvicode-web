@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,11 +12,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Send, Loader2, ChevronRight, KeyRound } from "lucide-react";
+import {
+  Send,
+  Loader2,
+  ChevronRight,
+  Settings2,
+  X,
+  KeyRound,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 import { publicPlaygroundModel } from "@/lib/playground";
-import { ChatCodeBlock, parseMessageContent } from "@/components/chat/code-block";
+import {
+  ChatCodeBlock,
+  parseMessageContent,
+} from "@/components/chat/code-block";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -26,11 +36,8 @@ interface ChatMessage {
 
 interface PlaygroundChatProps {
   models: ModelWithPricing[];
-  /** Chat route to POST to. Public and dashboard pages pass their own. */
   endpoint: string;
-  /** Lock the model selector to one model (public playground). */
   lockModel?: string;
-  /** Side the stats/cost panel sits on. Dashboard prefers the right. */
   statsPosition?: "left" | "right";
   showSignupCta?: boolean;
   hint?: string;
@@ -54,6 +61,11 @@ interface StreamChunk {
     };
   };
 }
+
+const requestDefaults = {
+  maxTokens: 4096,
+  temperature: 0.7,
+};
 
 function costOf(
   model: ModelWithPricing | undefined,
@@ -80,60 +92,59 @@ export function PlaygroundChat({
   const modelPricing = models.find((m) => m.model === model);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [remaining, setRemaining] = useState<number | null>(null);
-    const [needKey, setNeedKey] = useState(false);
-    const [lastCost, setLastCost] = useState<{
-      input: number;
-      output: number;
-      total: number;
-    } | null>(null);
-    const [lastUsage, setLastUsage] = useState<{
-      prompt: number;
-      completion: number;
-    } | null>(null);
-    const [lastReasoningTokens, setLastReasoningTokens] = useState(0);
-    // Default request settings shown in the stats panel.
-    const requestSettings = {
-      maxTokens: 4096,
-      temperature: 0.7,
-    };
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [needKey, setNeedKey] = useState(false);
+  const [showSettings, setShowSettings] = useState(true);
+  const [lastCost, setLastCost] = useState<{
+    input: number;
+    output: number;
+    total: number;
+  } | null>(null);
+  const [lastUsage, setLastUsage] = useState<{
+    prompt: number;
+    completion: number;
+  } | null>(null);
+  const [lastReasoningTokens, setLastReasoningTokens] = useState(0);
 
-  function handleChunk(chunk: StreamChunk, activeIndex: number) {
-    if (chunk.meta?.remaining !== undefined) {
-      setRemaining(chunk.meta.remaining);
-    }
+  const handleChunk = useCallback(
+    (chunk: StreamChunk, activeIndex: number) => {
+      if (chunk.meta?.remaining !== undefined) {
+        setRemaining(chunk.meta.remaining);
+      }
 
-    const delta = chunk.choices?.[0]?.delta;
-    const content = delta?.content ?? "";
-    const reasoning = delta?.reasoning ?? delta?.reasoning_content ?? "";
-    if (content || delta?.reasoning || delta?.reasoning_content) {
-      setMessages((prev) =>
-        prev.map((m, i) => {
-          if (i !== activeIndex) return m;
-          const next: ChatMessage = {
-            ...m,
-            content: m.content + content,
-            reasoning: m.reasoning + reasoning,
-          };
-          return next;
-        }),
-      );
-    }
+      const delta = chunk.choices?.[0]?.delta;
+      const content = delta?.content ?? "";
+      const reasoning =
+        delta?.reasoning ?? delta?.reasoning_content ?? "";
+      if (content || reasoning) {
+        setMessages((prev) =>
+          prev.map((m, i) => {
+            if (i !== activeIndex) return m;
+            return {
+              ...m,
+              content: m.content + content,
+              reasoning: m.reasoning + reasoning,
+            };
+          }),
+        );
+      }
 
-    if (chunk.usage && (chunk.usage.prompt_tokens ?? 0) > 0) {
-      const usage = {
-        prompt: chunk.usage.prompt_tokens ?? 0,
-        completion: chunk.usage.completion_tokens ?? 0,
-      };
-      setLastUsage(usage);
-      setLastCost(costOf(modelPricing, usage));
-      setLastReasoningTokens(
-        chunk.usage.completion_tokens_details?.reasoning_tokens ?? 0,
-      );
-    }
-  }
+      if (chunk.usage && (chunk.usage.prompt_tokens ?? 0) > 0) {
+        const usage = {
+          prompt: chunk.usage.prompt_tokens ?? 0,
+          completion: chunk.usage.completion_tokens ?? 0,
+        };
+        setLastUsage(usage);
+        setLastCost(costOf(modelPricing, usage));
+        setLastReasoningTokens(
+          chunk.usage.completion_tokens_details?.reasoning_tokens ?? 0,
+        );
+      }
+    },
+    [modelPricing],
+  );
 
   async function readStream(res: Response, activeIndex: number) {
     const reader = res.body?.getReader();
@@ -152,13 +163,12 @@ export function PlaygroundChat({
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith(":")) continue;
         if (!trimmed.startsWith("data:")) continue;
-
         const payload = trimmed.slice(5).trim();
         if (payload === "[DONE]") return;
         try {
           handleChunk(JSON.parse(payload) as StreamChunk, activeIndex);
         } catch {
-          // Partial or non-JSON line; ignore.
+          // ignore partial
         }
       }
     }
@@ -170,32 +180,26 @@ export function PlaygroundChat({
     setNeedKey(false);
 
     const userMessage: ChatMessage = { role: "user", content: input };
-    const newMessages = [...messages, userMessage];
-    // Reserve the assistant slot so streaming appends into it.
-    newMessages.push({ role: "assistant", content: "", reasoning: "" });
+        const newMessages: ChatMessage[] = [...messages, userMessage, { role: "assistant", content: "", reasoning: "" }];
     const activeIndex = newMessages.length - 1;
     setMessages(newMessages);
     setInput("");
 
     try {
       const res = await fetch(endpoint, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                model,
-                messages: [{ role: "user", content: input }],
-                max_tokens: requestSettings.maxTokens,
-                temperature: requestSettings.temperature,
-              }),
-            });
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "user", content: input }],
+          max_tokens: requestDefaults.maxTokens,
+          temperature: requestDefaults.temperature,
+        }),
+      });
 
       if (!res.ok) {
         let data: { error?: string; code?: string } = {};
-        try {
-          data = (await res.json()) as typeof data;
-        } catch {
-          // Non-JSON error body.
-        }
+        try { data = (await res.json()) as typeof data; } catch { /* ignore */ }
         toast.error(data.error ?? "Something went wrong. Please try again.");
         if (data.code === "no_active_key") setNeedKey(true);
         setMessages((prev) => prev.filter((_, i) => i !== activeIndex));
@@ -211,33 +215,80 @@ export function PlaygroundChat({
     }
   }
 
-  const statsPanel = (
-    <div className="space-y-4">
+  // ─── Info bar ────────────────────────────────────────────
+  const infoBar = (
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border-default bg-surface p-3">
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-medium text-text-primary">
+          {modelPricing?.display_name ?? model}
+        </span>
+        <span className="hidden text-xs text-text-muted sm:inline">
+          {requestDefaults.maxTokens.toLocaleString()} tokens · {requestDefaults.temperature} temp
+        </span>
+        {!locked && (
+          <Select value={model} onValueChange={(v) => { setSelectedModel(v); setMessages([]); setLastCost(null); }}>
+            <SelectTrigger className="h-7 w-auto border-0 bg-transparent p-0 text-xs text-accent hover:text-accent-hover">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {models.map((m) => (
+                <SelectItem key={m.model} value={m.model}>
+                  {m.display_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2">
+        {remaining !== null && (
+          <Badge variant={remaining > 0 ? "default" : "destructive"} className="text-xs">
+            {remaining} left
+          </Badge>
+        )}
+        {lastCost && (
+          <span className="font-mono text-xs tabular text-text-muted">
+            ${lastCost.total.toFixed(6)}
+          </span>
+        )}
+        <button
+          onClick={() => setShowSettings(!showSettings)}
+          className="text-text-muted transition-colors hover:text-text-primary"
+          aria-label="Toggle settings"
+        >
+          {showSettings ? <X className="h-4 w-4" /> : <Settings2 className="h-4 w-4" />}
+        </button>
+      </div>
+    </div>
+  );
+
+  // ─── Settings panel (slide-out / inline) ──────────────────
+  const settingsPanel = showSettings && (
+    <div className="space-y-4 rounded-lg border border-border-default bg-surface p-4">
       <div>
-        <label className="mb-2 block text-sm font-medium">Model</label>
+        <p className="mb-2 text-xs font-medium text-text-secondary">Model</p>
         {locked ? (
-          <div className="rounded-lg border border-border-default bg-surface px-3 py-2">
-            <p className="text-sm font-medium text-text-primary">
-              {modelPricing?.display_name ?? model}
-            </p>
-            <p className="font-mono text-xs text-text-secondary">
+          <div className="rounded-md border border-border-subtle bg-surface-2 px-3 py-2">
+            <p className="text-sm text-text-primary">{modelPricing?.display_name ?? model}</p>
+            <p className="font-mono text-xs text-text-muted">
               ${modelPricing?.user_input.toFixed(2) ?? "?"}/1M input
             </p>
           </div>
         ) : (
           <Select
-                      value={model}
-                      onValueChange={(v) => {
-                        setSelectedModel(v);
-                        setMessages([]);
-                        setLastCost(null);
-                        setLastUsage(null);
-                        setInput("");
-                      }}
-                    >
-                      <SelectTrigger className="!w-full">
-                        <SelectValue />
-                      </SelectTrigger>
+            value={model}
+            onValueChange={(v) => {
+              setSelectedModel(v);
+              setMessages([]);
+              setLastCost(null);
+              setLastUsage(null);
+              setInput("");
+            }}
+          >
+            <SelectTrigger className="!w-full">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {models.map((m) => (
                 <SelectItem key={m.model} value={m.model}>
@@ -249,19 +300,18 @@ export function PlaygroundChat({
         )}
       </div>
 
-            {/* Request settings */}
-            <div className="space-y-1 rounded-lg border border-border-default bg-surface p-3">
-              <p className="text-xs text-text-secondary">Request settings</p>
-              <div className="space-y-0.5 font-mono text-xs text-text-muted tabular">
-                <p>Max tokens: {requestSettings.maxTokens.toLocaleString()}</p>
-                <p>Temperature: {requestSettings.temperature}</p>
-                {!showSignupCta && <p>Billed to your wallet (per-key rate)</p>}
-              </div>
-            </div>
+      <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">
+        <p className="text-xs text-text-secondary">Request settings</p>
+        <div className="font-mono text-xs text-text-muted tabular">
+          <p>Max tokens: {requestDefaults.maxTokens.toLocaleString()}</p>
+          <p>Temperature: {requestDefaults.temperature}</p>
+          {!showSignupCta && <p>Billed to your wallet</p>}
+        </div>
+      </div>
 
-            {lastCost && lastUsage && (
-        <div className="space-y-1 rounded-lg border border-border-default bg-surface p-4">
-          <p className="text-xs text-text-secondary">Last request cost</p>
+      {lastCost && lastUsage && (
+        <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">
+          <p className="text-xs text-text-secondary">Last request</p>
           <p className="font-mono tabular text-lg text-text-primary">
             ${lastCost.total.toFixed(6)}
           </p>
@@ -270,41 +320,23 @@ export function PlaygroundChat({
               Input: ${lastCost.input.toFixed(6)} ({lastUsage.prompt} tokens)
             </p>
             <p>
-              Output: ${lastCost.output.toFixed(6)} (
-              {lastUsage.completion} tokens
-              {lastReasoningTokens > 0
-                ? `, ${lastReasoningTokens} reasoning`
-                : ""}
-              )
+              Output: ${lastCost.output.toFixed(6)} ({lastUsage.completion} tokens
+              {lastReasoningTokens > 0 ? `, ${lastReasoningTokens} reasoning` : ""})
             </p>
           </div>
         </div>
       )}
 
-      {remaining !== null && (
-        <Badge
-          variant={remaining > 0 ? "default" : "destructive"}
-          className="w-full justify-center"
-        >
-          {remaining} free requests remaining today
-        </Badge>
-      )}
-
       {needKey && (
-        <div className="space-y-2 rounded-lg border border-border-default bg-surface p-4">
-          <p className="text-sm text-text-secondary">
-            You need an active API key to use the playground.
-          </p>
-          <Button
-            variant="primary"
-            className="w-full"
-            nativeButton={false}
-            render={<Link href="/dashboard/keys" />}
-          >
-            <KeyRound className="mr-2 h-4 w-4" />
-            Create API Key
-          </Button>
-        </div>
+        <Button
+          variant="primary"
+          className="w-full"
+          nativeButton={false}
+          render={<Link href="/dashboard/keys" />}
+        >
+          <KeyRound className="mr-2 h-4 w-4" />
+          Create API Key
+        </Button>
       )}
 
       {showSignupCta && (
@@ -320,11 +352,12 @@ export function PlaygroundChat({
     </div>
   );
 
-  const chatPanel = (
-    <div className="flex h-[500px] flex-col rounded-lg border border-border-default bg-surface">
+  // ─── Chat area ────────────────────────────────────────────
+  const chatArea = (
+    <div className="flex min-h-[400px] flex-col rounded-lg border border-border-default bg-surface">
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.length === 0 && (
-          <div className="mt-20 text-center text-text-muted">
+          <div className="mt-16 text-center text-text-muted">
             <p>{hint}</p>
             <p className="mt-1 text-xs">{hintSub}</p>
           </div>
@@ -337,16 +370,16 @@ export function PlaygroundChat({
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[80%] space-y-2 rounded-lg px-4 py-2 ${
+                className={`max-w-[85%] space-y-2 rounded-xl px-4 py-3 ${
                   msg.role === "user"
-                    ? "bg-accent text-text-inverse"
-                    : "bg-surface-2 text-text-primary"
+                    ? "bg-accent text-text-inverse rounded-br-md"
+                    : "bg-surface-2 text-text-primary rounded-bl-md"
                 }`}
               >
                 {msg.reasoning && (
                   <details
                     open={isStreamingSlot}
-                    className="rounded-md bg-black/20 px-2 py-1 text-xs"
+                    className="rounded-md bg-black/15 px-2 py-1 text-xs"
                   >
                     <summary className="flex cursor-pointer select-none items-center gap-1 text-text-secondary">
                       <ChevronRight className="h-3 w-3" />
@@ -357,31 +390,28 @@ export function PlaygroundChat({
                     </p>
                   </details>
                 )}
-                                {parseMessageContent(msg.content).map((seg, si) =>
-                                  seg.type === "code" ? (
-                                    <ChatCodeBlock
-                                      key={si}
-                                      code={seg.content}
-                                      language={seg.language}
-                                    />
-                                  ) : (
-                                    <p key={si} className="whitespace-pre-wrap text-sm">
-                                      {seg.content}
-                                      {isStreamingSlot &&
-                                        si === parseMessageContent(msg.content).length - 1 && (
-                                          <span className="ml-0.5 inline-block h-3.5 w-1.5 animate-pulse bg-accent" />
-                                        )}
-                                    </p>
-                                  ),
-                                )}
-                                {isStreamingSlot && msg.content === "" && (
-                                  <Loader2 className="h-4 w-4 animate-spin text-text-secondary" />
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                {parseMessageContent(msg.content).map((seg, si) =>
+                  seg.type === "code" ? (
+                    <ChatCodeBlock key={si} code={seg.content} language={seg.language} />
+                  ) : (
+                    <p key={si} className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {seg.content}
+                      {isStreamingSlot &&
+                        si === parseMessageContent(msg.content).length - 1 &&
+                        seg.type === "text" && (
+                          <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-accent" />
+                        )}
+                    </p>
+                  ),
+                )}
+                {isStreamingSlot && msg.content === "" && (
+                  <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
       <div className="border-t border-border-subtle p-4">
         <div className="flex gap-2">
@@ -389,7 +419,7 @@ export function PlaygroundChat({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
-            className="resize-none"
+            className="min-h-[44px] resize-none rounded-xl bg-surface-2"
             rows={1}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -403,27 +433,42 @@ export function PlaygroundChat({
             size="icon"
             onClick={handleSend}
             disabled={loading || !input.trim()}
+            className="h-[44px] w-[44px] shrink-0 rounded-xl"
           >
-            <Send className="h-4 w-4" />
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Send className="h-5 w-5" />
+            )}
           </Button>
         </div>
       </div>
     </div>
   );
 
+  // ─── Layout assembly ──────────────────────────────────────
+  // For the public playground (statsPosition="left"), settings sits to the
+  // left of the chat. For the dashboard (statsPosition="right"), it sits to
+  // the right. The info bar always spans the full width above both.
   if (statsPosition === "right") {
     return (
-      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-        <div className="lg:order-1">{chatPanel}</div>
-        <div className="lg:order-2">{statsPanel}</div>
+      <div className="space-y-4">
+        {infoBar}
+        <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
+          <div className="lg:order-1">{chatArea}</div>
+          <div className="lg:order-2">{settingsPanel}</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-      <div>{statsPanel}</div>
-      <div>{chatPanel}</div>
+    <div className="space-y-4">
+      {infoBar}
+      <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
+        <div>{settingsPanel}</div>
+        <div>{chatArea}</div>
+      </div>
     </div>
   );
 }

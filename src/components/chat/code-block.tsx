@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Copy, Check, ChevronRight } from "lucide-react";
+import { highlight } from "@/lib/highlight";
 
 interface CodeBlockProps {
   code: string;
@@ -9,12 +10,17 @@ interface CodeBlockProps {
 }
 
 /**
- * Renders a fenced code block extracted from the assistant's message.
- * Styled with the Ruvicode design tokens: dark background, monospace text,
- * language badge, and a copy-to-clipboard button.
+ * Renders a fenced code block with syntax highlighting, a language badge,
+ * and a copy-to-clipboard button. Wrapped in a dark container with the
+ * Ruvicode design tokens.
  */
 export function ChatCodeBlock({ code, language }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
+
+  const highlighted = useMemo(
+    () => highlight(code, language),
+    [code, language],
+  );
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -23,7 +29,7 @@ export function ChatCodeBlock({ code, language }: CodeBlockProps) {
   };
 
   return (
-    <div className="my-3 overflow-hidden rounded-lg border border-border-default bg-inset">
+    <div className="my-3 overflow-hidden rounded-lg border border-border-default bg-code-bg">
       {/* Toolbar */}
       <div className="flex items-center justify-between border-b border-border-subtle bg-surface-2 px-3 py-1.5">
         {language ? (
@@ -43,16 +49,19 @@ export function ChatCodeBlock({ code, language }: CodeBlockProps) {
           )}
         </button>
       </div>
-      {/* Code */}
-      <pre className="overflow-x-auto p-3 font-mono text-sm leading-relaxed text-code-text">
-        <code>{code}</code>
+      {/* Highlighted code */}
+      <pre className="overflow-x-auto p-3 font-mono text-sm leading-relaxed">
+        <code
+          className="hljs"
+          dangerouslySetInnerHTML={{ __html: highlighted }}
+        />
       </pre>
     </div>
   );
 }
 
-/** Parse the first fenced code block from a message string. */
-const fenceRegex = /```(\w+)?\n([\s\S]*?)```/g;
+/** Parse fenced code blocks from a message body. */
+const fenceRegex = /```(\w+)?\n?([\s\S]*?)```/g;
 
 export interface ContentSegment {
   type: "text" | "code";
@@ -61,27 +70,25 @@ export interface ContentSegment {
 }
 
 /**
- * Split a message body into text and fenced-code segments so they can be
- * rendered differently (code gets the ChatCodeBlock treatment).
+ * Split a message into text and fenced-code segments so they can be rendered
+ * differently (code gets ChatCodeBlock, text goes through markdown rendering).
  */
 export function parseMessageContent(body: string): ContentSegment[] {
   const segments: ContentSegment[] = [];
   let lastIndex = 0;
 
   for (const match of body.matchAll(fenceRegex)) {
-    // Text before this code fence.
     const before = body.slice(lastIndex, match.index);
     if (before) segments.push({ type: "text", content: before });
 
     segments.push({
       type: "code",
-      content: match[2] ?? "",
+      content: (match[2] ?? match[1] ?? "").trim(),
       language: match[1] ?? undefined,
     });
     lastIndex = (match.index ?? 0) + match[0].length;
   }
 
-  // Remaining text after the last fence.
   const tail = body.slice(lastIndex);
   if (tail) segments.push({ type: "text", content: tail });
 
