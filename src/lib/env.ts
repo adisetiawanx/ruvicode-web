@@ -19,6 +19,10 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: z.string().optional(),
     PROVIDER_PLAYGROUND_KEY: z.string().optional(),
     PROVIDER_BASE_URL: z.string().url().optional(),
+    // Shared Redis used for the API key cache. The Go gateway reads
+    // `apikey:{hash}` from this Redis, so the dashboard deletes the same
+    // entry on revoke/limit change to make the change effective immediately.
+    REDIS_URL: z.string().optional(),
     UPSTASH_REDIS_REST_URL: z.string().optional(),
     UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
     // Paddle (ADR-015)
@@ -41,8 +45,9 @@ export const env = createEnv({
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     PROVIDER_PLAYGROUND_KEY: process.env.PROVIDER_PLAYGROUND_KEY,
-    PROVIDER_BASE_URL: process.env.PROVIDER_BASE_URL,
-    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+        PROVIDER_BASE_URL: process.env.PROVIDER_BASE_URL,
+        REDIS_URL: process.env.REDIS_URL,
+        UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     PADDLE_API_KEY: process.env.PADDLE_API_KEY,
     PADDLE_WEBHOOK_SECRET: process.env.PADDLE_WEBHOOK_SECRET,
