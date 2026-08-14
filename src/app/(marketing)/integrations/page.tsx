@@ -90,7 +90,7 @@ export default async function IntegrationsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Container size="content" className="py-24">
+      <Container size="wide" className="py-24">
         <h1 className="mb-4 text-4xl font-bold">
           Works with your favorite tools
         </h1>

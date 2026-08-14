@@ -9,7 +9,7 @@ export default function DocsLayout({
   const nav = getDocsNav();
 
   return (
-    <div className="mx-auto flex max-w-[1280px] gap-0 px-6 md:px-8">
+    <div className="mx-auto flex max-w-[1440px] gap-0 px-6 md:px-8">
       {/* Left sidebar — docs navigation */}
       <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 flex-shrink-0 overflow-y-auto border-r border-border-subtle p-4 lg:block">
         <nav className="space-y-6">

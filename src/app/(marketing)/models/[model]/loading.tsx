@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ModelDetailLoading() {
   return (
-    <Container size="content" className="py-12">
+    <Container size="wide" className="py-12">
       <Skeleton className="mb-8 h-5 w-48" />
       <div className="mb-8 flex items-start justify-between gap-4">
         <div className="space-y-3">

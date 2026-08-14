@@ -8,9 +8,9 @@ import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { LinkButton } from "@/components/shared/link-button";
 import {
-  QuickstartCode,
-  type HighlightedCodeTab,
-} from "@/components/shared/quickstart-code";
+  CodeDemo,
+  type CodeTab,
+} from "@/components/marketing/code-demo";
 import { ArrowLeft, ArrowRight, Sparkles, TrendingDown } from "lucide-react";
 
 export const revalidate = 300; // ISR — 5 minute revalidation
@@ -45,18 +45,18 @@ export async function generateMetadata({
   if (!model) return {};
 
   return {
-    title: `${model.display_name} API — Pricing & Docs | Ruvicode`,
+    title: `${model.display_name} API — Pricing & Docs`,
     description: `${model.display_name} via Ruvicode. Input $${model.user_input.toFixed(2)}/1M, output $${model.user_output.toFixed(2)}/1M tokens. Save ${model.user_discount_pct.toFixed(0)}% vs OpenRouter. OpenAI-compatible endpoint.`,
     alternates: { canonical: `https://ruvicode.com/models/${model.model}` },
     openGraph: {
-      title: `${model.display_name} API | Ruvicode`,
+      title: `${model.display_name} API`,
       description: `Save ${model.user_discount_pct.toFixed(0)}% vs OpenRouter on ${model.display_name}.`,
       url: `https://ruvicode.com/models/${model.model}`,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `${model.display_name} API | Ruvicode`,
+      title: `${model.display_name} API`,
       description: `Save ${model.user_discount_pct.toFixed(0)}% vs OpenRouter on ${model.display_name}.`,
     },
   };
@@ -126,11 +126,11 @@ console.log(response.choices[0].message.content);`,
     },
   ];
 
-  const quickstartTabs: HighlightedCodeTab[] = await Promise.all(
+  const quickstartTabs: CodeTab[] = await Promise.all(
     samples.map(async (s) => ({
       label: s.label,
-      code: s.code,
       highlightedHtml: await highlightCode(s.code, s.lang),
+      rawCode: s.code,
     })),
   );
 
@@ -183,7 +183,7 @@ console.log(response.choices[0].message.content);`,
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Container size="content" className="py-10 md:py-14">
+      <Container size="wide" className="py-10 md:py-14">
         {/* Breadcrumb */}
         <nav className="mb-8 flex items-center gap-2 text-sm text-text-muted">
           <Link href="/" className="transition-colors hover:text-text-secondary">
@@ -212,9 +212,11 @@ console.log(response.choices[0].message.content);`,
                   −{model.user_discount_pct.toFixed(0)}% vs OpenRouter
                 </span>
               </div>
-              <p className="font-mono text-sm text-text-muted">
-                {model.model}
-              </p>
+              {model.model !== model.display_name && (
+                <p className="font-mono text-sm text-text-muted">
+                  {model.model}
+                </p>
+              )}
               {model.capabilities.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {model.capabilities.map((cap) => (
@@ -282,7 +284,7 @@ console.log(response.choices[0].message.content);`,
               Use the OpenAI SDK with your Ruvicode API key. Just change the
               base URL and model name.
             </p>
-            <QuickstartCode tabs={quickstartTabs} />
+            <CodeDemo tabs={quickstartTabs} />
 
             <div className="mt-8 flex items-center justify-between rounded-xl border border-border-default bg-surface p-5">
               <div>

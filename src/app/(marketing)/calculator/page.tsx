@@ -5,12 +5,12 @@ import { CostCalculator } from "@/components/marketing/cost-calculator";
 import { Container } from "@/components/layout/container";
 
 export const metadata: Metadata = {
-  title: "AI API Cost Calculator — See Your Savings | Ruvicode",
+  title: "AI API Cost Calculator — See Your Savings",
   description:
     "Calculate exactly how much you'll save with Ruvicode vs official provider pricing. Compare per-token costs across 20+ AI models.",
   alternates: { canonical: "https://ruvicode.com/calculator" },
   openGraph: {
-    title: "AI API Cost Calculator | Ruvicode",
+    title: "AI API Cost Calculator",
     description:
       "Calculate your savings with Ruvicode vs official provider pricing.",
     url: "https://ruvicode.com/calculator",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI API Cost Calculator | Ruvicode",
+    title: "AI API Cost Calculator",
     description: "See how much you'll save with Ruvicode.",
   },
 };
@@ -51,7 +51,7 @@ export default async function CalculatorPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Container size="content" className="py-12">
+      <Container size="wide" className="py-12">
         <h1 className="mb-2 text-h1 font-semibold">Cost Calculator</h1>
         <p className="mb-8 text-text-secondary">
           See exactly how much you&apos;ll save with Ruvicode versus official

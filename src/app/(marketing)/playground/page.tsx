@@ -12,19 +12,19 @@ import {
 } from "@/components/shared/page-entrance";
 
 export const metadata: Metadata = {
-  title: "AI Playground — Try DeepSeek V4 Flash Free | Ruvicode",
+  title: "AI Playground — Try DeepSeek V4 Flash Free",
   description:
     "Try DeepSeek V4 Flash in your browser. No account needed. 5 free requests per day. Sign up for every model with real per-request costs.",
   alternates: { canonical: "https://ruvicode.com/playground" },
   openGraph: {
-    title: "AI Playground | Ruvicode",
+    title: "AI Playground",
     description: "Try DeepSeek V4 Flash in your browser. No account needed. 5 free requests per day.",
     url: "https://ruvicode.com/playground",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Playground | Ruvicode",
+    title: "AI Playground",
     description: "Try DeepSeek V4 Flash free. No account needed.",
   },
 };

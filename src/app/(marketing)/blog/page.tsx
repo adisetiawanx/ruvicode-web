@@ -9,7 +9,7 @@ import {
 } from "@/components/shared/page-entrance";
 
 export const metadata: Metadata = {
-  title: "Blog — AI API Guides, Tutorials & Comparisons | Ruvicode",
+  title: "Blog — AI API Guides, Tutorials & Comparisons",
   description:
     "Learn how to use AI APIs effectively. Comparison guides, pricing analysis, tutorials for Claude, GPT, GLM, DeepSeek and more.",
   alternates: { canonical: "https://ruvicode.com/blog" },
@@ -27,7 +27,7 @@ export default function BlogIndex() {
   const rest = posts.filter((p) => p.slug !== featured?.slug);
 
   return (
-    <Container className="py-12">
+    <Container size="wide" className="py-12">
       <PageEntrance>
         <PageEntranceItem>
           <h1 className="mb-2 text-h1 font-semibold">Blog</h1>

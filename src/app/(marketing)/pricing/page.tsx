@@ -22,12 +22,12 @@ import {
 export const revalidate = 300; // SSR — 5 minute revalidation
 
 export const metadata: Metadata = {
-  title: "Pricing — Transparent Per-Request AI API Costs | Ruvicode",
+  title: "Pricing — Transparent Per-Request AI API Costs",
   description:
     "See exact per-request pricing for 20+ AI models. Transparent $/1M token rates. Save up to 77% vs OpenRouter. No hidden fees, no credit expiry.",
   alternates: { canonical: "https://ruvicode.com/pricing" },
   openGraph: {
-    title: "Transparent Per-Request AI API Costs | Ruvicode",
+    title: "Transparent Per-Request AI API Costs",
     description:
       "See exact per-request pricing for 20+ AI models. Save up to 77% vs OpenRouter.",
     url: "https://ruvicode.com/pricing",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pricing — Transparent AI API Costs | Ruvicode",
+    title: "Pricing — Transparent AI API Costs",
     description:
       "See exact per-request pricing for 20+ AI models. Save up to 77% vs OpenRouter.",
   },

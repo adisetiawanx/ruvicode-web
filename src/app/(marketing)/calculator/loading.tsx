@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CalculatorLoading() {
   return (
-    <Container size="content" className="py-12">
+    <Container size="wide" className="py-12">
       <Skeleton className="mb-2 h-10 w-48" />
       <Skeleton className="mb-8 h-5 w-72" />
       <div className="grid gap-8 lg:grid-cols-2">

@@ -16,7 +16,7 @@ export default function StatusPage() {
   const lastUpdated = new Date().toISOString();
 
   return (
-    <Container size="content" className="py-24">
+    <Container size="wide" className="py-24">
       <div className="mb-12">
         <h1 className="mb-2 text-4xl font-bold">System Status</h1>
         <p className="text-sm text-text-muted">
