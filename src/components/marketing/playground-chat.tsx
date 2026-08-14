@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -107,6 +107,18 @@ export function PlaygroundChat({
     completion: number;
   } | null>(null);
   const [lastReasoningTokens, setLastReasoningTokens] = useState(0);
+
+  // Chat scroll container: auto-follow the latest message while streaming,
+  // but stop the moment the user scrolls up to read.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const stickToBottom = useRef(true);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el && stickToBottom.current) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [messages]);
 
   const handleChunk = useCallback(
     (chunk: StreamChunk, activeIndex: number) => {
@@ -353,9 +365,22 @@ export function PlaygroundChat({
   );
 
   // ─── Chat area ────────────────────────────────────────────
+  // The chat area needs a bounded height, otherwise the message list grows
+  // the whole page instead of scrolling internally.
   const chatArea = (
-    <div className="flex min-h-[400px] flex-col rounded-lg border border-border-default bg-surface">
-      <div className="flex-1 space-y-4 overflow-y-auto p-4">
+    <div className="flex h-[600px] max-h-[75vh] flex-col rounded-lg border border-border-default bg-surface">
+      <div
+        ref={scrollRef}
+        onScroll={() => {
+          const el = scrollRef.current;
+          if (!el) return;
+          // Keep auto-scrolling only while the user is parked near the bottom;
+          // never yank them back down when they scrolled up to read.
+          stickToBottom.current =
+            el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+        }}
+        className="flex-1 space-y-4 overflow-y-auto p-4"
+      >
         {messages.length === 0 && (
           <div className="mt-16 text-center text-text-muted">
             <p>{hint}</p>

@@ -47,7 +47,7 @@ function rowToModelPricing(
 ): ModelWithPricing {
   return {
     model: row.model,
-    display_name: row.displayName ?? row.model,
+    display_name: row.displayName || row.model,
     provider: row.provider,
     ref_input: Number(row.refInput),
     ref_output: Number(row.refOutput),

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 
 /** Format price — shows more decimals for very cheap models. */
@@ -14,11 +13,8 @@ export function ModelCard({ model }: { model: ModelWithPricing }) {
       href={`/models/${model.model}`}
       className="group flex flex-col rounded-xl border border-border-default bg-surface p-5 transition-all hover:border-accent/30 hover:shadow-card"
     >
-      {/* Header: provider badge + savings */}
-      <div className="mb-4 flex items-center justify-between">
-        <Badge variant="outline" className="text-xs text-text-secondary">
-          {model.provider}
-        </Badge>
+      {/* Header: savings badge (upstream provider identity is masked) */}
+      <div className="mb-4 flex items-center justify-end">
         <span className="font-mono text-xs font-medium text-success">
           −{model.user_discount_pct.toFixed(0)}%
         </span>

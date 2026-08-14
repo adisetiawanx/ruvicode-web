@@ -1,10 +1,9 @@
-import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/layout/container";
 import { SHOWCASE_MODELS } from "@/lib/constants";
 
 /**
  * Professional model cards grid.
- * Shows: provider badge, model name, input/output per-1M pricing,
+ * Shows: savings badge, model name, input/output per-1M pricing,
  * savings badge, context window.
  * Replaces the old horizontal scroll strip with a proper grid.
  */
@@ -25,11 +24,8 @@ export function ModelShowcase() {
               key={m.model}
               className="group flex flex-col rounded-xl border border-border-default bg-surface p-5 transition-all hover:border-accent/30 hover:shadow-card"
             >
-              {/* Header: provider badge + savings */}
-              <div className="mb-4 flex items-center justify-between">
-                <Badge variant="outline" className="text-xs text-text-secondary">
-                  {m.provider}
-                </Badge>
+              {/* Header: savings badge (upstream provider identity is masked) */}
+              <div className="mb-4 flex items-center justify-end">
                 <span className="font-mono text-xs font-medium text-success">
                   −{m.savings_pct}%
                 </span>

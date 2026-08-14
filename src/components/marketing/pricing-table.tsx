@@ -122,9 +122,6 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                 >
                   <td className="px-4 py-3">
                     <span className="font-medium">{m.display_name}</span>
-                    <span className="ml-2 text-xs text-text-muted">
-                      {m.provider}
-                    </span>
                   </td>
                   <td className="px-4 py-3 text-right font-mono tabular text-text-secondary">
                     ${formatPrice(m.user_input)}

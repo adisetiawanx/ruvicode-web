@@ -10,14 +10,22 @@ import { QuickstartCode } from "@/components/shared/quickstart-code";
 
 export const revalidate = 300; // SSR — 5 minute revalidation
 
-/** SECURITY: validate slug format — only allow alphanumeric, hyphens, and dots.
- * Prevents path traversal. Dots are needed for model names like "glm-5.2". */
-const SLUG_REGEX = /^[a-z0-9.-]+$/;
+/** SECURITY: validate slug format — only allow lowercase alphanumeric,
+ * hyphens, dots, and colons (variant slugs like "kimi-k2.5:web" use them).
+ * Prevents path traversal. */
+const SLUG_REGEX = /^[a-z0-9.:-]+$/;
 
-/** Pre-generate all model detail pages at build time. */
+/** Slugs that are safe to prerender as static files on every OS.
+ * Windows forbids ':' in directory names, so variant slugs are excluded
+ * here and rendered on demand instead (dynamicParams is on by default). */
+const STATIC_SLUG_REGEX = /^[a-z0-9.-]+$/;
+
+/** Pre-generate model detail pages at build time. */
 export function generateStaticParams() {
   return getAllActiveModels().then((models) =>
-    models.map((m) => ({ model: m.model })),
+    models
+      .filter((m) => STATIC_SLUG_REGEX.test(m.model))
+      .map((m) => ({ model: m.model })),
   );
 }
 
@@ -37,7 +45,7 @@ export async function generateMetadata({
     alternates: { canonical: `https://ruvicode.com/models/${model.model}` },
     openGraph: {
       title: `${model.display_name} API | Ruvicode`,
-      description: `${model.display_name} — ${model.provider}. Save ${model.user_discount_pct.toFixed(0)}% vs OpenRouter.`,
+      description: `Save ${model.user_discount_pct.toFixed(0)}% vs OpenRouter on ${model.display_name}.`,
       url: `https://ruvicode.com/models/${model.model}`,
       type: "website",
     },
@@ -110,7 +118,7 @@ const response = await client.chat.completions.create({
     "@context": "https://schema.org",
     "@type": "Product",
     name: `${model.display_name} API Access`,
-    description: `${model.display_name} via Ruvicode. ${model.provider} model with OpenAI-compatible endpoint.`,
+    description: `${model.display_name} via Ruvicode with an OpenAI-compatible endpoint.`,
     brand: { "@type": "Brand", name: "Ruvicode" },
     offers: {
       "@type": "Offer",
@@ -177,7 +185,6 @@ const response = await client.chat.completions.create({
           <div>
             <div className="mb-3 flex items-center gap-3">
               <h1 className="text-h1 font-bold">{model.display_name}</h1>
-              <Badge variant="outline">{model.provider}</Badge>
             </div>
             <div className="flex flex-wrap gap-2">
               {model.capabilities.map((cap) => (
@@ -249,14 +256,10 @@ const response = await client.chat.completions.create({
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-text-secondary">Provider</span>
-                  <span className="text-text-primary">{model.provider}</span>
-                </div>
-                <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">
                     OpenRouter ref
                   </span>
-                  <span className="font-mono tabular text-text-muted">
+                  <span className="font-mono text-text-muted">
                     ${formatPrice(model.ref_input)} / $
                     {formatPrice(model.ref_output)}
                   </span>
