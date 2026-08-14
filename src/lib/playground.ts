@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { getModelBySlug } from "@/lib/db/queries/models";
 
 /**
  * Shared playground logic used by both the public playground route
@@ -93,25 +92,4 @@ export function sanitizeSSELine(line: string, modelId: string): string | null {
 
 export function stripCostField(data: string): string {
   return stripField(data, "cost");
-}
-
-/**
- * Estimate what a request costs using the model's current Ruvicode pricing.
- * Returns null when the model is not in the catalog.
- */
-export async function calculatePlaygroundCost(
-  model: string,
-  usage: { prompt_tokens: number; completion_tokens: number },
-) {
-  const pricing = await getModelBySlug(model);
-  if (!pricing) return null;
-
-  const inputCost = (usage.prompt_tokens / 1_000_000) * pricing.user_input;
-  const outputCost =
-    (usage.completion_tokens / 1_000_000) * pricing.user_output;
-  return {
-    input: inputCost,
-    output: outputCost,
-    total: inputCost + outputCost,
-  };
 }

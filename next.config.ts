@@ -26,6 +26,7 @@ const securityHeaders = [
 
 const config: NextConfig = {
   output: "standalone",
+  serverExternalPackages: ["pg"],
   images: {
     formats: ["image/avif", "image/webp"],
   },
