@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
 import {
   Send,
   Loader2,
@@ -19,6 +20,7 @@ import {
   Settings2,
   X,
   KeyRound,
+  Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
@@ -62,9 +64,13 @@ interface StreamChunk {
   };
 }
 
-const requestDefaults = {
-  maxTokens: 4096,
-  temperature: 0.7,
+const requestLimits = {
+  maxTokensMin: 256,
+  maxTokensMax: 4096,
+  maxTokensStep: 256,
+  tempMin: 0,
+  tempMax: 2,
+  tempStep: 0.1,
 };
 
 function costOf(
@@ -97,6 +103,8 @@ export function PlaygroundChat({
   const [remaining, setRemaining] = useState<number | null>(null);
   const [needKey, setNeedKey] = useState(false);
   const [showSettings, setShowSettings] = useState(true);
+  const [maxTokens, setMaxTokens] = useState(4096);
+  const [temperature, setTemperature] = useState(0.7);
   const [lastCost, setLastCost] = useState<{
     input: number;
     output: number;
@@ -204,8 +212,8 @@ export function PlaygroundChat({
         body: JSON.stringify({
           model,
           messages: [{ role: "user", content: input }],
-          max_tokens: requestDefaults.maxTokens,
-          temperature: requestDefaults.temperature,
+          max_tokens: maxTokens,
+          temperature,
         }),
       });
 
@@ -235,7 +243,7 @@ export function PlaygroundChat({
           {modelPricing?.display_name ?? model}
         </span>
         <span className="hidden text-xs text-text-muted sm:inline">
-          {requestDefaults.maxTokens.toLocaleString()} tokens · {requestDefaults.temperature} temp
+          {maxTokens.toLocaleString()} tokens · {temperature.toFixed(1)} temp
         </span>
         {!locked && (
           <Select value={model} onValueChange={(v) => { setSelectedModel(v); setMessages([]); setLastCost(null); }}>
@@ -278,16 +286,9 @@ export function PlaygroundChat({
   // ─── Settings panel (slide-out / inline) ──────────────────
   const settingsPanel = showSettings && (
     <div className="space-y-4 rounded-lg border border-border-default bg-surface p-4">
-      <div>
-        <p className="mb-2 text-xs font-medium text-text-secondary">Model</p>
-        {locked ? (
-          <div className="rounded-md border border-border-subtle bg-surface-2 px-3 py-2">
-            <p className="text-sm text-text-primary">{modelPricing?.display_name ?? model}</p>
-            <p className="font-mono text-xs text-text-muted">
-              ${modelPricing?.user_input.toFixed(2) ?? "?"}/1M input
-            </p>
-          </div>
-        ) : (
+      {!locked && (
+        <div>
+          <p className="mb-2 text-xs font-medium text-text-secondary">Model</p>
           <Select
             value={model}
             onValueChange={(v) => {
@@ -309,17 +310,73 @@ export function PlaygroundChat({
               ))}
             </SelectContent>
           </Select>
-        )}
+        </div>
+      )}
+
+      <div className="space-y-3 rounded-md border border-border-subtle bg-surface-2 p-3">
+        <p className="text-xs font-medium text-text-secondary">Request settings</p>
+        <div>
+          <div className="mb-1.5 flex items-baseline justify-between">
+            <span className="text-xs text-text-muted">Max tokens</span>
+            <span className="font-mono text-xs tabular text-text-secondary">
+              {maxTokens.toLocaleString()}
+            </span>
+          </div>
+          <Slider
+            value={maxTokens}
+            onValueChange={(v) => setMaxTokens(Number(v))}
+            min={requestLimits.maxTokensMin}
+            max={requestLimits.maxTokensMax}
+            step={requestLimits.maxTokensStep}
+          />
+        </div>
+        <div>
+          <div className="mb-1.5 flex items-baseline justify-between">
+            <span className="text-xs text-text-muted">Temperature</span>
+            <span className="font-mono text-xs tabular text-text-secondary">
+              {temperature.toFixed(1)}
+            </span>
+          </div>
+          <Slider
+            value={temperature}
+            onValueChange={(v) => setTemperature(Number(v))}
+            min={requestLimits.tempMin}
+            max={requestLimits.tempMax}
+            step={requestLimits.tempStep}
+          />
+        </div>
+        {!showSignupCta && <p className="text-xs text-text-muted">Billed to your wallet</p>}
       </div>
 
-      <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">
-        <p className="text-xs text-text-secondary">Request settings</p>
-        <div className="font-mono text-xs text-text-muted tabular">
-          <p>Max tokens: {requestDefaults.maxTokens.toLocaleString()}</p>
-          <p>Temperature: {requestDefaults.temperature}</p>
-          {!showSignupCta && <p>Billed to your wallet</p>}
+      {locked && (
+        <div className="space-y-2 rounded-md border border-border-subtle bg-surface-2 p-3">
+          <p className="text-xs font-medium text-text-secondary">
+            Other models
+          </p>
+          <ul className="space-y-1">
+            {models
+              .filter((m) => m.model !== locked)
+              .slice(0, 5)
+              .map((m) => (
+                <li
+                  key={m.model}
+                  className="flex items-center justify-between gap-2 text-xs"
+                >
+                  <span className="flex min-w-0 items-center gap-1.5 text-text-muted">
+                    <Lock className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{m.display_name}</span>
+                  </span>
+                  <span className="shrink-0 font-mono tabular text-text-muted">
+                    ${m.user_input.toFixed(2)}/1M
+                  </span>
+                </li>
+              ))}
+          </ul>
+          <p className="pt-1 text-xs text-text-muted">
+            Sign up to try every model in the dashboard playground.
+          </p>
         </div>
-      </div>
+      )}
 
       {lastCost && lastUsage && (
         <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">

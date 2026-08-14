@@ -194,7 +194,11 @@ const response = await client.chat.completions.create({
               ))}
             </div>
           </div>
-          <LinkButton href="/playground" variant="outline" size="sm">
+          <LinkButton
+            href={`/playground?model=${model.model}`}
+            variant="outline"
+            size="sm"
+          >
             Try in Playground →
           </LinkButton>
         </div>
@@ -247,6 +251,7 @@ const response = await client.chat.completions.create({
             <div className="rounded-lg border border-border-default bg-surface p-6">
               <h3 className="mb-4 font-semibold">Specs</h3>
               <div className="space-y-3">
+              {model.context && (
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">
                     Context window
@@ -255,6 +260,7 @@ const response = await client.chat.completions.create({
                     {model.context}
                   </span>
                 </div>
+              )}
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">
                     OpenRouter ref
