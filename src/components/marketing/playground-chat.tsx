@@ -14,19 +14,38 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { playgroundChat } from "@/app/(marketing)/playground/actions";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
+import type {
+  PlaygroundChatAction,
+  PlaygroundInput,
+} from "@/lib/playground";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
+interface PlaygroundChatProps {
+  models: ModelWithPricing[];
+  /** The server action to run on send. Public and dashboard pages pass their own. */
+  action: PlaygroundChatAction;
+  /** Show the "Sign up" CTA. Marketing only; dashboard hides it. */
+  showSignupCta?: boolean;
+  hint?: string;
+  hintSub?: string;
+  /** Badge suffix, e.g. "free requests remaining". Strings only; functions
+   * cannot cross the server/client boundary. */
+  remainingPrefix?: string;
+}
+
 export function PlaygroundChat({
   models,
-}: {
-  models: ModelWithPricing[];
-}) {
+  action,
+  showSignupCta = true,
+  hint = "Try any model. No account needed.",
+  hintSub = "5 free requests per hour.",
+  remainingPrefix = "free requests remaining",
+}: PlaygroundChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [model, setModel] = useState(models[0]?.model ?? "glm-5.2");
@@ -51,11 +70,12 @@ export function PlaygroundChat({
     setMessages(newMessages);
     setInput("");
 
-    const result = await playgroundChat({
+    const payload: PlaygroundInput = {
       model,
       messages: [{ role: "user", content: input }],
       max_tokens: 500,
-    });
+    };
+    const result = await action(payload);
 
     setLoading(false);
 
@@ -87,7 +107,7 @@ export function PlaygroundChat({
             <SelectContent>
               {models.map((m) => (
                 <SelectItem key={m.model} value={m.model}>
-                  {m.display_name} — ${m.user_input.toFixed(2)}/1M
+                  {m.display_name} · ${m.user_input.toFixed(2)}/1M
                 </SelectItem>
               ))}
             </SelectContent>
@@ -119,13 +139,20 @@ export function PlaygroundChat({
             variant={remaining > 0 ? "default" : "destructive"}
             className="w-full justify-center"
           >
-            {remaining} free requests remaining
+            {remaining} {remainingPrefix}
           </Badge>
         )}
 
-        <Button variant="primary" className="w-full" nativeButton={false} render={<Link href="/register" />}>
-          Sign up for unlimited →
-        </Button>
+        {showSignupCta && (
+          <Button
+            variant="primary"
+            className="w-full"
+            nativeButton={false}
+            render={<Link href="/register" />}
+          >
+            Sign up for unlimited →
+          </Button>
+        )}
       </div>
 
       {/* Chat interface */}
@@ -133,8 +160,8 @@ export function PlaygroundChat({
         <div className="flex-1 space-y-4 overflow-y-auto p-4">
           {messages.length === 0 && (
             <div className="mt-20 text-center text-text-muted">
-              <p>Try any model. No account needed.</p>
-              <p className="mt-1 text-xs">5 free requests per hour.</p>
+              <p>{hint}</p>
+              <p className="mt-1 text-xs">{hintSub}</p>
             </div>
           )}
           {messages.map((msg, i) => (

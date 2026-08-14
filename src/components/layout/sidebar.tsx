@@ -12,6 +12,7 @@ import {
   Menu,
   LogOut,
   Tags,
+  FlaskConical,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/dashboard/topup", label: "Top Up", icon: Wallet },
   { href: "/dashboard/models", label: "Models & Pricing", icon: Tags },
+  { href: "/dashboard/playground", label: "Playground", icon: FlaskConical },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 

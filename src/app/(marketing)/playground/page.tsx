@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { BreadcrumbList, WithContext } from "schema-dts";
 import { getAllActiveModels } from "@/lib/db/queries/models";
 import { PlaygroundChat } from "@/components/marketing/playground-chat";
+import { playgroundChat } from "./actions";
 import { Container } from "@/components/layout/container";
 import {
   PageEntrance,
@@ -64,7 +65,7 @@ export default async function PlaygroundPage() {
             </p>
           </PageEntranceItem>
           <PageEntranceItem>
-            <PlaygroundChat models={models} />
+            <PlaygroundChat models={models} action={playgroundChat} />
           </PageEntranceItem>
         </PageEntrance>
       </Container>
