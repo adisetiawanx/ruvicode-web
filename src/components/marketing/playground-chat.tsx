@@ -79,20 +79,25 @@ export function PlaygroundChat({
   const modelPricing = models.find((m) => m.model === model);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [remaining, setRemaining] = useState<number | null>(null);
-  const [needKey, setNeedKey] = useState(false);
-  const [lastCost, setLastCost] = useState<{
-    input: number;
-    output: number;
-    total: number;
-  } | null>(null);
-  const [lastUsage, setLastUsage] = useState<{
-    prompt: number;
-    completion: number;
-  } | null>(null);
-  const [lastReasoningTokens, setLastReasoningTokens] = useState(0);
+    const [input, setInput] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [remaining, setRemaining] = useState<number | null>(null);
+    const [needKey, setNeedKey] = useState(false);
+    const [lastCost, setLastCost] = useState<{
+      input: number;
+      output: number;
+      total: number;
+    } | null>(null);
+    const [lastUsage, setLastUsage] = useState<{
+      prompt: number;
+      completion: number;
+    } | null>(null);
+    const [lastReasoningTokens, setLastReasoningTokens] = useState(0);
+    // Default request settings shown in the stats panel.
+    const requestSettings = {
+      maxTokens: 4096,
+      temperature: 0.7,
+    };
 
   function handleChunk(chunk: StreamChunk, activeIndex: number) {
     if (chunk.meta?.remaining !== undefined) {
@@ -173,14 +178,15 @@ export function PlaygroundChat({
 
     try {
       const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: "user", content: input }],
-          max_tokens: 500,
-        }),
-      });
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                model,
+                messages: [{ role: "user", content: input }],
+                max_tokens: requestSettings.maxTokens,
+                temperature: requestSettings.temperature,
+              }),
+            });
 
       if (!res.ok) {
         let data: { error?: string; code?: string } = {};
@@ -242,7 +248,17 @@ export function PlaygroundChat({
         )}
       </div>
 
-      {lastCost && lastUsage && (
+            {/* Request settings */}
+            <div className="space-y-1 rounded-lg border border-border-default bg-surface p-3">
+              <p className="text-xs text-text-secondary">Request settings</p>
+              <div className="space-y-0.5 font-mono text-xs text-text-muted tabular">
+                <p>Max tokens: {requestSettings.maxTokens.toLocaleString()}</p>
+                <p>Temperature: {requestSettings.temperature}</p>
+                {!showSignupCta && <p>Billed to your wallet (per-key rate)</p>}
+              </div>
+            </div>
+
+            {lastCost && lastUsage && (
         <div className="space-y-1 rounded-lg border border-border-default bg-surface p-4">
           <p className="text-xs text-text-secondary">Last request cost</p>
           <p className="font-mono tabular text-lg text-text-primary">
