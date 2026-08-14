@@ -16,6 +16,7 @@ import { Send, Loader2, ChevronRight, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 import { publicPlaygroundModel } from "@/lib/playground";
+import { ChatCodeBlock, parseMessageContent } from "@/components/chat/code-block";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -225,18 +226,18 @@ export function PlaygroundChat({
           </div>
         ) : (
           <Select
-            value={model}
-            onValueChange={(v) => {
-              setSelectedModel(v);
-              setMessages([]);
-              setLastCost(null);
-              setLastUsage(null);
-              setInput("");
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
+                      value={model}
+                      onValueChange={(v) => {
+                        setSelectedModel(v);
+                        setMessages([]);
+                        setLastCost(null);
+                        setLastUsage(null);
+                        setInput("");
+                      }}
+                    >
+                      <SelectTrigger className="!w-full">
+                        <SelectValue />
+                      </SelectTrigger>
             <SelectContent>
               {models.map((m) => (
                 <SelectItem key={m.model} value={m.model}>
@@ -356,17 +357,31 @@ export function PlaygroundChat({
                     </p>
                   </details>
                 )}
-                <p className="whitespace-pre-wrap text-sm">
-                  {msg.content}
-                  {isStreamingSlot && msg.content === "" && (
-                    <Loader2 className="mt-0.5 inline h-3 w-3 animate-spin" />
-                  )}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                                {parseMessageContent(msg.content).map((seg, si) =>
+                                  seg.type === "code" ? (
+                                    <ChatCodeBlock
+                                      key={si}
+                                      code={seg.content}
+                                      language={seg.language}
+                                    />
+                                  ) : (
+                                    <p key={si} className="whitespace-pre-wrap text-sm">
+                                      {seg.content}
+                                      {isStreamingSlot &&
+                                        si === parseMessageContent(msg.content).length - 1 && (
+                                          <span className="ml-0.5 inline-block h-3.5 w-1.5 animate-pulse bg-accent" />
+                                        )}
+                                    </p>
+                                  ),
+                                )}
+                                {isStreamingSlot && msg.content === "" && (
+                                  <Loader2 className="h-4 w-4 animate-spin text-text-secondary" />
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
 
       <div className="border-t border-border-subtle p-4">
         <div className="flex gap-2">
