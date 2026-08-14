@@ -4,17 +4,17 @@
  * Key management (get/create/revoke/update limits) is backed by Drizzle ORM
  * against the shared Postgres when DATABASE_URL is configured, and falls back
  * to static seed data when it is not (local dev without the DB running).
- * Usage and billing queries are still backed by static seed data.
+ * Usage and billing queries are now also Drizzle-backed with mock fallback.
  *
  * SECURITY: All functions take a `userId` that MUST come from the
  * authenticated session. Every query is scoped `.where(eq(table.userId,
  * userId))`. Ownership checks are enforced before any mutation.
  */
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { db, isDbAvailable } from "@/lib/db";
-import { apiKeys } from "@/lib/db/schema";
+import { apiKeys, topups, usageRecords } from "@/lib/db/schema";
 import { invalidateKeyCache } from "@/lib/key-cache";
 
 // ── Types ──
@@ -324,112 +324,209 @@ export async function updateApiKeyLimits(
   return true;
 }
 
-// ── Usage queries ──
+// ── Usage queries (Drizzle-backed) ──
+
+function buildUsageConditions(
+  userId: string,
+  filters: Omit<UsageFilters, "page" | "pageSize">,
+) {
+  const conditions = [eq(usageRecords.userId, userId)];
+  if (filters.model && filters.model !== "all") {
+    conditions.push(eq(usageRecords.model, filters.model));
+  }
+  if (filters.dateFrom) {
+    conditions.push(gte(usageRecords.createdAt, new Date(filters.dateFrom)));
+  }
+  if (filters.dateTo) {
+    conditions.push(lte(usageRecords.createdAt, new Date(filters.dateTo)));
+  }
+  return conditions;
+}
+
+function applyMockFilters<T extends UsageRecord>(
+  records: T[],
+  filters: Omit<UsageFilters, "page" | "pageSize">,
+): T[] {
+  let result = [...records];
+  if (filters.model && filters.model !== "all") {
+    result = result.filter((r) => r.model === filters.model);
+  }
+  if (filters.dateFrom) {
+    const from = new Date(filters.dateFrom).getTime();
+    result = result.filter((r) => r.createdAt.getTime() >= from);
+  }
+  if (filters.dateTo) {
+    const to = new Date(filters.dateTo).getTime();
+    result = result.filter((r) => r.createdAt.getTime() <= to);
+  }
+  return result;
+}
 
 export async function getUsageRecords(
   userId: string,
   filters: UsageFilters,
 ): Promise<UsageRecord[]> {
-  void userId;
-  let records = [...ALL_USAGE_RECORDS];
-
-  if (filters.model && filters.model !== "all") {
-    records = records.filter((r) => r.model === filters.model);
-  }
-  if (filters.dateFrom) {
-    const from = new Date(filters.dateFrom).getTime();
-    records = records.filter((r) => r.createdAt.getTime() >= from);
-  }
-  if (filters.dateTo) {
-    const to = new Date(filters.dateTo).getTime();
-    records = records.filter((r) => r.createdAt.getTime() <= to);
+  if (!isDbAvailable()) {
+    const records = applyMockFilters(ALL_USAGE_RECORDS, filters);
+    const offset = (filters.page - 1) * filters.pageSize;
+    return records.slice(offset, offset + filters.pageSize);
   }
 
-  const offset = (filters.page - 1) * filters.pageSize;
-  return records.slice(offset, offset + filters.pageSize);
+  const conditions = buildUsageConditions(userId, filters);
+
+  const rows = await db
+    .select({
+      id: usageRecords.id,
+      model: usageRecords.model,
+      promptTokens: usageRecords.promptTokens,
+      completionTokens: usageRecords.completionTokens,
+      cost: usageRecords.cost,
+      createdAt: usageRecords.createdAt,
+    })
+    .from(usageRecords)
+    .where(and(...conditions))
+    .orderBy(desc(usageRecords.createdAt))
+    .limit(filters.pageSize)
+    .offset((filters.page - 1) * filters.pageSize);
+
+  return rows.map((r) => ({
+    id: r.id,
+    model: r.model,
+    promptTokens: r.promptTokens,
+    completionTokens: r.completionTokens,
+    cost: r.cost,
+    createdAt: r.createdAt,
+  }));
 }
 
 export async function getUsageCount(
   userId: string,
   filters: Omit<UsageFilters, "page" | "pageSize">,
 ): Promise<number> {
-  void userId;
-  let records = [...ALL_USAGE_RECORDS];
+  if (!isDbAvailable()) {
+    return applyMockFilters(ALL_USAGE_RECORDS, filters).length;
+  }
 
-  if (filters.model && filters.model !== "all") {
-    records = records.filter((r) => r.model === filters.model);
-  }
-  if (filters.dateFrom) {
-    const from = new Date(filters.dateFrom).getTime();
-    records = records.filter((r) => r.createdAt.getTime() >= from);
-  }
-  if (filters.dateTo) {
-    const to = new Date(filters.dateTo).getTime();
-    records = records.filter((r) => r.createdAt.getTime() <= to);
-  }
-  return records.length;
+  const conditions = buildUsageConditions(userId, filters);
+
+  const [row] = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(usageRecords)
+    .where(and(...conditions));
+
+  return row?.count ?? 0;
 }
 
 export async function getUsageSummary(
   userId: string,
   filters: Omit<UsageFilters, "page" | "pageSize">,
 ): Promise<UsageSummary> {
-  void userId;
-  let records = [...ALL_USAGE_RECORDS];
+  if (!isDbAvailable()) {
+    const records = applyMockFilters(ALL_USAGE_RECORDS, filters);
+    return {
+      totalRequests: records.length,
+      totalTokens: records.reduce(
+        (acc, r) => acc + r.promptTokens + r.completionTokens,
+        0,
+      ),
+      totalCost: records.reduce((acc, r) => acc + Number(r.cost), 0),
+    };
+  }
 
-  if (filters.model && filters.model !== "all") {
-    records = records.filter((r) => r.model === filters.model);
-  }
-  if (filters.dateFrom) {
-    const from = new Date(filters.dateFrom).getTime();
-    records = records.filter((r) => r.createdAt.getTime() >= from);
-  }
-  if (filters.dateTo) {
-    const to = new Date(filters.dateTo).getTime();
-    records = records.filter((r) => r.createdAt.getTime() <= to);
-  }
+  const conditions = buildUsageConditions(userId, filters);
+
+  const [row] = await db
+    .select({
+      totalRequests: sql<number>`COUNT(*)`,
+      totalTokens: sql<number>`COALESCE(SUM(${usageRecords.promptTokens} + ${usageRecords.completionTokens}),0)`,
+      totalCost: sql<number>`COALESCE(SUM(${usageRecords.cost}),0)`,
+    })
+    .from(usageRecords)
+    .where(and(...conditions));
 
   return {
-    totalRequests: records.length,
-    totalTokens: records.reduce(
-      (acc, r) => acc + r.promptTokens + r.completionTokens,
-      0,
-    ),
-    totalCost: records.reduce((acc, r) => acc + Number(r.cost), 0),
+    totalRequests: row?.totalRequests ?? 0,
+    totalTokens: row?.totalTokens ?? 0,
+    totalCost: row?.totalCost ?? 0,
   };
 }
 
 export async function getUniqueModels(userId: string): Promise<string[]> {
-  void userId;
-  return Array.from(new Set(ALL_USAGE_RECORDS.map((r) => r.model))).sort();
+  if (!isDbAvailable()) {
+    return Array.from(new Set(ALL_USAGE_RECORDS.map((r) => r.model))).sort();
+  }
+
+  const rows = await db
+    .select({ model: usageRecords.model })
+    .from(usageRecords)
+    .where(eq(usageRecords.userId, userId))
+    .groupBy(usageRecords.model)
+    .orderBy(usageRecords.model);
+
+  return rows.map((r) => r.model);
 }
 
 export async function getAllUsageForExport(
   userId: string,
   filters: Omit<UsageFilters, "page" | "pageSize">,
 ): Promise<UsageRecord[]> {
-  void userId;
-  let records = [...ALL_USAGE_RECORDS];
+  if (!isDbAvailable()) {
+    return applyMockFilters(ALL_USAGE_RECORDS, filters);
+  }
 
-  if (filters.model && filters.model !== "all") {
-    records = records.filter((r) => r.model === filters.model);
-  }
-  if (filters.dateFrom) {
-    const from = new Date(filters.dateFrom).getTime();
-    records = records.filter((r) => r.createdAt.getTime() >= from);
-  }
-  if (filters.dateTo) {
-    const to = new Date(filters.dateTo).getTime();
-    records = records.filter((r) => r.createdAt.getTime() <= to);
-  }
-  return records;
+  const conditions = buildUsageConditions(userId, filters);
+
+  const rows = await db
+    .select({
+      id: usageRecords.id,
+      model: usageRecords.model,
+      promptTokens: usageRecords.promptTokens,
+      completionTokens: usageRecords.completionTokens,
+      cost: usageRecords.cost,
+      createdAt: usageRecords.createdAt,
+    })
+    .from(usageRecords)
+    .where(and(...conditions))
+    .orderBy(desc(usageRecords.createdAt));
+
+  return rows.map((r) => ({
+    id: r.id,
+    model: r.model,
+    promptTokens: r.promptTokens,
+    completionTokens: r.completionTokens,
+    cost: r.cost,
+    createdAt: r.createdAt,
+  }));
 }
 
-// ── Billing / topup queries ──
+// ── Billing / topup queries (Drizzle-backed) ──
 
 export async function getTopups(userId: string): Promise<TopupRecord[]> {
-  void userId;
-  return [...MOCK_TOPUPS].sort(
-    (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-  );
+  if (!isDbAvailable()) {
+    return [...MOCK_TOPUPS].sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    );
+  }
+
+  const rows = await db
+    .select({
+      id: topups.id,
+      amount: topups.amount,
+      method: topups.method,
+      fee: topups.fee,
+      status: topups.status,
+      createdAt: topups.createdAt,
+    })
+    .from(topups)
+    .where(eq(topups.userId, userId))
+    .orderBy(desc(topups.createdAt));
+
+  return rows.map((r) => ({
+    id: r.id,
+    amount: r.amount,
+    method: r.method,
+    fee: r.fee,
+    status: r.status,
+    createdAt: r.createdAt,
+  }));
 }
