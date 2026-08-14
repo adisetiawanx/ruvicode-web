@@ -2,14 +2,17 @@ import { z } from "zod";
 import { getModelBySlug } from "@/lib/db/queries/models";
 
 /**
- * Shared playground logic used by both the public playground
- * (src/app/(marketing)/playground) and the dashboard playground
- * (src/app/(dashboard)/dashboard/playground).
+ * Shared playground logic used by both the public playground route
+ * (src/app/api/playground/chat) and the dashboard playground route
+ * (src/app/api/dashboard/playground/chat), and by the client component.
  *
- * The two server actions differ only in auth and rate limiting; the request
- * validation, provider URL building, response sanitization, and cost
- * estimation live here so they cannot drift apart.
+ * The public playground lets anonymous visitors try exactly one model;
+ * the dashboard playground runs the signed-in user's own key through the
+ * gateway. Both stream responses so reasoning and tokens appear live.
  */
+
+// The only model anonymous visitors can try on the public playground.
+export const publicPlaygroundModel = "deepseek-v4-flash";
 
 export const playgroundSchema = z.object({
   model: z.string().min(1).max(50),
@@ -28,25 +31,12 @@ export const playgroundSchema = z.object({
 
 export type PlaygroundInput = z.infer<typeof playgroundSchema>;
 
-export type PlaygroundResult =
-  | {
-      ok: true;
-      data: {
-        content: string;
-        usage: { prompt_tokens: number; completion_tokens: number };
-        cost: {
-          input: number;
-          output: number;
-          total: number;
-        } | null;
-        remaining: number;
-      };
-    }
-  | { ok: false; error: string; remaining?: number };
-
-export type PlaygroundChatAction = (
-  input: PlaygroundInput,
-) => Promise<PlaygroundResult>;
+/** A non-streaming error payload returned by a playground chat route. */
+export interface PlaygroundErrorResponse {
+  error: string;
+  code?: string;
+  remaining?: number;
+}
 
 /**
  * Build the chat completions URL for the provider. The configured
@@ -61,9 +51,53 @@ export function playgroundProviderUrl(): string {
     : `${base}/v1/chat/completions`;
 }
 
+// The provider reports settlement internals (cost, cost_details, is_byok)
+// and its own identity (provider field, model echoed with an upstream
+// prefix). Every SSE line is scrubbed before it reaches the browser.
+// Mirrors the gateway's masking.SanitizeResponseBody.
+
+const modelField = /"model"\s*:\s*"[^"]*"/;
+
+// stripValue matches scalar JSON values and flat objects, bounded so it
+// never spans a comma.
+const stripValue = `(?:-?\\d+(?:\\.\\d+)?|"[^"]*"|true|false|null|\\{[^{}]*\\})`;
+
+function stripField(data: string, field: string): string {
+  const lead = new RegExp(`,\\s*"${field}"\\s*:\\s*${stripValue}`);
+  const trail = new RegExp(`"${field}"\\s*:\\s*${stripValue},\\s*`);
+  const bare = new RegExp(`"${field}"\\s*:\\s*${stripValue}`);
+  return data.replace(lead, "").replace(trail, "").replace(bare, "");
+}
+
+const internalFields = ["provider", "cost", "cost_details", "is_byok"];
+
+/** Rewrite the model to the requested id and drop upstream-internal fields. */
+export function sanitizeBody(data: string, modelId: string): string {
+  let d = data.replace(modelField, `"model":"${modelId}"`);
+  for (const field of internalFields) {
+    d = stripField(d, field);
+  }
+  return d;
+}
+
 /**
- * Estimate what this request would cost the user, using the model's current
- * Ruvicode pricing. Returns null when the model is not in the catalog.
+ * Sanitize one SSE line before forwarding: drop comments/keep-alives and
+ * scrub the body. Returns null when the line must not be forwarded.
+ */
+export function sanitizeSSELine(line: string, modelId: string): string | null {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.startsWith(":")) return null;
+  if (!trimmed.startsWith("data:")) return null;
+  return sanitizeBody(line, modelId);
+}
+
+export function stripCostField(data: string): string {
+  return stripField(data, "cost");
+}
+
+/**
+ * Estimate what a request costs using the model's current Ruvicode pricing.
+ * Returns null when the model is not in the catalog.
  */
 export async function calculatePlaygroundCost(
   model: string,
