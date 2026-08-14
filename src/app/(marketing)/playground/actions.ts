@@ -1,54 +1,26 @@
 "use server";
 
 import DOMPurify from "isomorphic-dompurify";
-import { z } from "zod";
 import { headers } from "next/headers";
 import { limitPlaygroundRequest } from "@/lib/upstash";
-import { getModelBySlug } from "@/lib/db/queries/models";
+import {
+  playgroundSchema,
+  playgroundProviderUrl,
+  calculatePlaygroundCost,
+  type PlaygroundResult,
+} from "@/lib/playground";
 
 /**
- * Playground chat server action.
+ * Public playground chat server action.
  *
- * Architecture: Browser → Server Action (rate limited) → Provider API →
+ * Architecture: Browser → Server Action (rate limited by IP) → Provider API →
  *   Sanitize → Browser
  *
  * This prevents:
  * - API key exposure in client-side code
  * - Direct browser-to-provider calls (leaks provider identity)
- * - Unlimited free API calls (rate limited by IP)
+ * - Unlimited free API calls (rate limited by IP: 5 requests/hour)
  */
-
-const playgroundSchema = z.object({
-  model: z.string().min(1).max(50),
-  messages: z
-    .array(
-      z.object({
-        role: z.enum(["user", "system", "assistant"]),
-        content: z.string().min(1).max(32000),
-      }),
-    )
-    .min(1)
-    .max(20),
-  temperature: z.number().min(0).max(2).optional(),
-  max_tokens: z.number().min(1).max(4096).optional(),
-});
-
-export type PlaygroundResult =
-  | {
-      ok: true;
-      data: {
-        content: string;
-        usage: { prompt_tokens: number; completion_tokens: number };
-        cost: {
-          input: number;
-          output: number;
-          total: number;
-        } | null;
-        remaining: number;
-      };
-    }
-  | { ok: false; error: string; remaining?: number };
-
 export async function playgroundChat(input: unknown): Promise<PlaygroundResult> {
   // 1. Validate input with Zod
   const result = playgroundSchema.safeParse(input);
@@ -59,7 +31,7 @@ export async function playgroundChat(input: unknown): Promise<PlaygroundResult> 
   // 2. Rate limit by IP (5 requests per hour per IP)
   const h = await headers();
   const ip = h.get("x-forwarded-for") ?? "unknown";
-  const { success, remaining } = await limitPlaygroundRequest(ip);
+  const { success, remaining } = await limitPlaygroundRequest(ip, 5, "1 h");
 
   if (!success) {
     return {
@@ -71,8 +43,8 @@ export async function playgroundChat(input: unknown): Promise<PlaygroundResult> 
 
   // 3. Forward to provider (server-side — API key never exposed to browser)
   const providerKey = process.env.PROVIDER_PLAYGROUND_KEY;
-  const baseUrl = process.env.PROVIDER_BASE_URL;
-  if (!providerKey || !baseUrl) {
+  const url = playgroundProviderUrl();
+  if (!providerKey || !url) {
     return {
       ok: false,
       error: "Playground is not configured. Please try again later.",
@@ -81,7 +53,7 @@ export async function playgroundChat(input: unknown): Promise<PlaygroundResult> 
   }
 
   try {
-    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${providerKey}`,
@@ -137,21 +109,4 @@ export async function playgroundChat(input: unknown): Promise<PlaygroundResult> 
       remaining,
     };
   }
-}
-
-async function calculatePlaygroundCost(
-  model: string,
-  usage: { prompt_tokens: number; completion_tokens: number },
-) {
-  const pricing = await getModelBySlug(model);
-  if (!pricing) return null;
-
-  const inputCost = (usage.prompt_tokens / 1_000_000) * pricing.user_input;
-  const outputCost =
-    (usage.completion_tokens / 1_000_000) * pricing.user_output;
-  return {
-    input: inputCost,
-    output: outputCost,
-    total: inputCost + outputCost,
-  };
 }
