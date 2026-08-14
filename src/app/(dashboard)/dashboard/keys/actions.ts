@@ -6,6 +6,7 @@ import { getSession } from "@/lib/session";
 import {
   createApiKey,
   revokeApiKey,
+  updateApiKeyLimits,
 } from "@/lib/db/queries/management";
 
 export type CreateKeyResult =
@@ -54,6 +55,40 @@ export async function revokeKeyAction(
 
   // SECURITY: Ownership check is inside revokeApiKey — scoped to userId
   const success = await revokeApiKey(session.user.id, keyId);
+  if (!success) {
+    return { ok: false, message: "Key not found" };
+  }
+
+  revalidatePath("/dashboard/keys");
+  return { ok: true };
+}
+
+export type UpdateKeyLimitsResult =
+  | { ok: true }
+  | { ok: false; errors?: Record<string, string[]>; message: string };
+
+export async function updateKeyLimitsAction(
+  keyId: string,
+  input: unknown,
+): Promise<UpdateKeyLimitsResult> {
+  const session = await getSession();
+  if (!session) return { ok: false, message: "Unauthorized" };
+
+  const result = createKeySchema.safeParse(input);
+  if (!result.success) {
+    return {
+      ok: false,
+      errors: result.error.flatten().fieldErrors,
+      message: "Please fix the highlighted fields.",
+    };
+  }
+
+  const success = await updateApiKeyLimits(session.user.id, keyId, {
+    label: result.data.label,
+    rateLimitRpm: result.data.rateLimitRpm,
+    spendLimitDaily: result.data.spendLimitDaily?.toString() ?? null,
+    spendLimitMonthly: result.data.spendLimitMonthly?.toString() ?? null,
+  });
   if (!success) {
     return { ok: false, message: "Key not found" };
   }
