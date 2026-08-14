@@ -1,14 +1,21 @@
 /**
  * API key, usage, billing, and topup queries.
  *
- * Currently backed by static seed data (DB not running in local dev).
- * Will be swapped to Drizzle ORM queries once Postgres is provisioned.
+ * Key management (get/create/revoke/update limits) is backed by Drizzle ORM
+ * against the shared Postgres when DATABASE_URL is configured, and falls back
+ * to static seed data when it is not (local dev without the DB running).
+ * Usage and billing queries are still backed by static seed data.
  *
  * SECURITY: All functions take a `userId` that MUST come from the
- * authenticated session. When Drizzle is added, every query is scoped
- * `.where(eq(table.userId, userId))`. Ownership checks are enforced
- * before any mutation.
+ * authenticated session. Every query is scoped `.where(eq(table.userId,
+ * userId))`. Ownership checks are enforced before any mutation.
  */
+
+import { and, desc, eq } from "drizzle-orm";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { db, isDbAvailable } from "@/lib/db";
+import { apiKeys } from "@/lib/db/schema";
+import { invalidateKeyCache } from "@/lib/key-cache";
 
 // ── Types ──
 
@@ -161,11 +168,38 @@ const MOCK_TOPUPS: TopupRecord[] = [
 
 // ── Keys queries ──
 
-export async function getApiKeys(userId: string): Promise<ApiKeyData[]> {
-  void userId; // will be used in Drizzle where clause
-  return MOCK_API_KEYS.filter((k) => k.isActive);
+/** Map a Drizzle api_keys row to the dashboard's ApiKeyData shape. */
+function rowToApiKey(row: typeof apiKeys.$inferSelect): ApiKeyData {
+  return {
+    id: row.id,
+    label: row.label,
+    keyPrefix: row.keyPrefix,
+    rateLimitRpm: row.rateLimitRpm,
+    spendLimitDaily: row.spendLimitDaily,
+    spendLimitMonthly: row.spendLimitMonthly,
+    isActive: row.isActive,
+    lastUsed: row.lastUsedAt,
+    createdAt: row.createdAt,
+    revokedAt: row.revokedAt,
+  };
 }
 
+export async function getApiKeys(userId: string): Promise<ApiKeyData[]> {
+  if (!isDbAvailable()) return MOCK_API_KEYS.filter((k) => k.isActive);
+
+  const rows = await db
+    .select()
+    .from(apiKeys)
+    .where(and(eq(apiKeys.userId, userId), eq(apiKeys.isActive, true)))
+    .orderBy(desc(apiKeys.createdAt));
+
+  return rows.map(rowToApiKey);
+}
+
+/**
+ * Create a key: `rvcd_` + 32 random hex chars (128 bits). Only the SHA-256
+ * hash is persisted; the full key is returned once and never retrievable.
+ */
 export async function createApiKey(
   userId: string,
   data: {
@@ -175,40 +209,118 @@ export async function createApiKey(
     spendLimitMonthly: string | null;
   },
 ): Promise<{ keyId: string; fullKey: string }> {
-  void userId;
-  // Generate key: rvcd_ + 32 random hex chars
-  const random = Array.from(crypto.getRandomValues(new Uint8Array(16)))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  const random = randomBytes(16).toString("hex"); // 32 hex chars
   const fullKey = `rvcd_${random}`;
+  const keyHash = createHash("sha256").update(fullKey).digest("hex");
   const keyPrefix = random.substring(0, 8);
-  const keyId = `key-${Date.now()}`;
+  const keyId = randomUUID();
 
-  MOCK_API_KEYS.push({
+  if (!isDbAvailable()) {
+    MOCK_API_KEYS.push({
+      id: keyId,
+      label: data.label,
+      keyPrefix,
+      rateLimitRpm: data.rateLimitRpm,
+      spendLimitDaily: data.spendLimitDaily,
+      spendLimitMonthly: data.spendLimitMonthly,
+      isActive: true,
+      lastUsed: null,
+      createdAt: new Date(),
+      revokedAt: null,
+    });
+    return { keyId, fullKey };
+  }
+
+  await db.insert(apiKeys).values({
     id: keyId,
+    userId,
     label: data.label,
     keyPrefix,
+    keyHash,
     rateLimitRpm: data.rateLimitRpm,
     spendLimitDaily: data.spendLimitDaily,
     spendLimitMonthly: data.spendLimitMonthly,
-    isActive: true,
-    lastUsed: null,
-    createdAt: new Date(),
-    revokedAt: null,
   });
 
   return { keyId, fullKey };
 }
 
+/**
+ * Revoke a key owned by `userId`: mark it inactive in Postgres, then delete
+ * its Redis cache entry so the gateway stops accepting it immediately
+ * instead of waiting out the 5 minute TTL.
+ */
 export async function revokeApiKey(
   userId: string,
   keyId: string,
 ): Promise<boolean> {
-  void userId;
-  const key = MOCK_API_KEYS.find((k) => k.id === keyId && k.isActive);
+  if (!isDbAvailable()) {
+    const key = MOCK_API_KEYS.find((k) => k.id === keyId && k.isActive);
+    if (!key) return false;
+    key.isActive = false;
+    key.revokedAt = new Date();
+    return true;
+  }
+
+  const [key] = await db
+    .select({ keyHash: apiKeys.keyHash })
+    .from(apiKeys)
+    .where(and(eq(apiKeys.id, keyId), eq(apiKeys.userId, userId)))
+    .limit(1);
   if (!key) return false;
-  key.isActive = false;
-  key.revokedAt = new Date();
+
+  await db
+    .update(apiKeys)
+    .set({ isActive: false, revokedAt: new Date() })
+    .where(and(eq(apiKeys.id, keyId), eq(apiKeys.userId, userId)));
+
+  await invalidateKeyCache(key.keyHash);
+  return true;
+}
+
+/**
+ * Update a key's label and limits. The Postgres row is the source of truth,
+ * and the Redis cache entry is deleted so new limits apply on the next
+ * gateway request instead of after the TTL.
+ */
+export async function updateApiKeyLimits(
+  userId: string,
+  keyId: string,
+  data: {
+    label: string;
+    rateLimitRpm: number;
+    spendLimitDaily: string | null;
+    spendLimitMonthly: string | null;
+  },
+): Promise<boolean> {
+  if (!isDbAvailable()) {
+    const key = MOCK_API_KEYS.find((k) => k.id === keyId && k.isActive);
+    if (!key) return false;
+    key.label = data.label;
+    key.rateLimitRpm = data.rateLimitRpm;
+    key.spendLimitDaily = data.spendLimitDaily;
+    key.spendLimitMonthly = data.spendLimitMonthly;
+    return true;
+  }
+
+  const [key] = await db
+    .select({ keyHash: apiKeys.keyHash })
+    .from(apiKeys)
+    .where(and(eq(apiKeys.id, keyId), eq(apiKeys.userId, userId)))
+    .limit(1);
+  if (!key) return false;
+
+  await db
+    .update(apiKeys)
+    .set({
+      label: data.label,
+      rateLimitRpm: data.rateLimitRpm,
+      spendLimitDaily: data.spendLimitDaily,
+      spendLimitMonthly: data.spendLimitMonthly,
+    })
+    .where(and(eq(apiKeys.id, keyId), eq(apiKeys.userId, userId)));
+
+  await invalidateKeyCache(key.keyHash);
   return true;
 }
 
