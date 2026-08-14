@@ -3,12 +3,17 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Product, BreadcrumbList, WithContext } from "schema-dts";
 import { getAllActiveModels, getModelBySlug } from "@/lib/db/queries/models";
+import { highlightCode } from "@/lib/shiki";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { LinkButton } from "@/components/shared/link-button";
-import { QuickstartCode } from "@/components/shared/quickstart-code";
+import {
+  QuickstartCode,
+  type HighlightedCodeTab,
+} from "@/components/shared/quickstart-code";
+import { ArrowLeft, ArrowRight, Sparkles, TrendingDown } from "lucide-react";
 
-export const revalidate = 300; // SSR — 5 minute revalidation
+export const revalidate = 300; // ISR — 5 minute revalidation
 
 /** SECURITY: validate slug format — only allow lowercase alphanumeric,
  * hyphens, dots, and colons (variant slugs like "kimi-k2.5:web" use them).
@@ -72,9 +77,12 @@ export default async function ModelDetailPage({
   const model = await getModelBySlug(slug);
   if (!model) notFound();
 
-  const quickstartTabs = [
+  // Quickstart snippets are static per model, so they are highlighted with
+  // Shiki on the server and shipped as HTML (zero client JS for coloring).
+  const samples = [
     {
       label: "curl",
+      lang: "bash" as const,
       code: `curl https://api.ruvicode.com/v1/chat/completions \\
   -H "Authorization: Bearer rvcd_..." \\
   -H "Content-Type: application/json" \\
@@ -85,6 +93,7 @@ export default async function ModelDetailPage({
     },
     {
       label: "python",
+      lang: "python" as const,
       code: `from openai import OpenAI
 
 client = OpenAI(
@@ -100,6 +109,7 @@ print(response.choices[0].message.content)`,
     },
     {
       label: "node",
+      lang: "typescript" as const,
       code: `import OpenAI from "openai";
 
 const client = new OpenAI({
@@ -110,9 +120,19 @@ const client = new OpenAI({
 const response = await client.chat.completions.create({
   model: "${model.model}",
   messages: [{ role: "user", content: "Hello" }],
-});`,
+});
+
+console.log(response.choices[0].message.content);`,
     },
   ];
+
+  const quickstartTabs: HighlightedCodeTab[] = await Promise.all(
+    samples.map(async (s) => ({
+      label: s.label,
+      code: s.code,
+      highlightedHtml: await highlightCode(s.code, s.lang),
+    })),
+  );
 
   const productJsonLd: WithContext<Product> = {
     "@context": "https://schema.org",
@@ -163,7 +183,7 @@ const response = await client.chat.completions.create({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Container size="content" className="py-12">
+      <Container size="content" className="py-10 md:py-14">
         {/* Breadcrumb */}
         <nav className="mb-8 flex items-center gap-2 text-sm text-text-muted">
           <Link href="/" className="transition-colors hover:text-text-secondary">
@@ -181,101 +201,170 @@ const response = await client.chat.completions.create({
         </nav>
 
         {/* Header */}
-        <div className="mb-8 flex items-start justify-between gap-4">
-          <div>
-            <div className="mb-3 flex items-center gap-3">
-              <h1 className="text-h1 font-bold">{model.display_name}</h1>
+        <div className="mb-10">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div>
+              <div className="mb-3 flex flex-wrap items-center gap-3">
+                <h1 className="text-h1 font-bold tracking-tight">
+                  {model.display_name}
+                </h1>
+                <span className="rounded-full border border-success/30 bg-success-subtle px-3 py-1 font-mono text-xs font-medium tabular text-success">
+                  −{model.user_discount_pct.toFixed(0)}% vs OpenRouter
+                </span>
+              </div>
+              <p className="font-mono text-sm text-text-muted">
+                {model.model}
+              </p>
+              {model.capabilities.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {model.capabilities.map((cap) => (
+                    <Badge
+                      key={cap}
+                      variant="secondary"
+                      className="capitalize"
+                    >
+                      {cap}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="flex flex-wrap gap-2">
-              {model.capabilities.map((cap) => (
-                <Badge key={cap} variant="secondary" className="capitalize">
-                  {cap}
-                </Badge>
-              ))}
+            <LinkButton
+              href={`/playground?model=${model.model}`}
+              variant="primary"
+            >
+              <Sparkles className="mr-1.5 h-4 w-4" />
+              Try in Playground
+            </LinkButton>
+          </div>
+
+          {/* Price strip */}
+          <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border-default bg-border-subtle sm:grid-cols-3">
+            <div className="bg-surface p-5">
+              <p className="mb-1.5 text-xs font-medium uppercase tracking-wider text-text-muted">
+                Input
+              </p>
+              <p className="font-mono text-2xl font-semibold tabular text-text-primary">
+                ${formatPrice(model.user_input)}
+                <span className="ml-1 text-sm font-normal text-text-muted">
+                  /1M tokens
+                </span>
+              </p>
+            </div>
+            <div className="bg-surface p-5">
+              <p className="mb-1.5 text-xs font-medium uppercase tracking-wider text-text-muted">
+                Output
+              </p>
+              <p className="font-mono text-2xl font-semibold tabular text-text-primary">
+                ${formatPrice(model.user_output)}
+                <span className="ml-1 text-sm font-normal text-text-muted">
+                  /1M tokens
+                </span>
+              </p>
+            </div>
+            <div className="bg-surface p-5">
+              <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                <TrendingDown className="h-3.5 w-3.5" />
+                You save
+              </p>
+              <p className="font-mono text-2xl font-semibold tabular text-success">
+                {model.user_discount_pct.toFixed(0)}%
+              </p>
             </div>
           </div>
-          <LinkButton
-            href={`/playground?model=${model.model}`}
-            variant="outline"
-            size="sm"
-          >
-            Try in Playground →
-          </LinkButton>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           {/* Left: Quickstart */}
           <div>
-            <h2 className="mb-4 text-xl font-semibold">Quickstart</h2>
+            <h2 className="mb-1 text-xl font-semibold">Quickstart</h2>
             <p className="mb-4 text-sm text-text-secondary">
-              Use the OpenAI SDK with your Ruvicode API key. Just change the base
-              URL and model name.
+              Use the OpenAI SDK with your Ruvicode API key. Just change the
+              base URL and model name.
             </p>
             <QuickstartCode tabs={quickstartTabs} />
+
+            <div className="mt-8 flex items-center justify-between rounded-xl border border-border-default bg-surface p-5">
+              <div>
+                <p className="font-medium text-text-primary">
+                  Need the full API reference?
+                </p>
+                <p className="mt-0.5 text-sm text-text-secondary">
+                  Authentication, streaming, error handling, and rate limits.
+                </p>
+              </div>
+              <Link
+                href="/docs"
+                className="flex shrink-0 items-center gap-1 text-sm font-medium text-accent-text transition-colors hover:text-accent-hover"
+              >
+                Read the docs
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
 
-          {/* Right: Pricing card */}
+          {/* Right: reference card */}
           <div className="space-y-4">
-            <div className="rounded-lg border border-border-default bg-surface p-6">
-              <h3 className="mb-4 font-semibold">Pricing</h3>
+            <div className="rounded-xl border border-border-default bg-surface p-6">
+              <h3 className="mb-4 font-semibold">Reference pricing</h3>
               <div className="space-y-3">
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">
-                    Input / 1M tokens
+                    OpenRouter input
                   </span>
-                  <span className="font-mono tabular text-lg text-text-primary">
-                    ${formatPrice(model.user_input)}
+                  <span className="font-mono text-sm tabular text-text-muted">
+                    ${formatPrice(model.ref_input)}/1M
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">
-                    Output / 1M tokens
+                    OpenRouter output
                   </span>
-                  <span className="font-mono tabular text-lg text-text-primary">
-                    ${formatPrice(model.user_output)}
+                  <span className="font-mono text-sm tabular text-text-muted">
+                    ${formatPrice(model.ref_output)}/1M
                   </span>
                 </div>
-              </div>
-              <div className="mt-4 border-t border-border-subtle pt-4">
-                <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline justify-between border-t border-border-subtle pt-3">
                   <span className="text-sm text-text-secondary">
-                    vs OpenRouter
+                    Ruvicode price
                   </span>
-                  <span className="font-mono tabular font-medium text-success">
+                  <span className="font-mono text-sm font-medium tabular text-success">
                     −{model.user_discount_pct.toFixed(0)}%
                   </span>
                 </div>
               </div>
+              <p className="mt-4 text-xs leading-relaxed text-text-muted">
+                Live market pricing, refreshed every 2 minutes. No minimum
+                spend, no credit expiry.
+              </p>
             </div>
 
-            <div className="rounded-lg border border-border-default bg-surface p-6">
-              <h3 className="mb-4 font-semibold">Specs</h3>
-              <div className="space-y-3">
-              {model.context && (
+            {model.context && (
+              <div className="rounded-xl border border-border-default bg-surface p-6">
+                <h3 className="mb-4 font-semibold">Specs</h3>
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">
                     Context window
                   </span>
-                  <span className="font-mono tabular text-text-primary">
+                  <span className="font-mono text-sm tabular text-text-primary">
                     {model.context}
                   </span>
                 </div>
-              )}
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-text-secondary">
-                    OpenRouter ref
-                  </span>
-                  <span className="font-mono text-text-muted">
-                    ${formatPrice(model.ref_input)} / $
-                    {formatPrice(model.ref_output)}
-                  </span>
-                </div>
               </div>
-            </div>
+            )}
 
             <LinkButton href="/register" variant="primary" className="w-full">
-              Get Started →
+              Get Started
+              <ArrowRight className="ml-1.5 h-4 w-4" />
             </LinkButton>
+
+            <Link
+              href="/models"
+              className="flex items-center justify-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text-secondary"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              All models
+            </Link>
           </div>
         </div>
       </Container>
