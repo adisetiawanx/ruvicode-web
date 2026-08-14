@@ -414,7 +414,8 @@ export async function getUsageCount(
     .from(usageRecords)
     .where(and(...conditions));
 
-  return row?.count ?? 0;
+  // COUNT(*) also arrives as a string from pg; coerce for an honest number.
+  return Number(row?.count ?? 0);
 }
 
 export async function getUsageSummary(
@@ -444,10 +445,11 @@ export async function getUsageSummary(
     .from(usageRecords)
     .where(and(...conditions));
 
+  // Numeric SUM() returns strings from pg; coerce here (see dashboard.ts).
   return {
-    totalRequests: row?.totalRequests ?? 0,
-    totalTokens: row?.totalTokens ?? 0,
-    totalCost: row?.totalCost ?? 0,
+    totalRequests: Number(row?.totalRequests ?? 0),
+    totalTokens: Number(row?.totalTokens ?? 0),
+    totalCost: Number(row?.totalCost ?? 0),
   };
 }
 

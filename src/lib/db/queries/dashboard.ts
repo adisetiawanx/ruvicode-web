@@ -10,7 +10,7 @@
 
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { db, isDbAvailable } from "@/lib/db";
-import { usageHourly, usageRecords, wallets } from "@/lib/db/schema";
+import { usageRecords, wallets } from "@/lib/db/schema";
 
 // ── Types ──
 
@@ -171,16 +171,23 @@ export async function getMonthlySummary(
       ),
     );
 
+  // SUM() over numeric columns comes back from pg as a string, even though
+  // the sql<number> type claims otherwise. Coerce at the boundary so
+  // downstream .toFixed() calls cannot crash the render.
   return {
-    spent: row?.spent ?? 0,
-    requestCount: row?.requestCount ?? 0,
-    savings: row?.margin ?? 0,
+    spent: Number(row?.spent ?? 0),
+    requestCount: Number(row?.requestCount ?? 0),
+    savings: Number(row?.margin ?? 0),
   };
 }
 
 /**
  * Get daily usage aggregation for the last 7 days.
- * Aggregates from `usage_hourly`, grouping by day.
+ *
+ * Aggregates directly from `usage_records` (the source of truth written by
+ * the gateway) instead of `usage_hourly`, because no aggregation worker
+ * populates that table yet. The (user_id, created_at) index keeps this
+ * cheap at MVP scale. Revisit if per-user usage grows past ~100k rows.
  */
 export async function getWeeklyUsage(userId: string): Promise<DailyUsage[]> {
   if (!isDbAvailable()) return MOCK_WEEKLY_USAGE;
@@ -189,22 +196,22 @@ export async function getWeeklyUsage(userId: string): Promise<DailyUsage[]> {
 
   const rows = await db
     .select({
-      date: sql<string>`DATE(${usageHourly.hourBucket})`,
-      cost: sql<number>`COALESCE(SUM(${usageHourly.totalCost}),0)`,
-      requests: sql<number>`COALESCE(SUM(${usageHourly.requestCount}),0)`,
+      date: sql<string>`TO_CHAR(DATE_TRUNC('day', ${usageRecords.createdAt}), 'Dy')`,
+      cost: sql<number>`COALESCE(SUM(${usageRecords.cost}),0)`,
+      requests: sql<number>`COUNT(*)`,
     })
-    .from(usageHourly)
+    .from(usageRecords)
     .where(
       and(
-        eq(usageHourly.userId, userId),
-        gte(usageHourly.hourBucket, sevenDaysAgo),
+        eq(usageRecords.userId, userId),
+        gte(usageRecords.createdAt, sevenDaysAgo),
       ),
     )
-    .groupBy(sql`DATE(${usageHourly.hourBucket})`)
-    .orderBy(sql`DATE(${usageHourly.hourBucket})`);
+    .groupBy(sql`DATE_TRUNC('day', ${usageRecords.createdAt})`)
+    .orderBy(sql`DATE_TRUNC('day', ${usageRecords.createdAt})`);
 
   return rows.map((r) => ({
-    date: r.date,
+    date: r.date.trim(),
     cost: Number(r.cost),
     requests: Number(r.requests),
   }));
@@ -212,7 +219,8 @@ export async function getWeeklyUsage(userId: string): Promise<DailyUsage[]> {
 
 /**
  * Get model breakdown (cost per model) for the current month.
- * Aggregates from `usage_hourly`.
+ *
+ * Same rationale as getWeeklyUsage, aggregates `usage_records` directly.
  */
 export async function getModelBreakdown(
   userId: string,
@@ -223,18 +231,18 @@ export async function getModelBreakdown(
 
   const rows = await db
     .select({
-      model: usageHourly.model,
-      cost: sql<number>`COALESCE(SUM(${usageHourly.totalCost}),0)`,
+      model: usageRecords.model,
+      cost: sql<number>`COALESCE(SUM(${usageRecords.cost}),0)`,
     })
-    .from(usageHourly)
+    .from(usageRecords)
     .where(
       and(
-        eq(usageHourly.userId, userId),
-        gte(usageHourly.hourBucket, monthStart),
+        eq(usageRecords.userId, userId),
+        gte(usageRecords.createdAt, monthStart),
       ),
     )
-    .groupBy(usageHourly.model)
-    .orderBy(sql`COALESCE(SUM(${usageHourly.totalCost}),0)`);
+    .groupBy(usageRecords.model)
+    .orderBy(sql`COALESCE(SUM(${usageRecords.cost}),0)`);
 
   const total = rows.reduce((acc, r) => acc + Number(r.cost), 0);
   if (total === 0) return [];
