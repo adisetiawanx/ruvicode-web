@@ -61,9 +61,11 @@ export function CodeDemo({ tabs }: CodeDemoProps) {
           )}
         </button>
       </div>
-      {/* Code — Shiki HTML with inline styles */}
+      {/* Code — Shiki HTML with inline styles.
+          overflow-auto on the inner container so long lines scroll
+          inside the card instead of blowing out the grid column. */}
       <div
-        className="max-h-[420px] overflow-auto text-sm [&_pre]:!bg-inset [&_pre]:!p-4 [&_pre]:!m-0 [&_code]:!font-mono"
+        className="max-h-[420px] min-w-0 overflow-auto text-sm [&_pre]:!overflow-x-auto [&_pre]:!bg-inset [&_pre]:!p-4 [&_pre]:!m-0 [&_code]:!font-mono"
         dangerouslySetInnerHTML={{ __html: activeTab.highlightedHtml }}
       />
     </div>

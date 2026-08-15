@@ -251,7 +251,7 @@ export default async function IntegrationsPage() {
         </div>
 
         {/* Universal config callout */}
-        <div className="mb-12 rounded-xl border border-accent/25 bg-accent-subtle p-6">
+        <div className="mb-6 rounded-xl border border-accent/25 bg-accent-subtle p-6">
           <p className="mb-1 font-medium text-text-primary">
             The two values every tool needs
           </p>
@@ -310,11 +310,11 @@ export default async function IntegrationsPage() {
           {cards.map(({ integration, tabs }) => (
             <div
               key={integration.name}
-              className="rounded-xl border border-border-default bg-surface p-6 md:p-8"
+              className="min-w-0 rounded-xl border border-border-default bg-surface p-6 md:p-8"
             >
-              <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+              <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
                 {/* Left: name, tagline, steps */}
-                <div>
+                <div className="min-w-0">
                   <h2 className="mb-1 text-xl font-semibold text-text-primary">
                     {integration.name}
                   </h2>
