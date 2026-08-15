@@ -125,14 +125,14 @@ resp = client.chat.completions.create(
       },
       "models": {
         "glm-5.2": { "name": "GLM 5.2", "limit": { "context": 1000000, "output": 128000 } },
-        "claude-opus-5": { "name": "Claude Opus 5", "limit": { "context": 1000000, "output": 128000 } },
+        "claude-opus-5": { "name": "Claude Opus 5", "limit": { "context": 1000000, "output": 128000 }, "modalities": { "input": ["text", "image"], "output": ["text"] } },
         "deepseek-v4-flash": { "name": "DeepSeek V4 Flash", "limit": { "context": 1048576, "output": 384000 } }
       }
     }
   }
 }`,
     configLang: "json",
-    note: "OpenCode 1.x does not auto-fetch custom provider catalogs yet (Venice works because it is listed in models.dev). List the model ids you want explicitly. Get all ids from GET /v1/models.",
+    note: "OpenCode 1.x does not auto-fetch custom provider catalogs yet (Venice works because it is listed in models.dev). List model ids explicitly, and add modalities.input image for vision models, or OpenCode will refuse image attachments itself.",
   },
   {
     name: "OpenClaw",
