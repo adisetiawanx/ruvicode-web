@@ -18,12 +18,12 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "AI Models — Catalog & Transparent Pricing",
   description:
-    "Browse every AI model on Ruvicode with live transparent pricing. Filter by provider, price, and capabilities. Save up to 77% vs OpenRouter. No hidden fees.",
+    "Browse every AI model on Ruvicode with live transparent pricing. Filter by provider, price, and capabilities. Save up to 99% vs list price. No hidden fees.",
   alternates: { canonical: "https://ruvicode.com/models" },
   openGraph: {
     title: "AI Models — Catalog & Transparent Pricing",
     description:
-      "Browse every AI model with live transparent pricing. Save up to 77% vs OpenRouter.",
+      "Browse every AI model with live transparent pricing. Save up to 99% vs list price.",
     url: "https://ruvicode.com/models",
     type: "website",
   },

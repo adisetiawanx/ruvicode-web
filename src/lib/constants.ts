@@ -29,7 +29,7 @@ export const FAQS = [
 
 export const STATS = [
   { value: "20+", label: "AI Models" },
-  { value: "77%", label: "Cheaper vs OpenRouter" },
+  { value: "99%", label: "Cheaper vs list price" },
   { value: "$0", label: "Hidden Fees" },
   { value: "30K", label: "Requests/min Capacity" },
 ] as const;

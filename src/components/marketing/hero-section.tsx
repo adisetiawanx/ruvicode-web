@@ -49,7 +49,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
                 variant="outline"
                 className="mb-6 border-accent/30 text-accent-text"
               >
-                Save up to 77% vs OpenRouter
+                Save up to 99% vs list price
               </Badge>
             </motion.div>
 

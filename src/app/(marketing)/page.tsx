@@ -22,11 +22,11 @@ export const revalidate = 3600; // SSG — hourly refresh for model data
 export const metadata: Metadata = {
   title: "Ruvicode — One API Key, Every AI Model, Transparent Pricing",
   description:
-    "Access Claude, GPT, Gemini, GLM, DeepSeek, Kimi and more with one API key. Transparent per-request pricing, hard spend limits. Save up to 77% vs OpenRouter.",
+    "Access Claude, GPT, Gemini, GLM, DeepSeek, Kimi and more with one API key. Transparent per-request pricing, hard spend limits. Save up to 99% vs list price.",
   alternates: { canonical: "https://ruvicode.com" },
   openGraph: {
     title: "Ruvicode — One API Key, Every AI Model",
-    description: "Transparent AI API gateway. Save up to 77% vs OpenRouter.",
+    description: "Transparent AI API gateway. Save up to 99% vs list price.",
     url: "https://ruvicode.com",
     siteName: "Ruvicode",
     type: "website",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Ruvicode — One API Key, Every AI Model",
-    description: "Transparent AI API gateway. Save up to 77% vs OpenRouter.",
+    description: "Transparent AI API gateway. Save up to 99% vs list price.",
   },
 };
 

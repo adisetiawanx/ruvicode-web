@@ -8,6 +8,17 @@ import Link from "next/link";
  * Live data from the curated catalog (never mock): the eight most
  * affordable curated models, straight from the pricing engine.
  */
+// One flagship per brand: the showcase is a story about coverage across
+// frontier labs, not a price-sorted list.
+const SHOWCASE_ORDER = [
+  "claude-opus-5",
+  "gpt-5.6-sol",
+  "grok-4.5",
+  "glm-5.2",
+  "kimi-k3",
+  "deepseek-v4-flash-0731",
+];
+
 export async function ModelShowcase() {
   // Opt this section into request-time rendering: the landing shell stays
   // static, but prices must never be baked at build time (the build
@@ -15,7 +26,11 @@ export async function ModelShowcase() {
   const { connection } = await import("next/server");
   await connection();
 
-  const models = (await getTopModels(8)).slice(0, 8);
+  const all = await getTopModels(100);
+  const bySlug = new Map(all.map((m) => [m.model, m]));
+  const models = SHOWCASE_ORDER.map((slug) => bySlug.get(slug)).filter(
+    (m): m is NonNullable<typeof m> => !!m,
+  );
 
   return (
     <section className="border-t border-border-subtle py-24">
@@ -27,7 +42,7 @@ export async function ModelShowcase() {
           Transparent per-1M-token pricing. No hidden fees, no credit expiry.
         </p>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {models.map((m) => (
             <Link
               key={m.model}

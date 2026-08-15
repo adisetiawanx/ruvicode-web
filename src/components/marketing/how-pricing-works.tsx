@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { ArrowRight, BadgeCheck, Scale, Wallet } from "lucide-react";
 
@@ -57,20 +58,20 @@ export function HowPricingWorks() {
               <Wallet className="h-5 w-5 text-accent" />
             </div>
             <h3 className="mb-2 text-lg font-semibold">
-              Save up to 77% vs OpenRouter
+              Save up to 99% vs list price
             </h3>
             <p className="mb-5 text-sm leading-relaxed text-text-secondary">
               Same models, same OpenAI-compatible API, a fraction of the
               reference price. Balance never expires and there are no
               minimums.
             </p>
-            <a
+            <Link
               href="/models"
               className="inline-flex items-center gap-1 text-sm font-medium text-accent-text transition-colors hover:text-accent-hover"
             >
               Browse live prices
               <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </Container>

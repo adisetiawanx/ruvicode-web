@@ -6,6 +6,11 @@
  * upstream feed carries no provider metadata (and the upstream provider
  * identity is masked by design).
  *
+ * Capability tags verified against vendor docs (Aug 2026): DeepSeek V4
+ * and GLM-5 are text-only (no image input), Kimi K2.5+ carry the MoonViT
+ * vision encoder (native multimodal), Grok 4.5 accepts image input,
+ * MiniMax M2 is text with deep tool-use.
+ *
  * To add a model: make sure the slug exists in `model_prices` (the pricing
  * worker syncs it), then add an entry here.
  */
@@ -64,9 +69,9 @@ export const CURATED_MODELS: CuratedModel[] = [
   c("gemini-3.1-pro-preview", "Gemini 3.1 Pro", "Google", ["text", "vision", "reasoning", "tools", "code"]),
 
   // ── DeepSeek ──
-  c("deepseek-v4-flash", "DeepSeek V4 Flash", "DeepSeek", ["text", "reasoning", "code"]),
-  c("deepseek-v4-flash-0731", "DeepSeek V4 Flash 0731", "DeepSeek", ["text", "reasoning", "code"]),
-  c("deepseek-v4-pro", "DeepSeek V4 Pro", "DeepSeek", ["text", "reasoning", "code"]),
+  c("deepseek-v4-flash", "DeepSeek V4 Flash", "DeepSeek", ["text", "reasoning", "tools", "code"]),
+  c("deepseek-v4-flash-0731", "DeepSeek V4 Flash 0731", "DeepSeek", ["text", "reasoning", "tools", "code"]),
+  c("deepseek-v4-pro", "DeepSeek V4 Pro", "DeepSeek", ["text", "reasoning", "tools", "code"]),
 
   // ── Z.ai ──
   c("glm-5.1", "GLM-5.1", "Z.ai", ["text", "reasoning", "tools", "code"]),
@@ -77,13 +82,13 @@ export const CURATED_MODELS: CuratedModel[] = [
 
   // ── Moonshot ──
   c("kimi-k3", "Kimi K3", "Moonshot", ["text", "vision", "reasoning", "tools", "code"]),
-  c("kimi-k2.5", "Kimi K2.5", "Moonshot", ["text", "vision", "tools", "code"]),
-  c("kimi-k2.6", "Kimi K2.6", "Moonshot", ["text", "vision", "tools", "code"]),
-  c("kimi-k2.7-code", "Kimi K2.7 Code", "Moonshot", ["text", "tools", "code"]),
+  c("kimi-k2.5", "Kimi K2.5", "Moonshot", ["text", "vision", "reasoning", "tools", "code"]),
+  c("kimi-k2.6", "Kimi K2.6", "Moonshot", ["text", "vision", "reasoning", "tools", "code"]),
+  c("kimi-k2.7-code", "Kimi K2.7 Code", "Moonshot", ["text", "vision", "tools", "code"]),
 
   // ── MiniMax ──
-  c("minimax-m2.5", "MiniMax M2.5", "MiniMax", ["text", "reasoning", "code"]),
-  c("minimax-m2.7", "MiniMax M2.7", "MiniMax", ["text", "reasoning", "code"]),
+  c("minimax-m2.5", "MiniMax M2.5", "MiniMax", ["text", "reasoning", "tools", "code"]),
+  c("minimax-m2.7", "MiniMax M2.7", "MiniMax", ["text", "reasoning", "tools", "code"]),
 ];
 
 /** Slug allowlist used by the DB queries. */

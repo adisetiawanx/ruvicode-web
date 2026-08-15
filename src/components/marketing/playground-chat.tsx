@@ -242,6 +242,12 @@ export function PlaygroundChat({
         <span className="hidden text-xs text-text-muted sm:inline">
           {maxTokens.toLocaleString()} tokens · {temperature.toFixed(1)} temp
         </span>
+        <Badge variant="outline" className="border-success/40 text-success">
+          Free
+        </Badge>
+        <Badge variant="outline" className="border-accent/40 text-accent-text">
+          Unlimited
+        </Badge>
         {activeKeyLabel && (
           <span className="hidden items-center gap-1.5 text-xs text-text-muted sm:inline-flex">
             <KeyRound className="h-3 w-3" />
@@ -347,35 +353,6 @@ export function PlaygroundChat({
         {!showSignupCta && <p className="text-xs text-text-muted">Billed to your wallet</p>}
       </div>
 
-      {locked && (
-        <div className="space-y-2 rounded-md border border-border-subtle bg-surface-2 p-3">
-          <p className="text-xs font-medium text-text-secondary">
-            Other models
-          </p>
-          <ul className="space-y-1">
-            {models
-              .filter((m) => m.model !== locked)
-              .slice(0, 5)
-              .map((m) => (
-                <li
-                  key={m.model}
-                  className="flex items-center justify-between gap-2 text-xs"
-                >
-                  <span className="flex min-w-0 items-center gap-1.5 text-text-muted">
-                    <Lock className="h-3 w-3 shrink-0" />
-                    <span className="truncate">{m.display_name}</span>
-                  </span>
-                  <span className="shrink-0 font-mono tabular text-text-muted">
-                    ${m.user_input.toFixed(2)}/1M
-                  </span>
-                </li>
-              ))}
-          </ul>
-          <p className="pt-1 text-xs text-text-muted">
-            Sign up to try every model in the dashboard playground.
-          </p>
-        </div>
-      )}
 
       <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">
         <p className="text-xs text-text-secondary">Last request</p>
@@ -403,17 +380,6 @@ export function PlaygroundChat({
         >
           <KeyRound className="mr-2 h-4 w-4" />
           Create API Key
-        </Button>
-      )}
-
-      {showSignupCta && (
-        <Button
-          variant="primary"
-          className="w-full"
-          nativeButton={false}
-          render={<Link href="/register" />}
-        >
-          Sign up for unlimited →
         </Button>
       )}
     </div>
