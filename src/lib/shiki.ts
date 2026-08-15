@@ -6,19 +6,19 @@ import {
 
 /**
  * Shiki singleton — initialized once, reused across renders.
- * Uses "github-dark" theme as the closest match to Ruvicode's warm dark palette.
- * (Shiki doesn't have a built-in warm-terracotta theme; github-dark is the
- * industry standard for dev tooling and pairs well with our dark canvas.)
  *
- * The generated HTML uses inline styles (Shiki's default), so no extra CSS
- * is needed. We just set the container background to --code-bg in the component.
+ * Dual themes: github-dark for dark mode, github-light for light mode.
+ * Both are rendered as CSS variables on a single <pre> (shiki's
+ * css-variables + defaultColor approach), and globals.css switches them
+ * via [data-theme]. This avoids the washed-out dark theme that a plain
+ * single-theme render caused in light mode.
  */
 let highlighterPromise: ReturnType<typeof createHighlighter> | null = null;
 
 function getHighlighter() {
   if (!highlighterPromise) {
     highlighterPromise = createHighlighter({
-      themes: ["github-dark"],
+      themes: ["github-dark", "github-light"],
       langs: ["bash", "python", "typescript"],
     });
   }
@@ -36,6 +36,12 @@ export async function highlightCode(
   const hl = await getHighlighter();
   return hl.codeToHtml(code, {
     lang,
-    theme: "github-dark" as BundledTheme,
+    themes: {
+      light: "github-light" as BundledTheme,
+      dark: "github-dark" as BundledTheme,
+    },
+    // No inline default color: spans carry --shiki-light/--shiki-dark and
+    // globals.css picks the right one per theme. This keeps both modes crisp.
+    defaultColor: false,
   });
 }

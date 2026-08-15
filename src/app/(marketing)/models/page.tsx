@@ -4,7 +4,6 @@ import { getAllActiveModels, getAllProviders } from "@/lib/db/queries/models";
 import { ModelCatalogGrid } from "@/components/marketing/model-catalog-grid";
 import { PricingHero } from "@/components/marketing/pricing-hero";
 import { HowPricingWorks } from "@/components/marketing/how-pricing-works";
-import { PricingTable } from "@/components/marketing/pricing-table";
 import { Container } from "@/components/layout/container";
 import {
   PageEntrance,
@@ -87,22 +86,6 @@ export default async function ModelsPage() {
                 </p>
               </div>
               <ModelCatalogGrid models={models} providers={providers} />
-            </Container>
-          </section>
-        </PageEntranceItem>
-
-        {/* Full sortable price table */}
-        <PageEntranceItem>
-          <section className="border-t border-border-subtle py-16">
-            <Container size="wide">
-              <h2 className="mb-2 text-3xl font-semibold">
-                Compare all models
-              </h2>
-              <p className="mb-8 text-text-secondary">
-                Sortable price list for every model, refreshed every 2 minutes
-                from the live market.
-              </p>
-              <PricingTable models={models} />
             </Container>
           </section>
         </PageEntranceItem>

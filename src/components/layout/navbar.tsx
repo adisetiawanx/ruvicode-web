@@ -51,11 +51,7 @@ export function Navbar() {
 
           {/* Right actions (desktop) */}
           <div className="hidden items-center gap-2 md:flex">
-            <CommandPalette />
             <ThemeToggle />
-            <LinkButton href="/login" variant="ghost" size="sm">
-              Sign in
-            </LinkButton>
             <LinkButton href="/register" variant="primary" size="sm">
               Get Started
             </LinkButton>
@@ -98,9 +94,6 @@ export function Navbar() {
                     ))}
                   </nav>
                   <div className="flex flex-col gap-3 border-t border-border-subtle pt-4">
-                    <LinkButton href="/login" variant="outline">
-                      Sign in
-                    </LinkButton>
                     <LinkButton href="/register" variant="primary">
                       Get Started
                     </LinkButton>

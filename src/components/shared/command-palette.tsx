@@ -23,7 +23,6 @@ import {
   KeyRound,
   LayoutDashboard,
   LogIn,
-  Search,
 } from "lucide-react";
 
 const PAGES = [
@@ -63,21 +62,10 @@ export function CommandPalette() {
     router.push(href);
   };
 
+  // No visible trigger button: the palette opens via Ctrl/Cmd+K only,
+  // keeping the navbar minimal.
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label="Search pages"
-        className="flex h-8 items-center gap-2 rounded-md border border-border-subtle bg-surface-2/60 px-2.5 text-xs text-text-muted transition-colors hover:border-border-default hover:text-text-secondary"
-      >
-        <Search className="h-3.5 w-3.5" />
-        <span className="hidden lg:inline">Search...</span>
-        <kbd className="hidden rounded border border-border-subtle bg-surface px-1.5 py-0.5 font-mono text-[10px] lg:inline">
-          Ctrl K
-        </kbd>
-      </button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
+    <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Search pages..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
@@ -101,7 +89,6 @@ export function CommandPalette() {
           ))}
         </CommandGroup>
       </CommandList>
-      </CommandDialog>
-    </>
+    </CommandDialog>
   );
 }

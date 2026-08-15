@@ -438,3 +438,26 @@ body {
 [data-sonner-toast][data-type="info"] {
   border-left: 3px solid var(--info) !important;
 }
+
+/* ── Shiki dual themes ─────────────────────────────────────────────
+   Spans are rendered with --shiki-light and --shiki-dark variables
+   (defaultColor: false). Pick the matching palette per app theme. */
+[data-theme="dark"] .shiki,
+[data-theme="dark"] .shiki span {
+  color: var(--shiki-dark);
+  background-color: transparent;
+}
+[data-theme="light"] .shiki,
+[data-theme="light"] .shiki span {
+  color: var(--shiki-light);
+  background-color: transparent;
+}
+[data-theme="dark"] .shiki {
+  --shiki-bg: var(--code-bg);
+}
+[data-theme="light"] .shiki {
+  --shiki-bg: var(--code-bg);
+}
+.shiki {
+  background-color: var(--code-bg) !important;
+}

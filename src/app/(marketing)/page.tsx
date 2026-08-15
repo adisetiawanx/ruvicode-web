@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { HeroSection } from "@/components/marketing/hero-section";
 import { StatBar } from "@/components/marketing/stat-bar";
 import { FeatureGrid } from "@/components/marketing/feature-grid";
+import { Suspense } from "react";
 import { ModelShowcase } from "@/components/marketing/model-showcase";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { CtaSection } from "@/components/marketing/cta-section";
@@ -54,7 +55,9 @@ export default async function LandingPage() {
       <HeroSection codeTabs={codeTabs} />
       <StatBar />
       <FeatureGrid />
-      <ModelShowcase />
+      <Suspense>
+        <ModelShowcase />
+      </Suspense>
       <HowItWorks />
       <CtaSection />
       <FaqSection />
