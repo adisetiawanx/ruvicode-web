@@ -55,13 +55,11 @@ export async function POST(req: NextRequest) {
       { status: 503 },
     );
   }
+  // The free model rotates on the freedom endpoint and its id is not
+  // known to the browser ahead of time, so any requested model is
+  // accepted and rewritten to the current free model server-side.
   const freeModel = await resolveFreeModel(freedomBase, freedomKey);
-  if (parsed.data.model !== freeModel) {
-    return Response.json(
-      { error: "Only the free model is available without an account." },
-      { status: 400 },
-    );
-  }
+  parsed.data.model = freeModel;
 
   // 2b. Server-side ceiling: the UI may lower max tokens, but a crafted
   // payload cannot raise it, which bounds the worst-case cost per request.

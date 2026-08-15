@@ -2,6 +2,7 @@ import { getTopModels } from "@/lib/db/queries/models";
 import { Container } from "@/components/layout/container";
 import Link from "next/link";
 import { BrandLogo } from "@/components/shared/brand-logo";
+import { ModelTag } from "@/components/shared/model-tag";
 
 /**
  * Featured model cards on the landing page.
@@ -58,8 +59,10 @@ export async function ModelShowcase() {
                 </span>
               </div>
 
-              {/* Model name */}
-              <h3 className="mb-4 text-lg font-semibold">{m.display_name}</h3>
+              {/* Model name + copyable API id */}
+              <div className="mb-4">
+                <ModelTag id={m.model} />
+              </div>
 
               {/* Pricing block */}
               <div className="mt-auto space-y-2 border-t border-border-subtle pt-4">

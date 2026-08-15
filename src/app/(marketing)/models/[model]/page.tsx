@@ -7,6 +7,7 @@ import { highlightCode } from "@/lib/shiki";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { BrandLogo } from "@/components/shared/brand-logo";
+import { ModelTag } from "@/components/shared/model-tag";
 import { LinkButton } from "@/components/shared/link-button";
 import {
   CodeDemo,
@@ -205,11 +206,9 @@ console.log(response.choices[0].message.content);`,
                   −{model.user_discount_pct.toFixed(0)}% vs OpenRouter
                 </span>
               </div>
-              {model.model !== model.display_name && (
-                <p className="font-mono text-sm text-text-muted">
-                  {model.model}
-                </p>
-              )}
+              <div className="mb-1">
+                <ModelTag id={model.model} showName={false} />
+              </div>
               {model.capabilities.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {model.capabilities.map((cap) => (

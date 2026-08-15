@@ -150,8 +150,8 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                   className="border-b border-border-subtle transition-colors last:border-0 hover:bg-surface/50"
                 >
                   <td className="px-4 py-3">
-                    <span className="flex items-center gap-2.5">
-                      <BrandLogo brand={m.provider} className="h-5 w-5 shrink-0" />
+                    <span className="flex items-start gap-2.5">
+                      <BrandLogo brand={m.provider} className="mt-0.5 h-5 w-5 shrink-0" />
                       <ModelTag id={m.model} className="min-w-0" />
                     </span>
                   </td>

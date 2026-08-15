@@ -319,11 +319,22 @@ export function PlaygroundChat({
       <div>
         <p className="mb-2 text-[13px] font-medium text-text-secondary">Model</p>
         {locked ? (
-          <div className="rounded-md border border-border-subtle bg-surface-2 px-3 py-2">
-            <p className="text-sm text-text-primary">{locked ? displayModelName(locked) : (modelPricing?.display_name ?? model)}</p>
-            <p className="font-mono text-xs text-text-muted">
-              ${modelPricing?.user_input.toFixed(2) ?? "?"}/1M input
+          <div className="space-y-2 rounded-md border border-border-subtle bg-surface-2 px-3 py-2.5">
+            <p className="text-sm text-text-primary">
+              {locked ? displayModelName(locked) : (modelPricing?.display_name ?? model)}
             </p>
+            <div className="flex items-center justify-between font-mono text-xs">
+              <span className="text-text-muted">Input</span>
+              <span className="tabular text-text-secondary">
+                ${modelPricing ? modelPricing.user_input.toFixed(4) : "?"}/1M
+              </span>
+            </div>
+            <div className="flex items-center justify-between font-mono text-xs">
+              <span className="text-text-muted">Output</span>
+              <span className="tabular text-text-secondary">
+                ${modelPricing ? modelPricing.user_output.toFixed(4) : "?"}/1M
+              </span>
+            </div>
           </div>
         ) : (
           <ModelPicker
@@ -337,6 +348,29 @@ export function PlaygroundChat({
               setInput("");
             }}
           />
+        )}
+
+        {!locked && modelPricing && (
+          <div className="mt-2 space-y-2 rounded-md border border-border-subtle bg-surface-2 px-3 py-2.5">
+            <div className="flex items-center justify-between font-mono text-xs">
+              <span className="text-text-muted">Input</span>
+              <span className="tabular text-text-secondary">
+                ${modelPricing.user_input.toFixed(4)}/1M
+              </span>
+            </div>
+            <div className="flex items-center justify-between font-mono text-xs">
+              <span className="text-text-muted">Output</span>
+              <span className="tabular text-text-secondary">
+                ${modelPricing.user_output.toFixed(4)}/1M
+              </span>
+            </div>
+            <div className="flex items-center justify-between font-mono text-xs">
+              <span className="text-text-muted">vs reference</span>
+              <span className="tabular text-success">
+                −{modelPricing.user_discount_pct.toFixed(0)}%
+              </span>
+            </div>
+          </div>
         )}
       </div>
 

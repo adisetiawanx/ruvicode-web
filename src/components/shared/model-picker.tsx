@@ -62,7 +62,8 @@ export function ModelPicker({ models, value, onChange }: ModelPickerProps) {
                 {selected?.display_name ?? value}
               </span>
               <span className="block truncate font-mono text-xs text-text-muted">
-                ${formatPrice(selected?.user_input ?? 0)}/1M in · save{" "}
+                ${formatPrice(selected?.user_input ?? 0)}/1M in · $
+                {formatPrice(selected?.user_output ?? 0)}/1M out · save{" "}
                 {(selected?.user_discount_pct ?? 0).toFixed(0)}%
               </span>
             </span>
