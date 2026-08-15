@@ -13,6 +13,17 @@ import { Input } from "@/components/ui/input";
 import { LinkButton } from "@/components/shared/link-button";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 
+/** Common usage profiles for one-click fills. */
+const PRESETS = [
+  { label: "Light agent", input: 1_000_000, output: 500_000 },
+  { label: "Coding assistant", input: 10_000_000, output: 2_000_000 },
+  { label: "Heavy pipeline", input: 100_000_000, output: 20_000_000 },
+];
+
+function formatTokens(n: number): string {
+  return n.toLocaleString("en-US");
+}
+
 export function CostCalculator({
   models,
 }: {
@@ -56,7 +67,7 @@ export function CostCalculator({
   return (
     <div className="grid gap-8 lg:grid-cols-2">
       {/* Input panel */}
-      <div className="space-y-6">
+      <div className="space-y-6 rounded-xl border border-border-default bg-surface p-6 md:p-8">
         <div>
           <label className="mb-2 block text-sm font-medium">Model</label>
           <Select
@@ -74,6 +85,37 @@ export function CostCalculator({
               ))}
             </SelectContent>
           </Select>
+          {selected && (
+            <p className="mt-2 font-mono text-xs text-text-muted">
+              ${selected.user_input < 1 ? selected.user_input.toFixed(4) : selected.user_input.toFixed(2)} in · $
+              {selected.user_output < 1 ? selected.user_output.toFixed(4) : selected.user_output.toFixed(2)} out per 1M
+              {selected.context && ` · ${selected.context} context`}
+            </p>
+          )}
+        </div>
+
+        {/* Usage presets */}
+        <div>
+          <p className="mb-2 text-sm font-medium">Usage profile</p>
+          <div className="flex flex-wrap gap-2">
+            {PRESETS.map((p) => (
+              <button
+                key={p.label}
+                type="button"
+                onClick={() => {
+                  setInputTokens(p.input);
+                  setOutputTokens(p.output);
+                }}
+                className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                  inputTokens === p.input && outputTokens === p.output
+                    ? "border-accent/40 bg-accent-subtle text-accent-text"
+                    : "border-border-subtle text-text-secondary hover:border-border-default hover:text-text-primary"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -88,6 +130,9 @@ export function CostCalculator({
             }
             className="font-mono tabular"
           />
+          <p className="mt-1 font-mono text-xs text-text-muted">
+            {formatTokens(inputTokens)} tokens
+          </p>
         </div>
 
         <div>
@@ -102,6 +147,9 @@ export function CostCalculator({
             }
             className="font-mono tabular"
           />
+          <p className="mt-1 font-mono text-xs text-text-muted">
+            {formatTokens(outputTokens)} tokens
+          </p>
         </div>
       </div>
 

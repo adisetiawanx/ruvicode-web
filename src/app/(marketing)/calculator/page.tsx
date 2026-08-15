@@ -3,6 +3,10 @@ import type { BreadcrumbList, WithContext } from "schema-dts";
 import { getAllActiveModels } from "@/lib/db/queries/models";
 import { CostCalculator } from "@/components/marketing/cost-calculator";
 import { Container } from "@/components/layout/container";
+import {
+  PageEntrance,
+  PageEntranceItem,
+} from "@/components/shared/page-entrance";
 
 export const metadata: Metadata = {
   title: "AI API Cost Calculator - See Your Savings",
@@ -52,12 +56,27 @@ export default async function CalculatorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Container size="wide" className="py-12">
-        <h1 className="mb-2 text-h1 font-semibold">Cost Calculator</h1>
-        <p className="mb-8 text-text-secondary">
-          See exactly how much you&apos;ll save with Ruvicode versus official
-          provider pricing.
-        </p>
-        <CostCalculator models={models} />
+        <PageEntrance>
+          <PageEntranceItem>
+            <div className="mb-10 max-w-2xl">
+              <p className="mb-2 font-mono text-xs uppercase tracking-widest text-accent-text">
+                Cost Calculator
+              </p>
+              <h1 className="mb-3 text-h1 font-semibold text-text-primary">
+                See exactly how much you save
+              </h1>
+              <p className="text-text-secondary">
+                Pick a model, enter your monthly token usage, and compare what
+                you pay with Ruvicode versus the official provider price. The
+                savings are real, not a teaser rate.
+              </p>
+            </div>
+          </PageEntranceItem>
+
+          <PageEntranceItem>
+            <CostCalculator models={models} />
+          </PageEntranceItem>
+        </PageEntrance>
       </Container>
     </>
   );

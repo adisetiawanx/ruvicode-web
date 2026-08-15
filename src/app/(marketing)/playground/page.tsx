@@ -124,6 +124,10 @@ export default async function PlaygroundPage({
                     <p className="text-xs text-text-muted">
                       Free playground model, no account needed.
                     </p>
+                    <p className="mt-1 flex items-center gap-1 text-[11px] text-text-muted">
+                      <Lock className="h-3 w-3" />
+                      Chats are not saved or stored.
+                    </p>
                   </div>
                 </div>
               </div>

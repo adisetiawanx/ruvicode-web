@@ -21,9 +21,11 @@ export const metadata: Metadata = {
   },
 };
 
-/** Format an ISO date as a readable "Aug 10, 2026". */
+/** Format a stored ISO date string as a readable "Aug 10, 2026". */
 function formatDate(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",

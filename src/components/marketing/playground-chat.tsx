@@ -103,6 +103,7 @@ export function PlaygroundChat({
   const modelPricing = models.find((m) => m.model === model);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // Privacy notice rendered under the chat input on both playgrounds.
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(null);
@@ -549,7 +550,7 @@ export function PlaygroundChat({
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message..."
+            placeholder="Type a message... (chats are not saved)"
             className="min-h-[44px] resize-none rounded-xl bg-surface-2"
             rows={1}
             onKeyDown={(e) => {
@@ -573,6 +574,11 @@ export function PlaygroundChat({
             )}
           </Button>
         </div>
+        <p className="mt-2 flex items-center gap-1.5 text-[11px] text-text-muted">
+          <Lock className="h-3 w-3 shrink-0" />
+          Chat history is not stored. Clearing this page or your browser
+          session removes the conversation.
+        </p>
       </div>
     </div>
   );

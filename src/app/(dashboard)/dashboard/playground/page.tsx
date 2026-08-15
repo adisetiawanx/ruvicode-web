@@ -48,7 +48,7 @@ export default async function DashboardPlaygroundPage() {
           showSignupCta={false}
           activeKeyLabel={keys[0]?.label}
           hint="Try any model with your own key."
-          hintSub="Billed to your wallet at real per-request prices."
+          hintSub="Billed to your wallet at real per-request prices. Chat history is not stored."
         />
       )}
     </div>

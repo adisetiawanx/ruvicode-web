@@ -59,7 +59,12 @@ export function getDocBySlug(slug: string): DocPage | null {
   };
 }
 
-// Build sidebar nav structure grouped by section
+// Build sidebar nav structure grouped by section. Getting Started always
+// comes first (it is the entry point), everything else sorts alphabetically.
+const SECTION_ORDER: Record<string, number> = {
+  "Getting Started": 0,
+};
+
 export function getDocsNav(): Array<{ section: string; items: DocPage[] }> {
   const docs = getAllDocs();
   const sections: Record<string, DocPage[]> = {};
@@ -69,8 +74,12 @@ export function getDocsNav(): Array<{ section: string; items: DocPage[] }> {
     sections[doc.section]!.push(doc);
   }
 
-  return Object.entries(sections).map(([section, items]) => ({
-    section,
-    items,
-  }));
+  return Object.entries(sections)
+    .map(([section, items]) => ({
+      section,
+      items,
+      order: SECTION_ORDER[section] ?? 100,
+    }))
+    .sort((a, b) => a.order - b.order || a.section.localeCompare(b.section))
+    .map(({ section, items }) => ({ section, items }));
 }

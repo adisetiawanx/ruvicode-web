@@ -31,9 +31,11 @@ export default function RefundPolicy() {
           We offer a 30-day money-back guarantee on all wallet top-ups.
         </p>
         <p>
-          If you are not satisfied with Ruvicode for any reason, contact
-          support@ruvicode.com within 30 days of your purchase for a full
-          refund of your remaining wallet balance.
+          Contact support@ruvicode.com within 30 days of your purchase and
+          we will refund your remaining wallet balance. No questions asked
+          about the balance itself, but we do verify your account and
+          transaction history before sending funds back (see How Refunds
+          Are Calculated below).
         </p>
         <p>
           Refunds are processed to the original payment method within 5-10

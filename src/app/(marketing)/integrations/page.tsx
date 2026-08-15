@@ -1,67 +1,136 @@
 import type { Metadata } from "next";
 import type { BreadcrumbList, WithContext } from "schema-dts";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { CodeDemo, type CodeTab } from "@/components/marketing/code-demo";
-import { CODE_SAMPLES } from "@/lib/code-samples";
 import { highlightCode } from "@/lib/shiki";
 
 export const metadata: Metadata = {
   title: "Integrations - Works with Your Tools",
   description:
-    "Ruvicode works with Cursor, Aider, Claude Code, LangChain, and any OpenAI-compatible tool. One base URL change.",
+    "Ruvicode works with Cursor, Aider, Cline, LangChain, and any OpenAI-compatible tool. One base URL change.",
   alternates: { canonical: "https://ruvicode.com/integrations" },
 };
 
-const integrations = [
+interface Integration {
+  name: string;
+  tagline: string;
+  /** Verified setup steps (against each tool's docs, Aug 2026). */
+  steps: string[];
+  config: string;
+  configLang: string;
+  note?: string;
+}
+
+const integrations: Integration[] = [
   {
     name: "Cursor",
-    description: "Point Cursor at Ruvicode with one base URL change.",
+    tagline: "Override the OpenAI base URL and bring your own key.",
+    steps: [
+      "Open Settings (Ctrl/Cmd+,) and go to Models.",
+      "Enable OpenAI API Key and paste your rvcd_ key.",
+      "Turn on Override OpenAI Base URL and enter the URL below.",
+      "Add the models you want in the model list, then Verify.",
+    ],
     config: `OPENAI_API_KEY=rvcd_...
 OPENAI_BASE_URL=https://api.ruvicode.com/v1`,
-    setup: "Settings → Models → OpenAI API Base → paste URL",
+    configLang: "bash",
+    note: "Cursor sends OpenAI-format requests, so every model in our catalog works.",
   },
   {
     name: "Aider",
-    description: "Use Ruvicode with Aider AI coding assistant.",
+    tagline: "Point aider at any model with two environment variables.",
+    steps: [
+      "Install aider: python -m pip install aider-install && aider-install.",
+      "Export OPENAI_API_BASE and OPENAI_API_KEY (or put them in .env).",
+      "Run aider with the openai/ model prefix.",
+    ],
     config: `export OPENAI_API_BASE=https://api.ruvicode.com/v1
-export OPENAI_API_KEY=rvcd_...`,
-    setup: "Set environment variables, run aider",
+export OPENAI_API_KEY=rvcd_...
+
+aider --model openai/glm-5.2`,
+    configLang: "bash",
+    note: "The openai/ prefix is how aider routes to a custom endpoint.",
   },
   {
-    name: "Claude Code",
-    description: "Route Claude Code through Ruvicode on any model.",
-    config: `ANTHROPIC_BASE_URL=https://api.ruvicode.com/anthropic
-ANTHROPIC_API_KEY=rvcd_...`,
-    setup: "Set environment variables before launching Claude Code",
+    name: "Cline",
+    tagline: "Select the OpenAI Compatible provider and paste the base URL.",
+    steps: [
+      "Open the Cline settings panel (gear icon).",
+      "Set API Provider to OpenAI Compatible.",
+      "Paste the Base URL and your rvcd_ API key.",
+      "Enter the model ID (e.g. claude-sonnet-5) and click Verify.",
+    ],
+    config: `Base URL: https://api.ruvicode.com/v1
+API Key:  rvcd_...
+Model:    claude-sonnet-5`,
+    configLang: "bash",
+    note: "Set the context window and max output tokens to match the model for accurate token tracking.",
   },
   {
     name: "LangChain",
-    description: "Use Ruvicode as your LangChain LLM provider.",
+    tagline: "One parameter on ChatOpenAI. Works with the whole chain ecosystem.",
+    steps: [
+      "pip install langchain langchain-openai.",
+      "Pass base_url and your rvcd_ key to ChatOpenAI.",
+      "Use any model from our catalog by slug.",
+    ],
     config: `from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
     model="glm-5.2",
     api_key="rvcd_...",
-    base_url="https://api.ruvicode.com/v1"
+    base_url="https://api.ruvicode.com/v1",
 )`,
-    setup: "Point ChatOpenAI at Ruvicode base URL",
+    configLang: "python",
   },
   {
-    name: "OpenCode / Continue",
-    description: "Any OpenAI-compatible tool works out of the box.",
+    name: "OpenAI SDK",
+    tagline: "The official SDKs work with a single baseURL change.",
+    steps: [
+      "Install the openai package for your language.",
+      "Point it at our base URL with your rvcd_ key.",
+      "Call chat.completions.create as usual.",
+    ],
+    config: `from openai import OpenAI
+
+client = OpenAI(
+    api_key="rvcd_...",
+    base_url="https://api.ruvicode.com/v1",
+)
+
+resp = client.chat.completions.create(
+    model="deepseek-v4-flash",
+    messages=[{"role": "user", "content": "Hello"}],
+)`,
+    configLang: "python",
+  },
+  {
+    name: "Anything else OpenAI-compatible",
+    tagline: "Continue, Roo Code, LibreChat, your own proxy, scripts.",
+    steps: [
+      "Find the base URL / endpoint setting in your tool.",
+      "Set it to https://api.ruvicode.com/v1.",
+      "Use your rvcd_ key where the OpenAI key goes.",
+    ],
     config: `base_url: https://api.ruvicode.com/v1
 api_key: rvcd_...`,
-    setup: "Change base URL in your tool's config",
+    configLang: "bash",
+    note: "If a tool speaks the OpenAI chat completions format, it works with Ruvicode.",
   },
 ];
 
 export default async function IntegrationsPage() {
-  // Pre-highlight code samples with Shiki (server-side)
-  const codeTabs: CodeTab[] = await Promise.all(
-    CODE_SAMPLES.map(async (sample) => ({
-      label: sample.label,
-      highlightedHtml: await highlightCode(sample.code, sample.lang as never),
-      rawCode: sample.code,
+  const cards = await Promise.all(
+    integrations.map(async (integration) => ({
+      integration,
+      tabs: [
+        {
+          label: "Setup",
+          highlightedHtml: await highlightCode(integration.config, integration.configLang as never),
+          rawCode: integration.config,
+        },
+      ] satisfies CodeTab[],
     })),
   );
 
@@ -90,57 +159,115 @@ export default async function IntegrationsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Container size="wide" className="py-24">
-        <h1 className="mb-4 text-4xl font-bold">
-          Works with your favorite tools
-        </h1>
-        <p className="mb-12 max-w-2xl text-lg text-text-secondary">
-          Ruvicode is OpenAI-compatible. Point any tool at our base URL and
-          you&apos;re ready — no SDK changes, no vendor lock-in.
-        </p>
+      <Container size="wide" className="py-16">
+        {/* Header */}
+        <div className="mb-12 max-w-2xl">
+          <p className="mb-2 font-mono text-xs uppercase tracking-widest text-accent-text">
+            Integrations
+          </p>
+          <h1 className="mb-3 text-h1 font-semibold text-text-primary">
+            Works with the tools you already use
+          </h1>
+          <p className="text-lg text-text-secondary">
+            Ruvicode speaks the OpenAI API format. Change one base URL, paste
+            your key, and every model in the catalog is available in your
+            tool of choice.
+          </p>
+        </div>
 
+        {/* Universal config callout */}
+        <div className="mb-12 rounded-xl border border-accent/25 bg-accent-subtle p-6">
+          <p className="mb-1 font-medium text-text-primary">
+            The two values every tool needs
+          </p>
+          <p className="mb-4 text-sm text-text-secondary">
+            Whatever the settings screen calls them, you are always providing
+            these two things.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-lg border border-border-default bg-surface p-4">
+              <p className="mb-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                Base URL
+              </p>
+              <p className="font-mono text-sm text-text-primary">
+                https://api.ruvicode.com/v1
+              </p>
+            </div>
+            <div className="rounded-lg border border-border-default bg-surface p-4">
+              <p className="mb-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                API Key
+              </p>
+              <p className="font-mono text-sm text-text-primary">rvcd_...</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Integration cards */}
         <div className="space-y-6">
-          {integrations.map((integration) => (
+          {cards.map(({ integration, tabs }) => (
             <div
               key={integration.name}
-              className="rounded-lg border border-border-default bg-surface p-6"
+              className="rounded-xl border border-border-default bg-surface p-6 md:p-8"
             >
-              <div className="mb-4 flex items-start justify-between gap-4">
+              <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+                {/* Left: name, tagline, steps */}
                 <div>
-                  <h2 className="mb-1 text-xl font-semibold">
+                  <h2 className="mb-1 text-xl font-semibold text-text-primary">
                     {integration.name}
                   </h2>
-                  <p className="text-sm text-text-secondary">
-                    {integration.description}
+                  <p className="mb-4 text-sm text-text-secondary">
+                    {integration.tagline}
                   </p>
+                  <ol className="space-y-2.5">
+                    {integration.steps.map((step, i) => (
+                      <li key={i} className="flex gap-2.5 text-sm">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-surface-2 font-mono text-[11px] text-text-secondary">
+                          {i + 1}
+                        </span>
+                        <span className="text-text-secondary">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                  {integration.note && (
+                    <p className="mt-4 flex items-start gap-2 text-xs text-text-muted">
+                      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" />
+                      {integration.note}
+                    </p>
+                  )}
+                </div>
+                {/* Right: config code */}
+                <div className="min-w-0">
+                  <CodeDemo tabs={tabs} />
                 </div>
               </div>
-              <details className="group">
-                <summary className="cursor-pointer text-sm text-accent-text hover:underline">
-                  Show setup
-                </summary>
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <p className="mb-2 text-xs uppercase tracking-wide text-text-muted">
-                      Config
-                    </p>
-                    <pre className="overflow-x-auto rounded-md border border-border-default bg-inset p-4 font-mono text-xs text-text-primary">
-                      <code>{integration.config}</code>
-                    </pre>
-                  </div>
-                  <p className="text-sm text-text-secondary">
-                    <span className="text-text-muted">Setup: </span>
-                    {integration.setup}
-                  </p>
-                </div>
-              </details>
             </div>
           ))}
         </div>
 
-        <div className="mt-16">
-          <h2 className="mb-6 text-2xl font-semibold">Try it now</h2>
-          <CodeDemo tabs={codeTabs} />
+        {/* Bottom CTA */}
+        <div className="mt-12 rounded-xl border border-border-default bg-surface p-8 text-center">
+          <h2 className="mb-2 text-xl font-semibold text-text-primary">
+            Get your key in under a minute
+          </h2>
+          <p className="mx-auto mb-5 max-w-md text-sm text-text-secondary">
+            Register, top up, generate an rvcd_ key, and paste it into any
+            setup above.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <a
+              href="/register"
+              className="inline-flex h-10 items-center rounded-md bg-accent px-5 text-sm font-medium text-text-inverse transition-colors hover:bg-accent-hover"
+            >
+              Get started free
+            </a>
+            <a
+              href="/docs/quickstart"
+              className="inline-flex h-10 items-center gap-1 rounded-md border border-border-default px-5 text-sm font-medium text-text-primary transition-colors hover:border-accent/40"
+            >
+              Read the quickstart
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
         </div>
       </Container>
     </>
