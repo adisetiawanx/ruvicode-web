@@ -135,6 +135,52 @@ resp = client.chat.completions.create(
     note: "OpenCode does not auto-fetch the model list for custom providers, so list the ids you want in the models block. Get all ids from GET /v1/models.",
   },
   {
+    name: "OpenClaw",
+    tagline: "Register Ruvicode as a custom OpenAI-completions provider.",
+    steps: [
+      "Open your OpenClaw config (config.json5 or the Control UI, Settings, Model Providers).",
+      "Add a models.providers.ruvicode block with the base URL and your rvcd_ key.",
+      "Set a model as primary with models set, then verify with models list.",
+    ],
+    config: `{
+  models: {
+    providers: {
+      ruvicode: {
+        baseUrl: "https://api.ruvicode.com/v1",
+        apiKey: "rvcd_...",
+        api: "openai-completions",
+        models: [
+          { id: "glm-5.2", name: "GLM 5.2", contextWindow: 1000000, maxTokens: 128000 },
+          { id: "claude-opus-5", name: "Claude Opus 5", contextWindow: 1000000, maxTokens: 128000 }
+        ],
+      },
+    },
+  },
+  agents: { defaults: { model: { primary: "ruvicode/glm-5.2" } } },
+}`,
+    configLang: "json",
+    note: "Proxy-style OpenAI-compatible routes skip native OpenAI shaping automatically, so no extra compat flags are needed.",
+  },
+  {
+    name: "Hermes Agent",
+    tagline: "Point the custom provider at Ruvicode and swap models mid-session.",
+    steps: [
+      "Run hermes setup or hermes model and choose the custom provider.",
+      "Set the base URL to https://api.ruvicode.com/v1 and paste your rvcd_ key (or set model.base_url and model.api_key in config.yaml).",
+      "Switch models any time with /model <id>, e.g. /model glm-5.2.",
+    ],
+    config: `# ~/.hermes/config.yaml
+model:
+  provider: custom
+  model: glm-5.2
+  base_url: "https://api.ruvicode.com/v1"
+
+# key goes in ~/.hermes/.env (secrets never live in config.yaml)
+# MODEL_API_KEY=rvcd_...`,
+    configLang: "yaml",
+    note: "Model ids come straight from GET /v1/models, so every catalog model works.",
+  },
+  {
     name: "Anything else OpenAI-compatible",
     tagline: "Continue, Roo Code, LibreChat, your own proxy, scripts.",
     steps: [
