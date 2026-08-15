@@ -1,6 +1,7 @@
 import { getTopModels } from "@/lib/db/queries/models";
 import { Container } from "@/components/layout/container";
 import Link from "next/link";
+import { BrandLogo } from "@/components/shared/brand-logo";
 
 /**
  * Featured model cards on the landing page.
@@ -51,7 +52,7 @@ export async function ModelShowcase() {
             >
               {/* Header: savings badge (upstream provider identity is masked) */}
               <div className="mb-4 flex items-center justify-between">
-                <span className="text-xs text-text-muted">{m.provider}</span>
+                <BrandLogo brand={m.provider} />
                 <span className="font-mono text-xs font-medium text-success">
                   −{m.user_discount_pct.toFixed(0)}%
                 </span>

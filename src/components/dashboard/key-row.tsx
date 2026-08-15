@@ -175,7 +175,7 @@ export function KeyRow({ keyData }: KeyRowProps) {
 
         {/* Edit limits dialog */}
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent>
             <form onSubmit={handleEdit}>
               <DialogHeader className="mb-2">
                 <DialogTitle>Edit API Key</DialogTitle>
@@ -310,7 +310,7 @@ export function KeyRow({ keyData }: KeyRowProps) {
 
         {/* Revoke confirmation */}
         <Dialog open={revokeOpen} onOpenChange={setRevokeOpen}>
-          <DialogContent className="sm:max-w-sm">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>Revoke API Key?</DialogTitle>
             </DialogHeader>

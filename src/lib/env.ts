@@ -12,12 +12,18 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url().optional(),
     BETTER_AUTH_SECRET: z.string().min(32).optional(),
+    // Better Auth Dash ownership verification (empty until pasted from dash)
+    BETTER_AUTH_API_KEY: z.string().optional(),
     BETTER_AUTH_URL: z.string().url(),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     GITHUB_CLIENT_ID: z.string().optional(),
     GITHUB_CLIENT_SECRET: z.string().optional(),
     PROVIDER_PLAYGROUND_KEY: z.string().optional(),
+    // Public free playground: dedicated freedom endpoint + key so free
+    // traffic is fully isolated from paid routing.
+    FREEDOM_PLAYGROUND_BASE_URL: z.string().url().optional(),
+    FREEDOM_PLAYGROUND_API_KEY: z.string().optional(),
     PROVIDER_BASE_URL: z.string().url().optional(),
     // Shared Redis used for the API key cache. The Go gateway reads
     // `apikey:{hash}` from this Redis, so the dashboard deletes the same
@@ -46,12 +52,15 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+    BETTER_AUTH_API_KEY: process.env.BETTER_AUTH_API_KEY,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     PROVIDER_PLAYGROUND_KEY: process.env.PROVIDER_PLAYGROUND_KEY,
+    FREEDOM_PLAYGROUND_BASE_URL: process.env.FREEDOM_PLAYGROUND_BASE_URL,
+    FREEDOM_PLAYGROUND_API_KEY: process.env.FREEDOM_PLAYGROUND_API_KEY,
     PROVIDER_BASE_URL: process.env.PROVIDER_BASE_URL,
     REDIS_URL: process.env.REDIS_URL,
     INTERNAL_API_TOKEN: process.env.INTERNAL_API_TOKEN,

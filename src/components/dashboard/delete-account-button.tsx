@@ -50,7 +50,7 @@ export function DeleteAccountButton() {
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Account?</DialogTitle>
           </DialogHeader>

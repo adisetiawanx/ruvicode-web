@@ -6,6 +6,7 @@ import { getModelBySlug } from "@/lib/db/queries/models";
 import { highlightCode } from "@/lib/shiki";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { LinkButton } from "@/components/shared/link-button";
 import {
   CodeDemo,
@@ -196,6 +197,7 @@ console.log(response.choices[0].message.content);`,
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
               <div className="mb-3 flex flex-wrap items-center gap-3">
+                <BrandLogo brand={model.provider} className="h-8 w-8" />
                 <h1 className="text-h1 font-bold tracking-tight">
                   {model.display_name}
                 </h1>

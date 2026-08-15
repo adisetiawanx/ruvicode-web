@@ -10,6 +10,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import { MODEL_TYPES } from "@/lib/models/catalog";
 
 const SORT_OPTIONS = ["cheapest", "name", "savings"] as const;
@@ -30,6 +31,7 @@ export function ModelFilters({
   // nuqs: type-safe URL params — prevents injection via query strings.
   // Provider list is a comma-separated string, parsed safely.
   const [filters, setFilters] = useQueryStates({
+    q: parseAsString.withDefault(""),
     provider: parseAsString.withDefault(""),
     max_price: parseAsFloat.withDefault(DEFAULT_MAX_PRICE),
     sort: parseAsStringEnum<SortOption>([...SORT_OPTIONS]).withDefault(
@@ -58,6 +60,23 @@ export function ModelFilters({
 
   return (
     <aside className="w-full space-y-6 lg:w-64 lg:flex-shrink-0">
+      <div>
+        <label htmlFor="model-search" className="sr-only">
+          Search models
+        </label>
+        <div className="relative">
+          <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-muted" />
+          <input
+            id="model-search"
+            type="search"
+            value={filters.q}
+            onChange={(e) => update({ q: e.target.value })}
+            placeholder="Search models..."
+            className="h-9 w-full rounded-md border border-border-subtle bg-surface-2 pl-9 pr-3 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-accent"
+          />
+        </div>
+      </div>
+
       <div>
         <h4 className="mb-3 text-sm font-semibold">Sort by</h4>
         <div className="flex flex-col gap-2">
@@ -156,7 +175,7 @@ export function ModelFilters({
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => update({ provider: "", max_price: DEFAULT_MAX_PRICE })}
+        onClick={() => update({ q: "", provider: "", max_price: DEFAULT_MAX_PRICE })}
       >
         Clear Filters
       </Button>

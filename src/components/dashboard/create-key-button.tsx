@@ -93,7 +93,7 @@ export function CreateKeyButton() {
           </Button>
         }
       />
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent>
         {createdKey ? (
           <>
             <DialogHeader>

@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQueryStates, parseAsStringEnum, parseAsInteger } from "nuqs";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
@@ -23,6 +24,7 @@ function formatPrice(price: number): string {
 export function PricingTable({ models }: { models: ModelWithPricing[] }) {
   // nuqs: type-safe URL search params — prevents injection via query strings.
   // Values are validated against enum unions; invalid values fall back to defaults.
+  const [query, setQuery] = useState("");
   const [state, setState] = useQueryStates({
     sort: parseAsStringEnum<SortKey>(SORT_KEYS).withDefault("savings"),
     dir: parseAsStringEnum<SortDir>(["asc", "desc"]).withDefault("desc"),
@@ -31,9 +33,17 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
   });
 
   const sorted = useMemo(() => {
+    const q = query.trim().toLowerCase();
     const filtered = models.filter((m) => {
       if (state.filter === "all") return true;
       return m.capabilities.includes(state.filter);
+    }).filter((m) => {
+      if (!q) return true;
+      return (
+        m.display_name.toLowerCase().includes(q) ||
+        m.model.toLowerCase().includes(q) ||
+        m.provider.toLowerCase().includes(q)
+      );
     });
 
     return filtered.sort((a, b) => {
@@ -54,7 +64,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
       }
       return state.dir === "asc" ? cmp : -cmp;
     });
-  }, [models, state]);
+  }, [models, query, state]);
 
   const PAGE_SIZE = 25;
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
@@ -71,7 +81,18 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
 
   return (
     <div>
-      {/* Filter pills */}
+      {/* Search + filter pills */}
+      <div className="relative mb-4">
+        <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-muted" />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search models..."
+          className="h-9 w-full rounded-md border border-border-subtle bg-surface-2 pl-9 pr-3 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-accent"
+          aria-label="Search models"
+        />
+      </div>
       <div className="mb-6 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <Button
@@ -128,7 +149,10 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                   className="border-b border-border-subtle transition-colors last:border-0 hover:bg-surface/50"
                 >
                   <td className="px-4 py-3">
-                    <span className="font-medium">{m.display_name}</span>
+                    <span className="flex items-center gap-2.5">
+                      <BrandLogo brand={m.provider} className="h-5 w-5 shrink-0" />
+                      <span className="font-medium">{m.display_name}</span>
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-right font-mono tabular text-text-secondary">
                     ${formatPrice(m.user_input)}

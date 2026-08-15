@@ -38,6 +38,8 @@ interface PlaygroundChatProps {
   activeKeyLabel?: string;
   statsPosition?: "left" | "right";
   showSignupCta?: boolean;
+  /** Public free playground shows Free/Unlimited badges; the dashboard does not. */
+  showFreeBadges?: boolean;
   hint?: string;
   hintSub?: string;
 }
@@ -84,6 +86,7 @@ export function PlaygroundChat({
   endpoint,
   lockModel,
   activeKeyLabel,
+  showFreeBadges = false,
   statsPosition = "left",
   showSignupCta = true,
   hint = "Try any model. No account needed.",
@@ -242,12 +245,16 @@ export function PlaygroundChat({
         <span className="hidden text-xs text-text-muted sm:inline">
           {maxTokens.toLocaleString()} tokens · {temperature.toFixed(1)} temp
         </span>
-        <Badge variant="outline" className="border-success/40 text-success">
-          Free
-        </Badge>
-        <Badge variant="outline" className="border-accent/40 text-accent-text">
-          Unlimited
-        </Badge>
+        {showFreeBadges && (
+          <>
+            <Badge variant="outline" className="border-success/40 text-success">
+              Free
+            </Badge>
+            <Badge variant="outline" className="border-accent/40 text-accent-text">
+              Unlimited
+            </Badge>
+          </>
+        )}
         {activeKeyLabel && (
           <span className="hidden items-center gap-1.5 text-xs text-text-muted sm:inline-flex">
             <KeyRound className="h-3 w-3" />

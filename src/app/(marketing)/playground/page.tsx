@@ -132,6 +132,7 @@ export default async function PlaygroundPage({
                 models={models}
                 endpoint="/api/playground/chat"
                 lockModel={publicPlaygroundModel}
+                showFreeBadges
               />
             )}
           </PageEntranceItem>

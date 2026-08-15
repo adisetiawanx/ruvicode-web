@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 
 /** Format price — shows more decimals for very cheap models. */
@@ -13,8 +14,9 @@ export function ModelCard({ model }: { model: ModelWithPricing }) {
       href={`/models/${model.model}`}
       className="group flex flex-col rounded-xl border border-border-default bg-surface p-5 transition-all hover:border-accent/30 hover:shadow-card"
     >
-      {/* Header: savings badge (upstream provider identity is masked) */}
-      <div className="mb-4 flex items-center justify-end">
+      {/* Header: brand logo + savings */}
+      <div className="mb-4 flex items-center justify-between">
+        <BrandLogo brand={model.provider} />
         <span className="font-mono text-xs font-medium text-success">
           −{model.user_discount_pct.toFixed(0)}%
         </span>

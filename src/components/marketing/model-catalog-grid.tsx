@@ -30,6 +30,7 @@ export function ModelCatalogGrid({
   // sync with the address bar, so pagination is shareable and back-button
   // friendly.
   const [state, setState] = useQueryStates({
+    q: parseAsString.withDefault(""),
     provider: parseAsString.withDefault(""),
     max_price: parseAsFloat.withDefault(20),
     sort: parseAsStringEnum<SortOption>([...SORT_OPTIONS]).withDefault("cheapest"),
@@ -43,7 +44,15 @@ export function ModelCatalogGrid({
   );
 
   const filtered = useMemo(() => {
+    const query = state.q.trim().toLowerCase();
     let result = models.filter((m) => {
+      if (
+        query &&
+        !m.display_name.toLowerCase().includes(query) &&
+        !m.model.toLowerCase().includes(query) &&
+        !m.provider.toLowerCase().includes(query)
+      )
+        return false;
       if (selectedProviders.length > 0 && !selectedProviders.includes(m.provider))
         return false;
       if (state.type && !m.capabilities.includes(state.type))
@@ -65,7 +74,7 @@ export function ModelCatalogGrid({
     });
 
     return result;
-  }, [models, selectedProviders, state.max_price, state.sort]);
+  }, [models, state.q, selectedProviders, state.max_price, state.sort]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   // Clamp page when filters shrink the result set.

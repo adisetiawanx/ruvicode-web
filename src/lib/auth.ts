@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { dash } from "@better-auth/infra";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { env } from "@/lib/env";
 import { db } from "@/lib/db";
@@ -93,6 +94,10 @@ export const auth = betterAuth({
     window: 10, // 10 seconds between requests
     max: 5, // Max 5 requests per window per IP
   },
+
+  // Better Auth Dash (hosted dashboard) needs this plugin plus the API key
+  // to verify ownership of this deployment.
+  plugins: [dash()],
 });
 
 export type Session = (typeof auth.$Infer.Session)["session"];

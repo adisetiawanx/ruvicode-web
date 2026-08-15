@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   description:
     "Transparent AI API gateway. Access Claude, GPT, Gemini, GLM, DeepSeek and more with one key. Real per-request pricing, hard spend limits.",
   metadataBase: new URL("https://ruvicode.com"),
+  icons: {
+    icon: [{ url: "/ruvicode-favicon.ico", sizes: "any" }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

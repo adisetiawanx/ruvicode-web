@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { env } from "@/lib/env";
 import { limitPlaygroundRequest } from "@/lib/upstash";
 import {
   playgroundSchema,
@@ -52,10 +53,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 3. Forward to the provider (server-side; the key never reaches the browser).
-  const providerKey = process.env.PROVIDER_PLAYGROUND_KEY;
-  const url = playgroundProviderUrl();
-  if (!providerKey || !url) {
+  // 3. Forward to the freedom endpoint (server-side; the key never reaches
+  // the browser). Free playground traffic is isolated from paid routing.
+  const providerKey = env.FREEDOM_PLAYGROUND_API_KEY;
+  const url = env.FREEDOM_PLAYGROUND_BASE_URL?.replace(/\/+$/, "") + "/chat/completions";
+  if (!providerKey || !url || url === "/chat/completions") {
     return Response.json(
       { error: "Playground is not configured. Please try again later.", remaining },
       { status: 503 },

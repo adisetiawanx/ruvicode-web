@@ -70,7 +70,7 @@ export function ModelPicker({ models, value, onChange }: ModelPickerProps) {
           </button>
         }
       />
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Choose a model</DialogTitle>
         </DialogHeader>
