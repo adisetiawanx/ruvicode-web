@@ -53,6 +53,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // 2b. Server-side ceiling: the UI may lower max tokens, but a crafted
+  // payload cannot raise it, which bounds the worst-case cost per request.
+  const FREE_TIER_MAX_TOKENS = 4096;
+  if ((parsed.data.max_tokens ?? 4096) > FREE_TIER_MAX_TOKENS) {
+    parsed.data.max_tokens = FREE_TIER_MAX_TOKENS;
+  }
+
   // 3. Forward to the freedom endpoint (server-side; the key never reaches
   // the browser). Free playground traffic is isolated from paid routing.
   const providerKey = env.FREEDOM_PLAYGROUND_API_KEY;

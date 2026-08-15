@@ -29,7 +29,7 @@ export const playgroundSchema = z.object({
     .min(1)
     .max(20),
   temperature: z.number().min(0).max(2).optional(),
-  max_tokens: z.number().min(1).max(4096).optional(),
+  max_tokens: z.number().min(1).max(4096).optional(), // hard schema cap; route clamps again
 });
 
 export type PlaygroundInput = z.infer<typeof playgroundSchema>;

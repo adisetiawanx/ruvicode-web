@@ -34,7 +34,7 @@ export function TopUpPaddle({ userId }: { userId: string }) {
       // For now: show a placeholder message (Paddle SDK integration
       // happens when PADDLE_API_KEY is configured).
       toast.info(
-        "Paddle checkout will open here once payment is configured.",
+        "Card top-up is coming soon.",
       );
     } catch {
       toast.error("Checkout failed. Please try again.");

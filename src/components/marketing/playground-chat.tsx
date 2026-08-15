@@ -28,6 +28,8 @@ interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   reasoning?: string;
+  /** Why generation stopped, shown under the message when not a normal end. */
+  stopReason?: string;
 }
 
 interface PlaygroundChatProps {
@@ -52,6 +54,7 @@ interface StreamChunk {
       reasoning?: string;
       reasoning_content?: string;
     };
+    finish_reason?: string | null;
   }>;
   usage?: {
     prompt_tokens?: number;
@@ -134,6 +137,19 @@ export function PlaygroundChat({
         setRemaining(chunk.meta.remaining);
       }
 
+      const finish = chunk.choices?.[0]?.finish_reason;
+      if (finish && finish !== "stop") {
+        const why =
+          finish === "length"
+            ? "Stopped at the max token limit. Raise it in the settings panel for longer replies."
+            : finish === "content_filter"
+              ? "Stopped by the safety filter."
+              : `Stopped early (${finish}).`;
+        setMessages((prev) =>
+          prev.map((m, i) => (i === activeIndex ? { ...m, stopReason: why } : m)),
+        );
+      }
+
       const delta = chunk.choices?.[0]?.delta;
       const content = delta?.content ?? "";
       const reasoning =
@@ -211,7 +227,11 @@ export function PlaygroundChat({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model,
-          messages: [{ role: "user", content: input }],
+          // Full conversation so the model remembers earlier turns.
+          messages: [...messages, userMessage].map((m) => ({
+            role: m.role,
+            content: m.content,
+          })),
           max_tokens: maxTokens,
           temperature,
         }),
@@ -244,6 +264,13 @@ export function PlaygroundChat({
         </span>
         <span className="hidden text-xs text-text-muted sm:inline">
           {maxTokens.toLocaleString()} tokens · {temperature.toFixed(1)} temp
+        </span>
+        <span className="hidden items-center gap-1.5 text-xs text-text-muted sm:inline-flex">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-success"></span>
+          </span>
+          stream: true
         </span>
         {showFreeBadges && (
           <>
@@ -456,6 +483,11 @@ export function PlaygroundChat({
                         )}
                     </p>
                   ),
+                )}
+                {msg.stopReason && !isStreamingSlot && (
+                  <p className="mt-2 rounded-md border border-warning/30 bg-warning-subtle px-2 py-1.5 text-xs text-[color:var(--warning)]">
+                    {msg.stopReason}
+                  </p>
                 )}
                 {isStreamingSlot && msg.content === "" && (
                   <Loader2 className="h-5 w-5 animate-spin text-text-muted" />
