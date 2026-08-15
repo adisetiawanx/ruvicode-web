@@ -15,6 +15,7 @@ import {
   X,
   KeyRound,
   Lock,
+  Heart,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
@@ -426,7 +427,15 @@ export function PlaygroundChat({
 
 
       <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">
-        <p className="text-xs text-text-secondary">Last request</p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs text-text-secondary">Last request</p>
+          {showFreeBadges && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-success/30 bg-success-subtle px-2 py-0.5 text-[10px] font-medium text-success">
+              <Heart className="h-3 w-3" />
+              Covered by Ruvicode
+            </span>
+          )}
+        </div>
         <p className="font-mono tabular text-lg text-text-primary">
           ${(lastCost?.total ?? 0).toFixed(6)}
         </p>
