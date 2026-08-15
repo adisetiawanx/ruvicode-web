@@ -17,7 +17,7 @@ import type { ModelWithPricing } from "@/lib/db/queries/models";
 const SORT_OPTIONS = ["cheapest", "name", "savings"] as const;
 type SortOption = (typeof SORT_OPTIONS)[number];
 
-const PAGE_SIZE = 16;
+const PAGE_SIZE = 15;
 
 export function ModelCatalogGrid({
   models,

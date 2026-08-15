@@ -8,11 +8,13 @@ import Link from "next/link";
  * Live data from the curated catalog (never mock): the eight most
  * affordable curated models, straight from the pricing engine.
  */
-// Request-time data: the landing page shell is static, but this section
-// reads live prices, so it renders per request (dynamic hole).
-export const revalidate = 0;
-
 export async function ModelShowcase() {
+  // Opt this section into request-time rendering: the landing shell stays
+  // static, but prices must never be baked at build time (the build
+  // container has no database and would freeze the mock fallback in).
+  const { connection } = await import("next/server");
+  await connection();
+
   const models = (await getTopModels(8)).slice(0, 8);
 
   return (

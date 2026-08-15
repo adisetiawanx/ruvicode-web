@@ -87,7 +87,7 @@ export function PlaygroundChat({
   statsPosition = "left",
   showSignupCta = true,
   hint = "Try any model. No account needed.",
-  hintSub = "5 free requests per day.",
+  hintSub = "Free, no account needed. Fair-use limits apply.",
 }: PlaygroundChatProps) {
   const locked = lockModel ?? null;
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
@@ -251,9 +251,9 @@ export function PlaygroundChat({
       </div>
 
       <div className="flex items-center gap-2">
-        {remaining !== null && (
-          <Badge variant={remaining > 0 ? "default" : "destructive"} className="text-xs">
-            {remaining} left
+        {remaining !== null && remaining <= 2 && (
+          <Badge variant="destructive" className="text-xs">
+            Slow down
           </Badge>
         )}
         {lastCost && (
@@ -377,23 +377,22 @@ export function PlaygroundChat({
         </div>
       )}
 
-      {lastCost && lastUsage && (
-        <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">
-          <p className="text-xs text-text-secondary">Last request</p>
-          <p className="font-mono tabular text-lg text-text-primary">
-            ${lastCost.total.toFixed(6)}
+      <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">
+        <p className="text-xs text-text-secondary">Last request</p>
+        <p className="font-mono tabular text-lg text-text-primary">
+          ${(lastCost?.total ?? 0).toFixed(6)}
+        </p>
+        <div className="space-y-0.5 text-xs text-text-muted">
+          <p>
+            Input: ${(lastCost?.input ?? 0).toFixed(6)} ({lastUsage?.prompt ?? 0} tokens)
           </p>
-          <div className="space-y-0.5 text-xs text-text-muted">
-            <p>
-              Input: ${lastCost.input.toFixed(6)} ({lastUsage.prompt} tokens)
-            </p>
-            <p>
-              Output: ${lastCost.output.toFixed(6)} ({lastUsage.completion} tokens
-              {lastReasoningTokens > 0 ? `, ${lastReasoningTokens} reasoning` : ""})
-            </p>
-          </div>
+          <p>
+            Output: ${(lastCost?.output ?? 0).toFixed(6)} ({lastUsage?.completion ?? 0}
+            {""} tokens
+            {lastReasoningTokens > 0 ? `, ${lastReasoningTokens} reasoning` : ""})
+          </p>
         </div>
-      )}
+      </div>
 
       {needKey && (
         <Button

@@ -19,12 +19,18 @@ export const dynamic = "force-dynamic";
  * are set, and the upstream cost object is stripped from every SSE line.
  */
 export async function POST(req: NextRequest) {
-  // 1. Rate limit by IP (5 requests per day per IP).
+  // 1. Abuse control (not a hard quota): the playground is unlimited for
+  // humans, but scripted abuse via curl/IDEs gets throttled hard. A short
+  // sliding window of 10 requests per minute per IP stops bulk hammering
+  // while never touching a normal interactive session.
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
-  const { success, remaining } = await limitPlaygroundRequest(ip, 5, "24 h");
+  const { success, remaining } = await limitPlaygroundRequest(ip, 10, "1 m");
   if (!success) {
     return Response.json(
-      { error: "Daily limit reached. Sign up for unlimited access.", remaining: 0 },
+      {
+        error: "Too many requests. Slow down or sign up for an API key.",
+        remaining: 0,
+      },
       { status: 429 },
     );
   }

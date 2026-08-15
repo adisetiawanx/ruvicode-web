@@ -11,7 +11,11 @@ import { z } from "zod";
  */
 
 // The only model anonymous visitors can try on the public playground.
-export const publicPlaygroundModel = "deepseek-v4-flash";
+// Deliberately a DIFFERENT variant from the paid deepseek-v4-flash so the
+// free playground experience is isolated from billed traffic: the public
+// route calls the provider directly with PROVIDER_PLAYGROUND_KEY, while
+// paid requests for deepseek-v4-flash go through the gateway and wallets.
+export const publicPlaygroundModel = "deepseek-v4-flash-0731";
 
 export const playgroundSchema = z.object({
   model: z.string().min(1).max(50),

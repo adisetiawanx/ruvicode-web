@@ -14,11 +14,11 @@ import {
 export const metadata: Metadata = {
   title: "AI Playground — Try DeepSeek V4 Flash Free",
   description:
-    "Try DeepSeek V4 Flash in your browser. No account needed. 5 free requests per day. Sign up for every model with real per-request costs.",
+    "Try DeepSeek V4 Flash in your browser. Free, no account needed, fair-use limits apply. Sign up for every model with real per-request pricing.",
   alternates: { canonical: "https://ruvicode.com/playground" },
   openGraph: {
     title: "AI Playground",
-    description: "Try DeepSeek V4 Flash in your browser. No account needed. 5 free requests per day.",
+    description: "Try DeepSeek V4 Flash in your browser. Free, fair-use limits apply.",
     url: "https://ruvicode.com/playground",
     type: "website",
   },
@@ -71,8 +71,8 @@ export default async function PlaygroundPage({
           <PageEntranceItem>
             <h1 className="mb-2 text-h1 font-semibold">AI Playground</h1>
             <p className="mb-8 text-text-secondary">
-              Try a model in your browser. No account needed. 5 free requests
-              per day.
+              Try a model in your browser. Free, no account needed, fair-use
+              limits apply.
             </p>
           </PageEntranceItem>
           <PageEntranceItem>
