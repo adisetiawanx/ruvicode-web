@@ -1,13 +1,16 @@
+import { getTopModels } from "@/lib/db/queries/models";
 import { Container } from "@/components/layout/container";
-import { SHOWCASE_MODELS } from "@/lib/constants";
+import Link from "next/link";
 
 /**
- * Professional model cards grid.
- * Shows: savings badge, model name, input/output per-1M pricing,
- * savings badge, context window.
- * Replaces the old horizontal scroll strip with a proper grid.
+ * Featured model cards on the landing page.
+ *
+ * Live data from the curated catalog (never mock): the eight most
+ * affordable curated models, straight from the pricing engine.
  */
-export function ModelShowcase() {
+export async function ModelShowcase() {
+  const models = (await getTopModels(8)).slice(0, 8);
+
   return (
     <section className="border-t border-border-subtle py-24">
       <Container size="wide">
@@ -19,15 +22,17 @@ export function ModelShowcase() {
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {SHOWCASE_MODELS.map((m) => (
-            <div
+          {models.map((m) => (
+            <Link
               key={m.model}
+              href={`/models/${m.model}`}
               className="group flex flex-col rounded-xl border border-border-default bg-surface p-5 transition-all hover:border-accent/30 hover:shadow-card"
             >
               {/* Header: savings badge (upstream provider identity is masked) */}
-              <div className="mb-4 flex items-center justify-end">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="text-xs text-text-muted">{m.provider}</span>
                 <span className="font-mono text-xs font-medium text-success">
-                  −{m.savings_pct}%
+                  −{m.user_discount_pct.toFixed(0)}%
                 </span>
               </div>
 
@@ -52,14 +57,23 @@ export function ModelShowcase() {
                 </div>
               </div>
 
-              {/* Footer: context window */}
-              <div className="mt-4 flex items-center justify-between border-t border-border-subtle pt-3 text-xs text-text-muted">
-                <span>Context</span>
-                <span className="font-mono">{m.context}</span>
-              </div>
-            </div>
+              <p className="mt-4 text-xs text-accent transition-colors group-hover:text-accent-hover">
+                View details →
+              </p>
+            </Link>
           ))}
         </div>
+
+        <p className="mt-8 text-center text-sm text-text-muted">
+          Plus more frontier and open models in the{" "}
+          <Link
+            href="/models"
+            className="text-accent-text hover:text-accent-hover"
+          >
+            full catalog
+          </Link>
+          .
+        </p>
       </Container>
     </section>
   );

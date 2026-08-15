@@ -10,6 +10,7 @@ import {
   parseAsStringEnum,
   parseAsInteger,
 } from "nuqs";
+import { MODEL_TYPES, type ModelType } from "@/lib/models/catalog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 
@@ -32,6 +33,7 @@ export function ModelCatalogGrid({
     provider: parseAsString.withDefault(""),
     max_price: parseAsFloat.withDefault(20),
     sort: parseAsStringEnum<SortOption>([...SORT_OPTIONS]).withDefault("cheapest"),
+    type: parseAsStringEnum<ModelType>([...MODEL_TYPES]),
     page: parseAsInteger.withDefault(1),
   });
 
@@ -43,6 +45,8 @@ export function ModelCatalogGrid({
   const filtered = useMemo(() => {
     let result = models.filter((m) => {
       if (selectedProviders.length > 0 && !selectedProviders.includes(m.provider))
+        return false;
+      if (state.type && !m.capabilities.includes(state.type))
         return false;
       if (m.user_input > state.max_price) return false;
       return true;

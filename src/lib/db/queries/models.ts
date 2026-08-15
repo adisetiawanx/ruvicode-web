@@ -15,6 +15,11 @@ import { and, asc, eq } from "drizzle-orm";
 import { db, isDbAvailable } from "@/lib/db";
 import { modelPrices } from "@/lib/db/schema";
 import { MODEL_PRICES } from "@/lib/db/seed-data";
+import {
+  CURATED_SLUGS,
+  getCuratedModel,
+  type ModelType,
+} from "@/lib/models/catalog";
 
 // ── Types ──
 
@@ -27,6 +32,7 @@ import { MODEL_PRICES } from "@/lib/db/seed-data";
 export interface ModelWithPricing {
   model: string;
   display_name: string;
+  /** Brand from the curated catalog (upstream provider is masked). */
   provider: string;
   ref_input: number;
   ref_output: number;
@@ -35,7 +41,8 @@ export interface ModelWithPricing {
   discount_pct: number;
   user_discount_pct: number;
   context: string;       // from seed only when DB unavailable; "" from DB
-  capabilities: string[]; // from seed only when DB unavailable; [] from DB
+  /** Capability tags from the curated catalog. */
+  capabilities: string[];
   is_active: boolean;
 }
 
@@ -45,10 +52,11 @@ export interface ModelWithPricing {
 function rowToModelPricing(
   row: typeof modelPrices.$inferSelect,
 ): ModelWithPricing {
+  const curated = getCuratedModel(row.model);
   return {
     model: row.model,
-    display_name: row.displayName || row.model,
-    provider: row.provider,
+    display_name: curated?.name ?? (row.displayName || row.model),
+    provider: curated?.brand ?? row.provider,
     ref_input: Number(row.refInput),
     ref_output: Number(row.refOutput),
     user_input: Number(row.userInput),
@@ -56,9 +64,14 @@ function rowToModelPricing(
     discount_pct: Number(row.discountPct),
     user_discount_pct: Number(row.userDiscountPct),
     context: "",
-    capabilities: [],
+    capabilities: curated?.types ?? [],
     is_active: row.isActive,
   };
+}
+
+/** Filter to the curated slug list (only these appear in the public UI). */
+function isCurated(slug: string): boolean {
+  return CURATED_SLUGS.includes(slug);
 }
 
 // ── Query functions ──
@@ -69,7 +82,7 @@ function rowToModelPricing(
  */
 export async function getAllActiveModels(): Promise<ModelWithPricing[]> {
   if (!isDbAvailable()) {
-    return MODEL_PRICES.filter((m) => m.is_active).sort(
+    return MODEL_PRICES.filter((m) => m.is_active && isCurated(m.model)).sort(
       (a, b) => a.user_input - b.user_input,
     );
   }
@@ -80,7 +93,7 @@ export async function getAllActiveModels(): Promise<ModelWithPricing[]> {
     .where(eq(modelPrices.isActive, true))
     .orderBy(asc(modelPrices.userInput));
 
-  return rows.map(rowToModelPricing);
+  return rows.filter((r) => isCurated(r.model)).map(rowToModelPricing);
 }
 
 /**
@@ -100,9 +113,9 @@ export async function getTopModels(
     .from(modelPrices)
     .where(eq(modelPrices.isActive, true))
     .orderBy(asc(modelPrices.userInput))
-    .limit(limit);
+    .limit(limit * 6); // over-fetch, then trim after curation
 
-  return rows.map(rowToModelPricing);
+  return rows.filter((r) => isCurated(r.model)).map(rowToModelPricing).slice(0, limit);
 }
 
 /**
@@ -130,17 +143,19 @@ export async function getModelBySlug(
 /**
  * Get all unique providers from active models.
  */
+/**
+ * Brands shown in the filter sidebar. The database column is always the
+ * masked "provider" string, so brands come from the curated catalog.
+ */
 export async function getAllProviders(): Promise<string[]> {
   if (!isDbAvailable()) {
-    const providers = new Set(MODEL_PRICES.map((m) => m.provider));
-    return Array.from(providers).sort();
+    const brands = new Set(
+      MODEL_PRICES.filter((m) => isCurated(m.model)).map(
+        (m) => getCuratedModel(m.model)?.brand ?? m.provider,
+      ),
+    );
+    return Array.from(brands).sort();
   }
-
-  const rows = await db
-      .select({ provider: modelPrices.provider })
-      .from(modelPrices)
-      .where(eq(modelPrices.isActive, true));
-
-    const providers = new Set(rows.map((r) => r.provider as string));
-    return Array.from(providers).sort();
+  const { getBrands } = await import("@/lib/models/catalog");
+  return getBrands();
 }

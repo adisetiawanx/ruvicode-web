@@ -10,6 +10,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
+import { MODEL_TYPES } from "@/lib/models/catalog";
 
 const SORT_OPTIONS = ["cheapest", "name", "savings"] as const;
 type SortOption = (typeof SORT_OPTIONS)[number];
@@ -34,6 +35,7 @@ export function ModelFilters({
     sort: parseAsStringEnum<SortOption>([...SORT_OPTIONS]).withDefault(
       "cheapest",
     ),
+    type: parseAsStringEnum<(typeof MODEL_TYPES)[number]>([...MODEL_TYPES]),
   });
 
   const selectedProviders = useMemo(
@@ -70,6 +72,25 @@ export function ModelFilters({
               onClick={() => update({ sort: s })}
             >
               <span className="capitalize">{s}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h4 className="mb-3 text-sm font-semibold">Type</h4>
+        <div className="flex flex-wrap gap-1.5">
+          {MODEL_TYPES.map((t) => (
+            <button
+              key={t}
+              onClick={() => update({ type: filters.type === t ? null : t })}
+              className={`rounded-full border px-2.5 py-1 text-xs capitalize transition-colors ${
+                filters.type === t
+                  ? "border-accent/40 bg-accent-subtle text-accent-text"
+                  : "border-border-subtle text-text-secondary hover:border-border-default hover:text-text-primary"
+              }`}
+            >
+              {t}
             </button>
           ))}
         </div>
