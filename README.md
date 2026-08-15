@@ -24,9 +24,9 @@ This repository is the Next.js web application. It contains the marketing site, 
 - API key management with per-key rate limits and daily and monthly spend caps.
 - Usage history with filters, charts, and CSV export.
 - Billing history and account settings.
-- A curated model catalog. The live market feed syncs 160+ models, the public catalog shows a hand-picked flagship list with live pricing, brand filters, capability filters, and pagination.
-- A free public playground, no account needed, running on its own dedicated model so free traffic never touches billed requests. Fair-use throttling stops scripted abuse.
-- A dashboard playground that bills the user's own API key with its rate and spend limits applied.
+- A curated model catalog of 33 flagship models with live pricing, brand filters, capability filters, search, and pagination. The gateway enforces the same list on its API, so /v1/models and chat requests serve exactly what the catalog shows.
+- A free public playground, no account needed. It runs on whatever a dedicated free endpoint currently serves (the model rotates), resolved server-side so the browser never sees the upstream, with per-IP fair-use throttling and a server-side token clamp.
+- A dashboard playground that bills the user's own API key with its rate and spend limits applied. Both playgrounds send the full conversation each turn, render markdown replies with tables and code blocks in 40+ languages, explain why a generation stopped early, and mark usage as covered by Ruvicode (free) or billed to the wallet (dashboard).
 - Cost calculator, integrations guide, and status page.
 - Blog and documentation rendered from MDX.
 - A Ctrl+K command palette so every page is reachable from anywhere.
