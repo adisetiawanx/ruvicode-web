@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ModelTag } from "@/components/shared/model-tag";
 import type { RecentActivityEntry } from "@/lib/db/queries/dashboard";
+import { ClientTime } from "@/components/shared/client-time";
 
 interface RecentActivityProps {
   data: RecentActivityEntry[];
@@ -53,6 +54,9 @@ export function RecentActivity({ data }: RecentActivityProps) {
                 <th className="px-4 py-2 text-left text-xs font-medium text-text-muted">
                   Model
                 </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-text-muted">
+                  Key
+                </th>
                 <th className="px-4 py-2 text-right text-xs font-medium text-text-muted">
                   Tokens
                 </th>
@@ -68,10 +72,13 @@ export function RecentActivity({ data }: RecentActivityProps) {
                   className="border-b border-border-subtle last:border-0"
                 >
                   <td className="px-4 py-3 font-mono text-sm text-text-secondary">
-                    {timeAgo(row.createdAt)}
+                    <ClientTime utc={row.createdAt} format="relative" />
                   </td>
                   <td className="px-4 py-3">
                     <ModelTag id={row.model} stacked={false} className="[&>span:first-child]:text-xs" />
+                  </td>
+                  <td className="px-4 py-3 text-xs text-text-secondary">
+                    {row.keyLabel ?? <span className="text-text-muted">Deleted key</span>}
                   </td>
                   <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
                     {(

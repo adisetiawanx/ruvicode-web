@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAllActiveModels, getPricingLastUpdated } from "@/lib/db/queries/models";
 import { PricingTable } from "@/components/marketing/pricing-table";
 import { Button } from "@/components/ui/button";
+import { ClientTime } from "@/components/shared/client-time";
 
 export const dynamic = "force-dynamic";
 
@@ -37,17 +38,11 @@ export default async function DashboardModelsPage() {
               <>
                 {" "}
                 Last updated{" "}
-                <time
+                <ClientTime
+                  utc={pricingLastUpdated}
+                  format="datetime"
                   className="font-mono"
-                  dateTime={pricingLastUpdated.toISOString()}
-                >
-                  {pricingLastUpdated.toLocaleString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </time>
+                />
               </>
             )}
           </p>

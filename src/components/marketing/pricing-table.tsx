@@ -8,6 +8,7 @@ import { ModelTag } from "@/components/shared/model-tag";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
+import { ClientTime } from "@/components/shared/client-time";
 
 type SortKey = "model" | "user_input" | "user_output" | "savings";
 type SortDir = "asc" | "desc";
@@ -217,12 +218,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
       )}
       <p className="mt-4 text-xs text-text-muted">
         Live market pricing. Last updated:{" "}
-        <span className="font-mono">
-          {new Date().toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </span>
+        <ClientTime utc={new Date().toISOString()} format="time" className="font-mono" />
       </p>
     </div>
   );

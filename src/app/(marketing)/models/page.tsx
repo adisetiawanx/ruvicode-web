@@ -9,6 +9,7 @@ import {
   PageEntrance,
   PageEntranceItem,
 } from "@/components/shared/page-entrance";
+import { ClientTime } from "@/components/shared/client-time";
 
 // Prices come from the live pricing engine; never prerender this at
 // build time (the build container has no DB access and would bake in the
@@ -101,17 +102,11 @@ export default async function ModelsPage() {
                 {pricingLastUpdated && (
                   <p className="text-xs text-text-muted">
                     Last updated{" "}
-                    <time
+                    <ClientTime
+                      utc={pricingLastUpdated}
+                      format="datetime"
                       className="font-mono"
-                      dateTime={pricingLastUpdated.toISOString()}
-                    >
-                      {pricingLastUpdated.toLocaleString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </time>
+                    />
                   </p>
                 )}
               </div>

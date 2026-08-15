@@ -10,7 +10,7 @@
 
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { db, isDbAvailable } from "@/lib/db";
-import { usageRecords, wallets } from "@/lib/db/schema";
+import { apiKeys, usageRecords, wallets } from "@/lib/db/schema";
 
 // ── Types ──
 
@@ -29,6 +29,9 @@ export interface MonthlySummary {
 
 export interface DailyUsage {
   date: string;
+  /** UTC day bucket as YYYY-MM-DD, so the chart can relabel it in the
+   *  viewer's timezone (see usage-chart.tsx). Null on the mock path. */
+  isoDate: string | null;
   cost: number;
   requests: number;
 }
@@ -46,6 +49,7 @@ export interface RecentActivityEntry {
   completionTokens: number;
   cost: string;
   createdAt: Date;
+  keyLabel: string | null;
 }
 
 // ── Helpers ──
@@ -77,13 +81,13 @@ const MOCK_MONTHLY_REQUESTS = 1247;
 const MOCK_MONTHLY_SAVINGS = 8.91;
 
 const MOCK_WEEKLY_USAGE: DailyUsage[] = [
-  { date: "Mon", cost: 0.42, requests: 180 },
-  { date: "Tue", cost: 0.31, requests: 142 },
-  { date: "Wed", cost: 0.88, requests: 321 },
-  { date: "Thu", cost: 0.56, requests: 245 },
-  { date: "Fri", cost: 0.72, requests: 298 },
-  { date: "Sat", cost: 0.19, requests: 88 },
-  { date: "Sun", cost: 0.16, requests: 73 },
+  { date: "Mon", isoDate: null, cost: 0.42, requests: 180 },
+  { date: "Tue", isoDate: null, cost: 0.31, requests: 142 },
+  { date: "Wed", isoDate: null, cost: 0.88, requests: 321 },
+  { date: "Thu", isoDate: null, cost: 0.56, requests: 245 },
+  { date: "Fri", isoDate: null, cost: 0.72, requests: 298 },
+  { date: "Sat", isoDate: null, cost: 0.19, requests: 88 },
+  { date: "Sun", isoDate: null, cost: 0.16, requests: 73 },
 ];
 
 const MOCK_MODEL_BREAKDOWN: ModelBreakdownEntry[] = [
@@ -99,16 +103,16 @@ const MIN = 60_000;
 const HOUR = 60 * MIN;
 
 const MOCK_RECENT_ACTIVITY: RecentActivityEntry[] = [
-  { id: "rec-1", model: "glm-5.2", promptTokens: 320, completionTokens: 930, cost: "0.000231", createdAt: new Date(NOW - 2 * MIN) },
-  { id: "rec-2", model: "claude-sonnet-5", promptTokens: 1200, completionTokens: 2200, cost: "0.013400", createdAt: new Date(NOW - 5 * MIN) },
-  { id: "rec-3", model: "deepseek-v4-flash", promptTokens: 4100, completionTokens: 4800, cost: "0.000162", createdAt: new Date(NOW - 12 * MIN) },
-  { id: "rec-4", model: "gpt-5.4", promptTokens: 850, completionTokens: 1150, cost: "0.001575", createdAt: new Date(NOW - 25 * MIN) },
-  { id: "rec-5", model: "glm-5.2", promptTokens: 210, completionTokens: 540, cost: "0.000142", createdAt: new Date(NOW - 38 * MIN) },
-  { id: "rec-6", model: "claude-sonnet-5", promptTokens: 3400, completionTokens: 5600, cost: "0.034200", createdAt: new Date(NOW - 1 * HOUR) },
-  { id: "rec-7", model: "gpt-5.4", promptTokens: 720, completionTokens: 980, cost: "0.001364", createdAt: new Date(NOW - 1.5 * HOUR) },
-  { id: "rec-8", model: "deepseek-v4-flash", promptTokens: 2600, completionTokens: 3100, cost: "0.000097", createdAt: new Date(NOW - 2 * HOUR) },
-  { id: "rec-9", model: "glm-5.2", promptTokens: 180, completionTokens: 420, cost: "0.000108", createdAt: new Date(NOW - 3 * HOUR) },
-  { id: "rec-10", model: "claude-sonnet-5", promptTokens: 950, completionTokens: 1800, cost: "0.010850", createdAt: new Date(NOW - 4 * HOUR) },
+  { keyLabel: "Production", id: "rec-1", model: "glm-5.2", promptTokens: 320, completionTokens: 930, cost: "0.000231", createdAt: new Date(NOW - 2 * MIN) },
+  { keyLabel: "Test", id: "rec-2", model: "claude-sonnet-5", promptTokens: 1200, completionTokens: 2200, cost: "0.013400", createdAt: new Date(NOW - 5 * MIN) },
+  { keyLabel: "Production", id: "rec-3", model: "deepseek-v4-flash", promptTokens: 4100, completionTokens: 4800, cost: "0.000162", createdAt: new Date(NOW - 12 * MIN) },
+  { keyLabel: "Test", id: "rec-4", model: "gpt-5.4", promptTokens: 850, completionTokens: 1150, cost: "0.001575", createdAt: new Date(NOW - 25 * MIN) },
+  { keyLabel: "Production", id: "rec-5", model: "glm-5.2", promptTokens: 210, completionTokens: 540, cost: "0.000142", createdAt: new Date(NOW - 38 * MIN) },
+  { keyLabel: "Test", id: "rec-6", model: "claude-sonnet-5", promptTokens: 3400, completionTokens: 5600, cost: "0.034200", createdAt: new Date(NOW - 1 * HOUR) },
+  { keyLabel: "Production", id: "rec-7", model: "gpt-5.4", promptTokens: 720, completionTokens: 980, cost: "0.001364", createdAt: new Date(NOW - 1.5 * HOUR) },
+  { keyLabel: "Test", id: "rec-8", model: "deepseek-v4-flash", promptTokens: 2600, completionTokens: 3100, cost: "0.000097", createdAt: new Date(NOW - 2 * HOUR) },
+  { keyLabel: "Production", id: "rec-9", model: "glm-5.2", promptTokens: 180, completionTokens: 420, cost: "0.000108", createdAt: new Date(NOW - 3 * HOUR) },
+  { keyLabel: "Test", id: "rec-10", model: "claude-sonnet-5", promptTokens: 950, completionTokens: 1800, cost: "0.010850", createdAt: new Date(NOW - 4 * HOUR) },
 ];
 
 // ── Query functions ──
@@ -198,6 +202,7 @@ export async function getWeeklyUsage(userId: string): Promise<DailyUsage[]> {
   const rows = await db
     .select({
       date: sql<string>`TO_CHAR(DATE_TRUNC('day', ${usageRecords.createdAt}), 'Dy')`,
+      isoDate: sql<string>`TO_CHAR(DATE_TRUNC('day', ${usageRecords.createdAt}), 'YYYY-MM-DD')`,
       cost: sql<number>`COALESCE(SUM(${usageRecords.cost}),0)`,
       requests: sql<number>`COUNT(*)`,
     })
@@ -213,6 +218,7 @@ export async function getWeeklyUsage(userId: string): Promise<DailyUsage[]> {
 
   return rows.map((r) => ({
     date: r.date.trim(),
+    isoDate: r.isoDate?.trim() ?? null,
     cost: Number(r.cost),
     requests: Number(r.requests),
   }));
@@ -272,8 +278,10 @@ export async function getRecentActivity(
       completionTokens: usageRecords.completionTokens,
       cost: usageRecords.cost,
       createdAt: usageRecords.createdAt,
+      keyLabel: apiKeys.label,
     })
     .from(usageRecords)
+    .leftJoin(apiKeys, eq(usageRecords.apiKeyId, apiKeys.id))
     .where(eq(usageRecords.userId, userId))
     .orderBy(desc(usageRecords.createdAt))
     .limit(limit);
@@ -285,5 +293,6 @@ export async function getRecentActivity(
     completionTokens: r.completionTokens,
     cost: r.cost,
     createdAt: r.createdAt,
+    keyLabel: r.keyLabel ?? null,
   }));
 }

@@ -13,6 +13,7 @@ import { UsageFiltersClient } from "@/components/dashboard/usage-filters";
 import { UsageExportButton } from "@/components/dashboard/usage-export-button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ModelTag } from "@/components/shared/model-tag";
+import { ClientTime } from "@/components/shared/client-time";
 import { FileSearch } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -116,6 +117,9 @@ export default async function UsagePage({ searchParams }: PageProps) {
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-text-muted">
                       Model
                     </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-text-muted">
+                      Key
+                    </th>
                     <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-text-muted">
                       Tokens In
                     </th>
@@ -134,17 +138,23 @@ export default async function UsagePage({ searchParams }: PageProps) {
                       className="border-b border-border-subtle last:border-0"
                     >
                       <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-text-secondary">
-                        {row.createdAt.toLocaleString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        <ClientTime utc={row.createdAt} format="datetime" />
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant="outline" className="font-mono text-xs">
                           <ModelTag id={row.model} stacked={false} />
                         </Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        {row.keyLabel ? (
+                          <Badge variant="outline" className="text-xs">
+                            {row.keyLabel}
+                          </Badge>
+                        ) : (
+                          <span className="text-xs text-text-muted">
+                            Deleted key
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
                         {row.promptTokens.toLocaleString()}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CheckCircle2, Activity, Zap, Layers } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { getAllActiveModels } from "@/lib/db/queries/models";
+import { ClientTime } from "@/components/shared/client-time";
 
 // Don't index transient status page
 export const metadata: Metadata = {
@@ -28,12 +29,11 @@ export default async function StatusPage() {
         </h1>
         <p className="text-sm text-text-muted">
           Last updated:{" "}
-          <time className="font-mono" dateTime={lastUpdated}>
-            {new Date(lastUpdated).toLocaleString("en-US", {
-              dateStyle: "medium",
-              timeStyle: "short",
-            })}
-          </time>
+          <ClientTime
+            utc={lastUpdated}
+            format="datetime"
+            className="font-mono"
+          />
         </p>
       </div>
 

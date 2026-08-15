@@ -39,6 +39,7 @@ export interface UsageRecord {
   completionTokens: number;
   cost: string;
   createdAt: Date;
+  keyLabel: string | null;
 }
 
 export interface UsageSummary {
@@ -132,6 +133,7 @@ function generateUsageRecords(): UsageRecord[] {
       completionTokens,
       cost,
       createdAt: new Date(NOW - i * 35 * 60 * 1000),
+      keyLabel: i % 3 === 0 ? "Production" : i % 3 === 1 ? "Test" : null,
     });
   }
   return records;
@@ -382,8 +384,10 @@ export async function getUsageRecords(
       completionTokens: usageRecords.completionTokens,
       cost: usageRecords.cost,
       createdAt: usageRecords.createdAt,
+      keyLabel: apiKeys.label,
     })
     .from(usageRecords)
+    .leftJoin(apiKeys, eq(usageRecords.apiKeyId, apiKeys.id))
     .where(and(...conditions))
     .orderBy(desc(usageRecords.createdAt))
     .limit(filters.pageSize)
@@ -396,6 +400,7 @@ export async function getUsageRecords(
     completionTokens: r.completionTokens,
     cost: r.cost,
     createdAt: r.createdAt,
+    keyLabel: r.keyLabel ?? null,
   }));
 }
 
@@ -486,8 +491,10 @@ export async function getAllUsageForExport(
       completionTokens: usageRecords.completionTokens,
       cost: usageRecords.cost,
       createdAt: usageRecords.createdAt,
+      keyLabel: apiKeys.label,
     })
     .from(usageRecords)
+    .leftJoin(apiKeys, eq(usageRecords.apiKeyId, apiKeys.id))
     .where(and(...conditions))
     .orderBy(desc(usageRecords.createdAt));
 
@@ -498,6 +505,7 @@ export async function getAllUsageForExport(
     completionTokens: r.completionTokens,
     cost: r.cost,
     createdAt: r.createdAt,
+    keyLabel: r.keyLabel ?? null,
   }));
 }
 

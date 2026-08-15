@@ -33,6 +33,20 @@ const tooltipStyle: React.CSSProperties = {
 export function UsageChart({ data }: UsageChartProps) {
   const allZero = data.every((d) => d.cost === 0);
 
+  // Relabel each day bucket in the viewer's timezone. The DB buckets by UTC
+  // day; the same bucket can be a different weekday for the user, so the
+  // label derives from isoDate in the browser and falls back to the server
+  // label when isoDate is absent (mock path).
+  const chartData = data.map((d) => ({
+    ...d,
+    date: d.isoDate
+      ? new Date(`${d.isoDate}T12:00:00Z`).toLocaleDateString("en-US", {
+          weekday: "short",
+          timeZone: undefined,
+        })
+      : d.date,
+  }));
+
   return (
     <div className="rounded-lg border border-border-default bg-surface p-6">
       <h3 className="mb-4 font-semibold text-text-primary">Usage This Week</h3>
@@ -48,7 +62,7 @@ export function UsageChart({ data }: UsageChartProps) {
       ) : (
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart
-            data={data}
+            data={chartData}
             margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
           >
             <defs>
