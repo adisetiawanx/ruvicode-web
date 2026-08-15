@@ -68,4 +68,8 @@ for await (const chunk of stream) {
 
 ## Usage and cost
 
-When streaming, usage data (token counts) is included in the final chunk before `[DONE]`. The `X-Cost` header is sent with the final chunk.
+When streaming, usage data (token counts) is included in the final chunk before `[DONE]`. HTTP headers cannot be appended after the stream starts, so streaming responses do not carry `X-Cost` — check your per-request cost in the dashboard usage history instead. Non-streaming responses include the `X-Cost` header as usual.
+
+## Strict SSE parsing
+
+Events are separated by blank lines, per the SSE specification. Each `data:` line is one JSON chunk, and the stream ends with `data: [DONE]`. Standard parsers (EventSource, OpenAI SDKs, Vercel AI SDK) work out of the box.

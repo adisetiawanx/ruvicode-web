@@ -20,9 +20,23 @@ POST https://api.ruvicode.com/v1/chat/completions
 |-----------|------|----------|-------------|
 | `model` | string | Yes | Model ID (e.g., `glm-5.2`) |
 | `messages` | array | Yes | List of message objects |
-| `temperature` | number | No | 0–2, default 1 |
-| `max_tokens` | number | No | Max output tokens |
 | `stream` | boolean | No | Enable streaming (default false) |
+| `max_tokens` | number | No | Max output tokens |
+| `temperature` | number | No | 0–2, default 1 |
+| `top_p` | number | No | Nucleus sampling, 0–1 |
+| `stop` | array | No | Sequences where generation stops |
+| `seed` | number | No | Deterministic sampling (model dependent) |
+| `frequency_penalty` | number | No | -2–2, penalizes repeated tokens |
+| `presence_penalty` | number | No | -2–2, penalizes new topic tokens |
+| `response_format` | object | No | `{"type":"json_object"}` or `{"type":"json_schema",...}` |
+| `tools` | array | No | Tool definitions (see Tool calling) |
+| `tool_choice` | string | object | No | `auto`, `none`, `required`, or a specific tool |
+| `parallel_tool_calls` | boolean | No | Allow multiple tool calls per turn |
+| `reasoning_effort` | string | No | `low` / `medium` / `high` on reasoning models |
+
+### Parameter pass-through
+
+This is the important part: **any parameter not listed above is forwarded to the model provider verbatim.** We do not whitelist. If your tool sends `top_k`, provider-specific extras, or a parameter invented next month, it rides along untouched. If a sampling parameter is absent from your request, we omit it upstream rather than substituting a default, so the model applies its own.
 
 ## Example
 
@@ -39,6 +53,67 @@ curl https://api.ruvicode.com/v1/chat/completions \
     "max_tokens": 100
   }'
 ```
+
+## Tool calling
+
+Tool definitions follow the OpenAI shape and are passed through as-is. When the model decides to call a tool, the response contains `tool_calls` on the assistant message:
+
+```json
+{
+  "choices": [{
+    "message": {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [{
+        "id": "call_1",
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "arguments": "{\"city\": \"Jakarta\"}"
+        }
+      }]
+    },
+    "finish_reason": "tool_calls"
+  }]
+}
+```
+
+Send the tool result back as a `tool` role message and continue the conversation:
+
+```json
+{
+  "model": "glm-5.2",
+  "messages": [
+    {"role": "user", "content": "What's the weather in Jakarta?"},
+    {"role": "assistant", "content": null, "tool_calls": [{"id": "call_1", "type": "function", "function": {"name": "get_weather", "arguments": "{\"city\": \"Jakarta\"}"}}]},
+    {"role": "tool", "tool_call_id": "call_1", "content": "30°C, sunny"},
+    {"role": "user", "content": "Great, thanks!"}
+  ],
+  "tools": [{"type": "function", "function": {"name": "get_weather", "parameters": {"type": "object", "properties": {"city": {"type": "string"}}}}}]
+}
+```
+
+Tool-call history is forwarded verbatim, so agentic frameworks (OpenCode, LangChain agents, Claude-SDK-style loops) work out of the box.
+
+## Vision (image input)
+
+Models marked with the vision tag in the [catalog](/models) accept image input using the OpenAI content-block format. Pass an image by URL or base64 data URL:
+
+```json
+{
+  "model": "kimi-k3",
+  "messages": [{
+    "role": "user",
+    "content": [
+      {"type": "text", "text": "What's in this image?"},
+      {"type": "image_url", "image_url": {"url": "https://example.com/photo.png"}}
+    ]
+  }],
+  "max_tokens": 200
+}
+```
+
+For base64, use a data URL: `"url": "data:image/png;base64,iVBOR..."`.
 
 ## Response
 
@@ -65,13 +140,13 @@ curl https://api.ruvicode.com/v1/chat/completions \
 
 ## Cost header
 
-Every response includes an `X-Cost` header showing the exact charge in USD:
+Every non-streaming response includes an `X-Cost` header showing the exact charge in USD:
 
 ```
 X-Cost: 0.00000698
 ```
 
-This is the amount deducted from your wallet for this request.
+This is the amount deducted from your wallet for this request. For streaming responses, headers are sent before generation starts, so your per-request cost appears in your dashboard usage history instead.
 
 ## Using with SDKs
 
@@ -98,7 +173,6 @@ const response = await client.chat.completions.create({
   messages: [{ role: "user", content: "Hello!" }],
 });
 ```
-
 
 ## Why the model may misname itself
 
