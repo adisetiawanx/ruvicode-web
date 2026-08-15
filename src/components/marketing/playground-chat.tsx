@@ -434,7 +434,7 @@ export function PlaygroundChat({
       </div>
 
 
-      <div className="space-y-3.5 rounded-lg border border-border-subtle bg-surface-2 p-4">
+      <div className="space-y-3 rounded-lg border border-border-subtle bg-surface-2 p-4">
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm font-medium text-text-secondary">Last request</p>
           {showFreeBadges && (
@@ -445,49 +445,50 @@ export function PlaygroundChat({
           )}
         </div>
 
-        {/* Cost + savings row */}
-        <div className="flex items-end justify-between gap-2">
-          <div>
-            <p className="mb-0.5 text-[11px] uppercase tracking-wider text-text-muted">
-              Cost
-            </p>
-            <p className="font-mono text-xl tabular font-semibold text-text-primary">
-              ${(lastCost?.total ?? 0).toFixed(6)}
-            </p>
-          </div>
-          {(lastCost?.saved ?? 0) > 0 && (
-            <div className="text-right">
-              <p className="mb-0.5 text-[11px] uppercase tracking-wider text-text-muted">
-                You saved
-              </p>
-              <p className="font-mono text-sm tabular font-medium text-success">
-                ${(lastCost?.saved ?? 0).toFixed(6)}
-              </p>
-              <p className="font-mono text-[11px] tabular text-success">
-                {(lastCost?.savedPct ?? 0).toFixed(0)}% vs ref
-              </p>
-            </div>
-          )}
+        {/* Cost */}
+        <div>
+          <p className="mb-0.5 text-[11px] uppercase tracking-wider text-text-muted">
+            Cost
+          </p>
+          <p className="font-mono text-lg tabular font-semibold text-text-primary">
+            ${(lastCost?.total ?? 0).toFixed(6)}
+          </p>
         </div>
 
-        {/* Breakdown grid */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2.5">
-            <p className="mb-1 text-[11px] uppercase tracking-wider text-text-muted">
-              Input
+        {/* Savings */}
+        {(lastCost?.saved ?? 0) > 0 && (
+          <div className="rounded-lg border border-success/20 bg-success-subtle px-3 py-2">
+            <p className="mb-0.5 text-[11px] uppercase tracking-wider text-success">
+              You saved
             </p>
-            <p className="mb-0.5 font-mono text-xs tabular text-text-secondary">
+            <p className="font-mono text-sm tabular font-medium text-success">
+              ${(lastCost?.saved ?? 0).toFixed(6)} ({(lastCost?.savedPct ?? 0).toFixed(0)}% vs reference)
+            </p>
+          </div>
+        )}
+
+        {/* Input breakdown */}
+        <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2.5">
+          <p className="mb-1 text-[11px] uppercase tracking-wider text-text-muted">
+            Input
+          </p>
+          <div className="flex items-baseline justify-between">
+            <p className="font-mono text-xs tabular text-text-secondary">
               ${(lastCost?.input ?? 0).toFixed(6)}
             </p>
             <p className="font-mono text-xs tabular font-medium text-accent-text">
               {lastUsage?.prompt ?? 0} tokens
             </p>
           </div>
-          <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2.5">
-            <p className="mb-1 text-[11px] uppercase tracking-wider text-text-muted">
-              Output
-            </p>
-            <p className="mb-0.5 font-mono text-xs tabular text-text-secondary">
+        </div>
+
+        {/* Output breakdown */}
+        <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2.5">
+          <p className="mb-1 text-[11px] uppercase tracking-wider text-text-muted">
+            Output
+          </p>
+          <div className="flex items-baseline justify-between">
+            <p className="font-mono text-xs tabular text-text-secondary">
               ${(lastCost?.output ?? 0).toFixed(6)}
             </p>
             <p className="font-mono text-xs tabular font-medium text-accent-text">

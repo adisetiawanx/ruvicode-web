@@ -3,16 +3,16 @@ import { Container } from "./container";
 import { Logo } from "@/components/shared/logo";
 
 const footerLinks = {
-  Product: [
+  Links: [
     { href: "/models", label: "Models" },
-    { href: "/playground", label: "Playground" },
-    { href: "/calculator", label: "Calculator" },
+    { href: "/blog", label: "Blog" },
     { href: "/docs", label: "Documentation" },
   ],
-  Company: [
+  Tools: [
+    { href: "/playground", label: "Playground" },
     { href: "/status", label: "Status" },
     { href: "/integrations", label: "Integrations" },
-    { href: "/blog", label: "Blog" },
+    { href: "/calculator", label: "Calculator" },
   ],
   Legal: [
     { href: "/legal/privacy", label: "Privacy Policy" },
