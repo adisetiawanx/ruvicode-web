@@ -33,3 +33,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .hermes-tmp*/
+
+# AI agent config, local only
+AGENTS.md
+CLAUDE.md

@@ -220,8 +220,12 @@ export const usageRecords = pgTable(
     upstreamCost: decimal("upstream_cost", { precision: 12, scale: 8 })
       .notNull()
       .default("0"), // provider cost
+    refCost: decimal("ref_cost", { precision: 12, scale: 8 })
+      .notNull()
+      .default("0"), // what the request would cost at the reference price
     // margin = cost - upstream_cost (computed on read; Drizzle doesn't
     // support GENERATED columns directly, so we calculate in queries)
+    // savings = ref_cost - cost (what the user avoided paying vs reference)
     requestId: text("request_id"), // Ruvicode internal trace ID
     status: usageStatusEnum("status").notNull().default("completed"),
     createdAt: timestamp("created_at").notNull().defaultNow(),

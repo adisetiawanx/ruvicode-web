@@ -142,7 +142,8 @@ export async function getWallet(userId: string): Promise<WalletData> {
 
 /**
  * Get the user's month-to-date spend, request count, and savings.
- * Savings = cost minus upstreamCost (margin = savings vs OpenRouter reference).
+ * Savings = ref_cost minus cost (what the user avoided paying vs the reference
+ * price, captured at settlement time so it never drifts with market moves).
  */
 export async function getMonthlySummary(
   userId: string,
@@ -161,7 +162,7 @@ export async function getMonthlySummary(
     .select({
       spent: sql<number>`COALESCE(SUM(${usageRecords.cost}),0)`,
       requestCount: sql<number>`COUNT(*)`,
-      margin: sql<number>`COALESCE(SUM(${usageRecords.cost} - ${usageRecords.upstreamCost}),0)`,
+      savings: sql<number>`COALESCE(SUM(${usageRecords.refCost} - ${usageRecords.cost}),0)`,
     })
     .from(usageRecords)
     .where(
@@ -177,7 +178,7 @@ export async function getMonthlySummary(
   return {
     spent: Number(row?.spent ?? 0),
     requestCount: Number(row?.requestCount ?? 0),
-    savings: Number(row?.margin ?? 0),
+    savings: Number(row?.savings ?? 0),
   };
 }
 
