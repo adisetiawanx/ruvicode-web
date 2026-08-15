@@ -11,11 +11,10 @@ import {
   Send,
   Loader2,
   ChevronRight,
-  Settings2,
-  X,
   KeyRound,
   Lock,
   Heart,
+  TrendingDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
@@ -83,7 +82,14 @@ function costOf(
   if (!model) return null;
   const input = (usage.prompt / 1_000_000) * model.user_input;
   const output = (usage.completion / 1_000_000) * model.user_output;
-  return { input, output, total: input + output };
+  const total = input + output;
+  // What the same tokens would cost at the reference price, so the UI can
+  // show how much the user saved versus paying full list price.
+  const refInput = (usage.prompt / 1_000_000) * model.ref_input;
+  const refOutput = (usage.completion / 1_000_000) * model.ref_output;
+  const refTotal = refInput + refOutput;
+  const saved = Math.max(0, refTotal - total);
+  return { input, output, total, saved, savedPct: refTotal > 0 ? (saved / refTotal) * 100 : 0 };
 }
 
 export function PlaygroundChat({
@@ -108,13 +114,14 @@ export function PlaygroundChat({
   const [loading, setLoading] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [needKey, setNeedKey] = useState(false);
-  const [showSettings, setShowSettings] = useState(true);
   const [maxTokens, setMaxTokens] = useState(4096);
   const [temperature, setTemperature] = useState(0.7);
   const [lastCost, setLastCost] = useState<{
     input: number;
     output: number;
     total: number;
+    saved: number;
+    savedPct: number;
   } | null>(null);
   const [lastUsage, setLastUsage] = useState<{
     prompt: number;
@@ -313,19 +320,12 @@ export function PlaygroundChat({
             ${lastCost.total.toFixed(6)}
           </span>
         )}
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className="text-text-muted transition-colors hover:text-text-primary"
-          aria-label="Toggle settings"
-        >
-          {showSettings ? <X className="h-4 w-4" /> : <Settings2 className="h-4 w-4" />}
-        </button>
       </div>
     </div>
   );
 
   // ─── Settings panel (slide-out / inline) ──────────────────
-  const settingsPanel = showSettings && (
+  const settingsPanel = (
     <div className="space-y-5 rounded-lg border border-border-default bg-surface p-5">
       <div>
         <p className="mb-2 text-[13px] font-medium text-text-secondary">Model</p>
@@ -434,9 +434,9 @@ export function PlaygroundChat({
       </div>
 
 
-      <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">
+      <div className="space-y-2.5 rounded-md border border-border-subtle bg-surface-2 p-3.5">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-xs text-text-secondary">Last request</p>
+          <p className="text-xs font-medium text-text-secondary">Last request</p>
           {showFreeBadges && (
             <span className="inline-flex items-center gap-1 rounded-full border border-success/30 bg-success-subtle px-2 py-0.5 text-[10px] font-medium text-success">
               <Heart className="h-3 w-3" />
@@ -444,20 +444,52 @@ export function PlaygroundChat({
             </span>
           )}
         </div>
-        <p className="font-mono tabular text-lg text-text-primary">
-          ${(lastCost?.total ?? 0).toFixed(6)}
-        </p>
-        <div className="space-y-0.5 text-xs text-text-muted">
-          <p>
-            Input: ${(lastCost?.input ?? 0).toFixed(6)} (
-            <span className="font-medium text-accent-text">{lastUsage?.prompt ?? 0} tokens</span>)
+
+        {/* Cost + savings row */}
+        <div className="flex items-baseline justify-between gap-2">
+          <p className="font-mono text-xl tabular font-semibold text-text-primary">
+            ${(lastCost?.total ?? 0).toFixed(6)}
           </p>
-          <p>
-            Output: ${(lastCost?.output ?? 0).toFixed(6)} (
-            <span className="font-medium text-accent-text">{lastUsage?.completion ?? 0} tokens</span>
-            {lastReasoningTokens > 0 ? `, ${lastReasoningTokens} reasoning` : ""})
-          </p>
+          {(lastCost?.saved ?? 0) > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-md bg-success-subtle px-2 py-1 font-mono text-[11px] tabular font-medium text-success">
+              <TrendingDown className="h-3 w-3" />
+              Saved ${(lastCost?.saved ?? 0).toFixed(6)} ({(lastCost?.savedPct ?? 0).toFixed(0)}%)
+            </span>
+          )}
         </div>
+
+        {/* Breakdown grid */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-md border border-border-subtle bg-surface px-2.5 py-2">
+            <p className="mb-0.5 text-[10px] uppercase tracking-wider text-text-muted">
+              Input
+            </p>
+            <p className="font-mono text-xs tabular text-text-secondary">
+              ${(lastCost?.input ?? 0).toFixed(6)}
+            </p>
+            <p className="font-mono text-xs tabular font-medium text-accent-text">
+              {lastUsage?.prompt ?? 0} tokens
+            </p>
+          </div>
+          <div className="rounded-md border border-border-subtle bg-surface px-2.5 py-2">
+            <p className="mb-0.5 text-[10px] uppercase tracking-wider text-text-muted">
+              Output
+            </p>
+            <p className="font-mono text-xs tabular text-text-secondary">
+              ${(lastCost?.output ?? 0).toFixed(6)}
+            </p>
+            <p className="font-mono text-xs tabular font-medium text-accent-text">
+              {lastUsage?.completion ?? 0} tokens
+              {lastReasoningTokens > 0 ? ` (+${lastReasoningTokens})` : ""}
+            </p>
+          </div>
+        </div>
+
+        {(lastCost?.saved ?? 0) > 0 && (
+          <p className="text-[10px] leading-snug text-text-muted">
+            Versus paying full reference price for the same tokens.
+          </p>
+        )}
       </div>
 
       {needKey && (

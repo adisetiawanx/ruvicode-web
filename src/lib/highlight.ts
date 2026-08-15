@@ -44,6 +44,9 @@ import graphql from "highlight.js/lib/languages/graphql";
 import protobuf from "highlight.js/lib/languages/protobuf";
 import shell from "highlight.js/lib/languages/shell";
 import diff from "highlight.js/lib/languages/diff";
+import objectivec from "highlight.js/lib/languages/objectivec";
+import vbnet from "highlight.js/lib/languages/vbnet";
+import ocaml from "highlight.js/lib/languages/ocaml";
 import plaintext from "highlight.js/lib/languages/plaintext";
 
 const langs: Record<string, unknown> = {
@@ -51,7 +54,7 @@ const langs: Record<string, unknown> = {
   markdown, rust, java, kotlin, swift, c, cpp, csharp, php, ruby, perl,
   lua, r, scala, haskell, elixir, erlang, clojure, dart, powershell,
   dockerfile, nginx, ini, toml, makefile, cmake, graphql, protobuf,
-  shell, diff, plaintext,
+  shell, diff, plaintext, objectivec, vbnet, ocaml,
 };
 
 // aliases users and models commonly emit
@@ -61,6 +64,10 @@ const aliases: Record<string, string> = {
   "c++": "cpp", "c#": "csharp", golang: "go", rs: "rust", kot: "kotlin",
   docker: "dockerfile", pwsh: "powershell", text: "plaintext", txt: "plaintext",
   conf: "ini", properties: "ini", md: "markdown", proto: "protobuf",
+  // Terminal / console output blocks models commonly emit
+  terminal: "plaintext", console: "plaintext", log: "plaintext",
+  output: "plaintext", none: "plaintext", "": "plaintext",
+  objc: "objectivec", vb: "vbnet", "vb.net": "vbnet", ml: "ocaml",
 };
 
 for (const [name, def] of Object.entries(langs)) {

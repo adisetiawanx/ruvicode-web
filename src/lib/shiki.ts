@@ -19,7 +19,10 @@ function getHighlighter() {
   if (!highlighterPromise) {
     highlighterPromise = createHighlighter({
       themes: ["github-dark", "github-light"],
-      langs: ["bash", "python", "typescript"],
+      langs: [
+        "bash", "python", "typescript", "javascript", "json", "yaml",
+        "go", "rust", "sql", "css", "xml", "markdown", "diff",
+      ],
     });
   }
   return highlighterPromise;
