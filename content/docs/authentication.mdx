@@ -55,3 +55,11 @@ If authentication fails, you'll receive a `401` response:
 ```
 
 If your key has been revoked or suspended (e.g., spend limit hit), you'll receive a `403` response.
+
+
+## Public endpoints
+
+`GET /v1/models` is public and needs no API key. Coding tools (OpenCode,
+OpenClaw, and other OpenAI-compatible clients) discover custom providers by
+fetching the model list without credentials, so it stays open. Everything
+else, including all chat completions, requires your `rvcd_` key.

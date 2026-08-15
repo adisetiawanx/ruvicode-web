@@ -107,11 +107,11 @@ resp = client.chat.completions.create(
   },
   {
     name: "OpenCode",
-    tagline: "Custom OpenAI-compatible provider with explicit model ids.",
+    tagline: "Custom OpenAI-compatible provider, auto-discovers the catalog.",
     steps: [
       "Create or edit opencode.json in your project root (or ~/.config/opencode/opencode.json for global).",
-      "Add the ruvicode provider block below with your rvcd_ key.",
-      "Run /models in OpenCode and pick any of the listed models.",
+      "Add the ruvicode provider block below with your rvcd_ key (empty models is fine, the catalog is fetched automatically).",
+      "Run /models in OpenCode and pick any model.",
     ],
     config: `{
   "$schema": "https://opencode.ai/config.json",
@@ -132,7 +132,7 @@ resp = client.chat.completions.create(
   }
 }`,
     configLang: "json",
-    note: "OpenCode does not auto-fetch the model list for custom providers, so list the ids you want in the models block. Get all ids from GET /v1/models.",
+    note: "Leave models empty and OpenCode auto-discovers the catalog from GET /v1/models (public). List ids explicitly only if you want to pin a subset.",
   },
   {
     name: "OpenClaw",
