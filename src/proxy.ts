@@ -17,8 +17,12 @@ const authPaths = ["/login", "/register", "/forgot-password", "/reset-password"]
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check session cookie presence (Better-auth sets this)
-  const sessionToken = request.cookies.get("better-auth.session_token");
+  // Check session cookie presence (Better-auth sets this).
+  // When BETTER_AUTH_URL is https, Better-auth prefixes the cookie with
+  // __Secure-, so accept both names.
+  const sessionToken =
+    request.cookies.get("better-auth.session_token") ??
+    request.cookies.get("__Secure-better-auth.session_token");
 
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
   const isAuthPage = authPaths.some((p) => pathname.startsWith(p));
