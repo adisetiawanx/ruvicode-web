@@ -141,6 +141,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                   onToggle={toggleSort}
                   align="right"
                 />
+                <th className="px-4 py-3 text-right font-semibold">Context</th>
               </tr>
             </thead>
             <tbody>
@@ -155,16 +156,33 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                       <ModelTag id={m.model} stacked={false} className="min-w-0" />
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-mono tabular text-text-secondary">
-                    ${formatPrice(m.user_input)}
+                  <td className="px-4 py-3 text-right">
+                    <span className="font-mono tabular text-text-secondary">
+                      ${formatPrice(m.user_input)}
+                    </span>
+                    {m.ref_input > m.user_input && (
+                      <span className="ml-1 font-mono tabular text-[11px] text-text-muted line-through">
+                        ${formatPrice(m.ref_input)}
+                      </span>
+                    )}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono tabular text-text-secondary">
-                    ${formatPrice(m.user_output)}
+                  <td className="px-4 py-3 text-right">
+                    <span className="font-mono tabular text-text-secondary">
+                      ${formatPrice(m.user_output)}
+                    </span>
+                    {m.ref_output > m.user_output && (
+                      <span className="ml-1 font-mono tabular text-[11px] text-text-muted line-through">
+                        ${formatPrice(m.ref_output)}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="font-mono tabular font-medium text-success">
                       −{m.user_discount_pct.toFixed(0)}%
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-right font-mono tabular text-text-muted">
+                    {m.context || "—"}
                   </td>
                 </tr>
               ))}

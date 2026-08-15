@@ -348,6 +348,11 @@ body {
   background-color: var(--bg-canvas);
   color: var(--text-primary);
   font-feature-settings: "rlig" 1, "calt" 1;
+  /* Reserve the scrollbar lane up front so the layout (background marks,
+     centered containers, the sticky sidebar) does not shift sideways the
+     moment content grows tall enough to make the scrollbar appear. */
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
 }
 
 /* Mono tabular figures for financial numbers */

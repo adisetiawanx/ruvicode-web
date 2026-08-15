@@ -74,7 +74,7 @@ export function ModelCatalogGrid({
     });
 
     return result;
-  }, [models, state.q, selectedProviders, state.max_price, state.sort]);
+  }, [models, state.q, selectedProviders, state.max_price, state.sort, state.type]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   // Clamp page when filters shrink the result set.

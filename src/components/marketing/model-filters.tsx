@@ -175,7 +175,7 @@ export function ModelFilters({
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => update({ q: "", provider: "", max_price: DEFAULT_MAX_PRICE })}
+        onClick={() => update({ q: "", provider: "", max_price: DEFAULT_MAX_PRICE, type: null })}
       >
         Clear Filters
       </Button>

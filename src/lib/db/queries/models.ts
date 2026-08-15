@@ -17,6 +17,7 @@ import { modelPrices } from "@/lib/db/schema";
 import { MODEL_PRICES } from "@/lib/db/seed-data";
 import {
   CURATED_SLUGS,
+  formatContext,
   getCuratedModel,
   type ModelType,
 } from "@/lib/models/catalog";
@@ -40,7 +41,8 @@ export interface ModelWithPricing {
   user_output: number;
   discount_pct: number;
   user_discount_pct: number;
-  context: string;       // from seed only when DB unavailable; "" from DB
+  context: string;       // formatted context window from the curated catalog
+  max_output: string;    // formatted max output tokens from the curated catalog
   /** Capability tags from the curated catalog. */
   capabilities: string[];
   is_active: boolean;
@@ -63,7 +65,8 @@ function rowToModelPricing(
     user_output: Number(row.userOutput),
     discount_pct: Number(row.discountPct),
     user_discount_pct: Number(row.userDiscountPct),
-    context: "",
+    context: curated ? formatContext(curated.context) : "",
+    max_output: curated ? formatContext(curated.maxOutput) : "",
     capabilities: curated?.types ?? [],
     is_active: row.isActive,
   };
