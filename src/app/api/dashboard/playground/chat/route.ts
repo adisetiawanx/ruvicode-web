@@ -2,11 +2,7 @@ import { NextRequest } from "next/server";
 import { getSession } from "@/lib/session";
 import { getApiKeys } from "@/lib/db/queries/management";
 import { env } from "@/lib/env";
-import {
-  playgroundSchema,
-  sanitizeSSELine,
-  displayModelName,
-} from "@/lib/playground";
+import { playgroundSchema, sanitizeSSELine } from "@/lib/playground";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -79,15 +75,6 @@ export async function POST(req: NextRequest) {
         user_id: session.user.id,
         key_id: key.id,
         ...parsed.data,
-        // Identity context added server-side so self-identification matches
-        // the catalog; browser payloads stay clean.
-        messages: [
-          {
-            role: "system",
-            content: `Context: this conversation runs on Ruvicode, an API gateway. The model serving it is ${displayModelName(parsed.data.model)}. Answer in your usual voice; if the user asks which model they are talking to, just say ${displayModelName(parsed.data.model)}.`,
-          },
-          ...parsed.data.messages,
-        ],
         stream: true,
       }),
     });

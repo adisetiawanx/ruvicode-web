@@ -98,3 +98,12 @@ const response = await client.chat.completions.create({
   messages: [{ role: "user", content: "Hello!" }],
 });
 ```
+
+
+## Why the model may misname itself
+
+Ask a model which version it is and it may answer from outdated training
+data, for example a V4 release calling itself V3. This happens on every
+provider and is not a sign that the wrong model served your request. The
+`model` field in the API response and the model catalog are the source of
+truth for what actually served the request.
