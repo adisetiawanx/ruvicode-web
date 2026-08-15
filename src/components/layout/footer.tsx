@@ -65,8 +65,11 @@ export function Footer() {
           <p className="text-xs text-text-muted">
             © {new Date().getFullYear()} Ruvicode. All rights reserved.
           </p>
-          <p className="text-xs text-text-muted">
-            Operated by Adi, Sole Trader, Indonesia.
+          <p className="flex items-center gap-1 text-xs text-text-muted">
+            Operated by the Ruvicode team with
+            <span aria-hidden="true" className="text-accent">
+              ♥
+            </span>
           </p>
         </div>
       </Container>

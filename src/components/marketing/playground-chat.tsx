@@ -233,10 +233,17 @@ export function PlaygroundChat({
           // Full conversation so the model remembers earlier turns. The
           // identity context is added server-side in the route, so it is
           // never visible in browser payloads.
-          messages: [...messages, userMessage].map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
+          //
+          // Empty assistant messages (a turn that stopped at the token
+          // limit before any text arrived) are dropped: most upstreams
+          // reject them with a 400 invalid-request error, which used to
+          // leave the playground unable to send the next message.
+          messages: [...messages, userMessage]
+            .filter((m) => m.content.trim() !== "")
+            .map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
           max_tokens: maxTokens,
           temperature,
         }),
@@ -442,11 +449,12 @@ export function PlaygroundChat({
         </p>
         <div className="space-y-0.5 text-xs text-text-muted">
           <p>
-            Input: ${(lastCost?.input ?? 0).toFixed(6)} ({lastUsage?.prompt ?? 0} tokens)
+            Input: ${(lastCost?.input ?? 0).toFixed(6)} (
+            <span className="font-medium text-accent-text">{lastUsage?.prompt ?? 0} tokens</span>)
           </p>
           <p>
-            Output: ${(lastCost?.output ?? 0).toFixed(6)} ({lastUsage?.completion ?? 0}
-            {""} tokens
+            Output: ${(lastCost?.output ?? 0).toFixed(6)} (
+            <span className="font-medium text-accent-text">{lastUsage?.completion ?? 0} tokens</span>
             {lastReasoningTokens > 0 ? `, ${lastReasoningTokens} reasoning` : ""})
           </p>
         </div>

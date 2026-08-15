@@ -216,7 +216,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
         </div>
       )}
       <p className="mt-4 text-xs text-text-muted">
-        Prices update every 2 minutes. Last updated:{" "}
+        Live market pricing. Last updated:{" "}
         <span className="font-mono">
           {new Date().toLocaleTimeString("en-US", {
             hour: "2-digit",

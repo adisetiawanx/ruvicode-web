@@ -11,7 +11,7 @@
  * SECURITY: All queries are parameterized automatically by the ORM.
  */
 
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { db, isDbAvailable } from "@/lib/db";
 import { modelPrices } from "@/lib/db/schema";
 import { MODEL_PRICES } from "@/lib/db/seed-data";
@@ -141,6 +141,23 @@ export async function getModelBySlug(
     .limit(1);
 
   return row ? rowToModelPricing(row) : null;
+}
+
+/**
+ * When the pricing data was last refreshed (max updated_at across active
+ * rows). Returns null when the database is unavailable or empty.
+ */
+export async function getPricingLastUpdated(): Promise<Date | null> {
+  if (!isDbAvailable()) return null;
+
+  const [row] = await db
+    .select({ lastUpdated: sql<string | null>`MAX(${modelPrices.updatedAt})` })
+    .from(modelPrices)
+    .where(eq(modelPrices.isActive, true));
+
+  if (!row?.lastUpdated) return null;
+  const d = new Date(row.lastUpdated);
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 /**

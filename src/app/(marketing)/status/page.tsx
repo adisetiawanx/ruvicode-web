@@ -84,58 +84,39 @@ export default async function StatusPage() {
         </div>
       </div>
 
-      {/* Per-model availability */}
+      {/* Per-model availability: two-column compact grid */}
       <h2 className="mb-4 text-lg font-semibold text-text-primary">
         Model Availability
       </h2>
       <div className="overflow-hidden rounded-xl border border-border-default">
-        <table className="w-full">
-          <thead className="border-b border-border-default bg-surface">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-text-muted">
-                Model
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-text-muted">
-                Status
-              </th>
-              <th className="hidden px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-text-muted sm:table-cell">
-                Context
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {models.map((m) => (
-              <tr
-                key={m.model}
-                className="border-b border-border-subtle last:border-0"
-              >
-                <td className="px-4 py-3">
-                  <span className="font-medium text-text-primary">
-                    {m.display_name}
-                  </span>
-                  <span className="ml-2 font-mono text-xs text-text-muted">
-                    {m.model}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="inline-flex items-center gap-1.5 text-sm text-success">
-                    <CheckCircle2 className="h-4 w-4" />
-                    Available
-                  </span>
-                </td>
-                <td className="hidden px-4 py-3 text-right font-mono text-sm tabular text-text-muted sm:table-cell">
-                  {m.context || "—"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="grid grid-cols-1 divide-y divide-border-subtle md:grid-cols-2 md:divide-x">
+          {models.map((m, i) => (
+            <div
+              key={m.model}
+              className={`flex items-center justify-between px-4 py-2.5 ${
+                i % 2 === 1 ? "md:border-l-0" : ""
+              } ${i < models.length - (models.length % 2 === 0 ? 2 : 1) ? "border-b border-border-subtle md:border-b" : ""}`}
+            >
+              <span className="flex min-w-0 items-baseline gap-2">
+                <span className="truncate font-medium text-text-primary">
+                  {m.display_name}
+                </span>
+                <span className="hidden shrink-0 font-mono text-xs text-text-muted lg:inline">
+                  {m.model}
+                </span>
+              </span>
+              <span className="ml-3 inline-flex shrink-0 items-center gap-1.5 text-sm text-success">
+                <CheckCircle2 className="h-4 w-4" />
+                Available
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <p className="mt-6 text-xs text-text-muted">
         Model availability reflects the curated catalog. Individual model
-        latency depends on the upstream provider. Prices refresh every 2
-        minutes from the live market.
+        latency depends on the upstream provider.
       </p>
     </Container>
   );

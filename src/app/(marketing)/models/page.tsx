@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { BreadcrumbList, WithContext } from "schema-dts";
-import { getAllActiveModels, getAllProviders } from "@/lib/db/queries/models";
+import { getAllActiveModels, getAllProviders, getPricingLastUpdated } from "@/lib/db/queries/models";
 import { ModelCatalogGrid } from "@/components/marketing/model-catalog-grid";
 import { PricingHero } from "@/components/marketing/pricing-hero";
 import { HowPricingWorks } from "@/components/marketing/how-pricing-works";
@@ -35,8 +35,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ModelsPage() {
-  const models = await getAllActiveModels();
-  const providers = await getAllProviders();
+  const [models, providers, pricingLastUpdated] = await Promise.all([
+    getAllActiveModels(),
+    getAllProviders(),
+    getPricingLastUpdated(),
+  ]);
 
   const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
     "@context": "https://schema.org",
@@ -77,13 +80,40 @@ export default async function ModelsPage() {
         <PageEntranceItem>
           <section id="model-catalog" className="scroll-mt-20 py-12">
             <Container size="wide">
-              <div className="mb-8">
-                <h2 className="mb-2 text-3xl font-semibold">Model catalog</h2>
-                <p className="text-text-secondary">
-                  Browse all {models.length} available models with live
-                  pricing. Filter by provider, price, and sort to find the
-                  right model for your use case.
-                </p>
+              <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <h2 className="mb-2 flex flex-wrap items-center gap-3 text-3xl font-semibold">
+                    Model catalog
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success-subtle px-2.5 py-0.5 align-middle text-[11px] font-medium text-success">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+                      </span>
+                      Realtime pricing
+                    </span>
+                  </h2>
+                  <p className="text-text-secondary">
+                    Browse all {models.length} available models with live
+                    pricing. Filter by provider, price, and sort to find the
+                    right model for your use case.
+                  </p>
+                </div>
+                {pricingLastUpdated && (
+                  <p className="text-xs text-text-muted">
+                    Last updated{" "}
+                    <time
+                      className="font-mono"
+                      dateTime={pricingLastUpdated.toISOString()}
+                    >
+                      {pricingLastUpdated.toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </time>
+                  </p>
+                )}
               </div>
               <ModelCatalogGrid models={models} providers={providers} />
             </Container>
