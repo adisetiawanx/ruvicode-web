@@ -228,11 +228,19 @@ export function PlaygroundChat({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model,
-          // Full conversation so the model remembers earlier turns.
-          messages: [...messages, userMessage].map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
+          // Full conversation so the model remembers earlier turns. A light
+          // identity context rides along so "which model are you" answers
+          // match the catalog instead of stale training data. This is our
+          // own chat surface; gateway API traffic is never modified.
+          messages: [
+            {
+              role: "system",
+              content:
+                `You are serving as ${locked ? displayModelName(locked) : (modelPricing?.display_name ?? model)} through Ruvicode. If asked which model you are, answer with this identity and do not speculate about other versions.`,
+            },
+            ...messages.map((m) => ({ role: m.role, content: m.content })),
+            { role: "user", content: input },
+          ],
           max_tokens: maxTokens,
           temperature,
         }),
