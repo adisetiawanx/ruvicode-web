@@ -52,7 +52,9 @@ export async function POST(req: NextRequest) {
   }
 
   // 4. Call the gateway's internal endpoint (server-to-server, shared token).
-  const gatewayUrl = env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
+  // Inside Docker the public api host does not resolve; prefer the
+  // internal service URL when set (docker compose), else the public one.
+  const gatewayUrl = (env.GATEWAY_INTERNAL_URL ?? env.NEXT_PUBLIC_API_URL).replace(/\/+$/, "");
   const token = env.INTERNAL_API_TOKEN;
   if (!gatewayUrl || !token) {
     return Response.json(

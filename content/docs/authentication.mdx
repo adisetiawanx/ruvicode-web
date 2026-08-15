@@ -31,12 +31,12 @@ curl https://api.ruvicode.com/v1/chat/completions \
 - **Name keys** for identification (e.g., "production-app", "dev-testing")
 - **Set spend limits** per key (daily, monthly, or total)
 - **Set rate limits** per key (requests per minute)
-- **Rotate keys** anytime — old key stops working immediately
+- **Rotate keys** anytime, old key stops working immediately
 - **Revoke keys** to permanently disable
 
 ## Security
 
-- Keys are hashed (SHA-256) before storage — we cannot recover lost keys
+- Keys are hashed (SHA-256) before storage, we cannot recover lost keys
 - Keys are shown **only once** at creation time
 - Never commit keys to version control
 - Use environment variables to manage keys in your application

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Product, BreadcrumbList, WithContext } from "schema-dts";
-import { getAllActiveModels, getModelBySlug } from "@/lib/db/queries/models";
+import { getModelBySlug } from "@/lib/db/queries/models";
 import { highlightCode } from "@/lib/shiki";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
@@ -13,26 +13,17 @@ import {
 } from "@/components/marketing/code-demo";
 import { ArrowLeft, ArrowRight, Sparkles, TrendingDown } from "lucide-react";
 
-export const revalidate = 300; // ISR — 5 minute revalidation
+export const revalidate = 300; // on-demand ISR — never prerendered at build
 
 /** SECURITY: validate slug format — only allow lowercase alphanumeric,
  * hyphens, dots, and colons (variant slugs like "kimi-k2.5:web" use them).
  * Prevents path traversal. */
 const SLUG_REGEX = /^[a-z0-9.:-]+$/;
 
-/** Slugs that are safe to prerender as static files on every OS.
- * Windows forbids ':' in directory names, so variant slugs are excluded
- * here and rendered on demand instead (dynamicParams is on by default). */
-const STATIC_SLUG_REGEX = /^[a-z0-9.-]+$/;
-
-/** Pre-generate model detail pages at build time. */
-export function generateStaticParams() {
-  return getAllActiveModels().then((models) =>
-    models
-      .filter((m) => STATIC_SLUG_REGEX.test(m.model))
-      .map((m) => ({ model: m.model })),
-  );
-}
+// No generateStaticParams: the build container cannot reach the database,
+// so build-time params would come from the static mock fallback and bake
+// mock prices into the prerendered pages. Pages are instead rendered on
+// demand and cached by ISR below.
 
 export async function generateMetadata({
   params,

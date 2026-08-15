@@ -19,9 +19,31 @@ export const mdxComponents = {
     </Link>
   ),
 
-  // Code blocks — Shiki handles highlighting via rehype-pretty-code
+  // Code blocks — highlighted server-side by Shiki via rehype-pretty-code
+  // (figure wrapper carries the optional data-title from ```lang:title fences)
+  figure: ({
+    children,
+    "data-rehype-pretty-code-figure": isCode,
+    "data-title": title,
+  }: {
+    children?: React.ReactNode;
+    "data-rehype-pretty-code-figure"?: string;
+    "data-title"?: string;
+  }) => {
+    if (!isCode) return <figure>{children}</figure>;
+    return (
+      <figure className="my-6 overflow-hidden rounded-lg border border-border-default bg-code-bg" data-rehype-pretty-code-figure="">
+        {title && (
+          <figcaption className="border-b border-border-subtle px-4 py-2 font-mono text-xs text-text-muted">
+            {title}
+          </figcaption>
+        )}
+        {children}
+      </figure>
+    );
+  },
   pre: ({ children }: { children?: React.ReactNode }) => (
-    <pre className="my-6 overflow-x-auto rounded-lg border border-border-default bg-inset p-4 text-sm">
+    <pre className="overflow-x-auto p-4 text-sm [&_code]:!bg-transparent">
       {children}
     </pre>
   ),

@@ -19,7 +19,10 @@ import {
   JsonLdScript,
 } from "@/lib/seo/json-ld";
 
-export const revalidate = 300; // SSR — 5 minute revalidation
+// Prices come from the live pricing engine; never prerender this at
+// build time (the build container has no DB access and would bake in the
+// static mock fallback).
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Pricing — Transparent Per-Request AI API Costs",

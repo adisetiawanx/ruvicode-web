@@ -7,6 +7,8 @@ interface EmptyStateProps {
   description: string;
   actionLabel?: string;
   actionHref?: string;
+  /** Custom action node (e.g. a dialog trigger button) instead of a plain link. */
+  action?: React.ReactNode;
 }
 
 /**
@@ -20,6 +22,7 @@ export function EmptyState({
   description,
   actionLabel,
   actionHref,
+  action,
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
@@ -30,14 +33,16 @@ export function EmptyState({
       <p className="mb-6 max-w-sm text-sm text-text-secondary">
         {description}
       </p>
-      {actionLabel && actionHref && (
-        <Link
-          href={actionHref}
-          className="inline-flex items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-text-inverse transition-colors hover:bg-accent-hover active:bg-accent-pressed"
-        >
-          {actionLabel}
-        </Link>
-      )}
+      {action
+        ? action
+        : actionLabel && actionHref && (
+            <Link
+              href={actionHref}
+              className="inline-flex items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-text-inverse transition-colors hover:bg-accent-hover active:bg-accent-pressed"
+            >
+              {actionLabel}
+            </Link>
+          )}
     </div>
   );
 }

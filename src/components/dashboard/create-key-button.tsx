@@ -108,7 +108,7 @@ export function CreateKeyButton() {
           </>
         ) : (
           <form onSubmit={handleSubmit}>
-            <DialogHeader className="mb-2">
+            <DialogHeader>
               <DialogTitle>Create API Key</DialogTitle>
             </DialogHeader>
             <div className="space-y-5">
@@ -219,7 +219,7 @@ export function CreateKeyButton() {
                 </div>
               </div>
             </div>
-            <DialogFooter className="mt-6">
+            <DialogFooter>
               <DialogClose render={<Button variant="outline" />}>
                 Cancel
               </DialogClose>

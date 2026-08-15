@@ -32,8 +32,7 @@ export default async function KeysPage() {
             icon={KeyRound}
             title="No API keys yet"
             description="Create one to start making requests."
-            actionLabel="Create API Key"
-            actionHref="/dashboard/keys"
+            action={<CreateKeyButton />}
           />
         ) : (
           <div className="overflow-x-auto">

@@ -4,13 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ModelPicker } from "@/components/shared/model-picker";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -40,6 +34,8 @@ interface PlaygroundChatProps {
   models: ModelWithPricing[];
   endpoint: string;
   lockModel?: string;
+  /** Label of the API key the dashboard playground bills to. */
+  activeKeyLabel?: string;
   statsPosition?: "left" | "right";
   showSignupCta?: boolean;
   hint?: string;
@@ -87,6 +83,7 @@ export function PlaygroundChat({
   models,
   endpoint,
   lockModel,
+  activeKeyLabel,
   statsPosition = "left",
   showSignupCta = true,
   hint = "Try any model. No account needed.",
@@ -245,19 +242,11 @@ export function PlaygroundChat({
         <span className="hidden text-xs text-text-muted sm:inline">
           {maxTokens.toLocaleString()} tokens · {temperature.toFixed(1)} temp
         </span>
-        {!locked && (
-          <Select value={model} onValueChange={(v) => { setSelectedModel(v); setMessages([]); setLastCost(null); }}>
-            <SelectTrigger className="h-7 w-auto border-0 bg-transparent p-0 text-xs text-accent hover:text-accent-hover">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {models.map((m) => (
-                <SelectItem key={m.model} value={m.model}>
-                  {m.display_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {activeKeyLabel && (
+          <span className="hidden items-center gap-1.5 text-xs text-text-muted sm:inline-flex">
+            <KeyRound className="h-3 w-3" />
+            Key: <span className="font-medium text-text-secondary">{activeKeyLabel}</span>
+          </span>
         )}
       </div>
 
@@ -286,30 +275,40 @@ export function PlaygroundChat({
   // ─── Settings panel (slide-out / inline) ──────────────────
   const settingsPanel = showSettings && (
     <div className="space-y-4 rounded-lg border border-border-default bg-surface p-4">
-      {!locked && (
-        <div>
-          <p className="mb-2 text-xs font-medium text-text-secondary">Model</p>
-          <Select
+      <div>
+        <p className="mb-2 text-xs font-medium text-text-secondary">Model</p>
+        {locked ? (
+          <div className="rounded-md border border-border-subtle bg-surface-2 px-3 py-2">
+            <p className="text-sm text-text-primary">{modelPricing?.display_name ?? model}</p>
+            <p className="font-mono text-xs text-text-muted">
+              ${modelPricing?.user_input.toFixed(2) ?? "?"}/1M input
+            </p>
+          </div>
+        ) : (
+          <ModelPicker
+            models={models}
             value={model}
-            onValueChange={(v) => {
+            onChange={(v) => {
               setSelectedModel(v);
               setMessages([]);
               setLastCost(null);
               setLastUsage(null);
               setInput("");
             }}
-          >
-            <SelectTrigger className="!w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {models.map((m) => (
-                <SelectItem key={m.model} value={m.model}>
-                  {m.display_name} · ${m.user_input.toFixed(2)}/1M
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
+        )}
+      </div>
+
+      {activeKeyLabel && (
+        <div className="space-y-1 rounded-md border border-border-subtle bg-surface-2 p-3">
+          <p className="text-xs text-text-secondary">Billing key</p>
+          <p className="flex items-center gap-1.5 text-sm text-text-primary">
+            <KeyRound className="h-3.5 w-3.5 text-accent" />
+            {activeKeyLabel}
+          </p>
+          <p className="text-xs text-text-muted">
+            Requests use this key&apos;s rate and spend limits and bill your wallet.
+          </p>
         </div>
       )}
 
