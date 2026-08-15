@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { floorUsd } from "@/lib/models/display";
 import { Wallet, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +14,7 @@ interface BalanceCardProps {
  * Numbers NEVER animate (PAGES.md §5.4).
  */
 export function BalanceCard({ balance, held }: BalanceCardProps) {
-  const available = (Number(balance) - Number(held)).toFixed(2);
+  const available = floorUsd(Number(balance) - Number(held)).toFixed(2);
   const hasPending = Number(held) > 0;
 
   return (
@@ -32,7 +33,7 @@ export function BalanceCard({ balance, held }: BalanceCardProps) {
       </p>
       {hasPending && (
         <p className="font-mono text-xs tabular text-text-muted">
-          (${Number(held).toFixed(2)} in pending requests)
+          (${floorUsd(held).toFixed(2)} in pending requests)
         </p>
       )}
       <Link

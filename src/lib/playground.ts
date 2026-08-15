@@ -10,12 +10,15 @@ import { z } from "zod";
  * gateway. Both stream responses so reasoning and tokens appear live.
  */
 
-// The only model anonymous visitors can try on the public playground.
-// Deliberately a DIFFERENT variant from the paid deepseek-v4-flash so the
-// free playground experience is isolated from billed traffic: the public
-// route calls the provider directly with PROVIDER_PLAYGROUND_KEY, while
-// paid requests for deepseek-v4-flash go through the gateway and wallets.
-export const publicPlaygroundModel = "deepseek-v4-flash-0731";
+/**
+ * The public playground's free model is whatever the freedom endpoint
+ * currently serves (it rotates day to day). The chat route resolves it
+ * from GET /v1/models server-side and passes it down; this is only the
+ * fallback used before the first resolution.
+ */
+export const publicPlaygroundFallbackModel = "deepseek-v4-flash-0731";
+
+export { displayModelName } from "@/lib/models/display";
 
 export const playgroundSchema = z.object({
   model: z.string().min(1).max(50),

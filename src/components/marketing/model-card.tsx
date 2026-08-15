@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/shared/brand-logo";
+import { ModelTag } from "@/components/shared/model-tag";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 
 /** Format price — shows more decimals for very cheap models. */
@@ -12,7 +13,7 @@ export function ModelCard({ model }: { model: ModelWithPricing }) {
   return (
     <Link
       href={`/models/${model.model}`}
-      className="group flex flex-col rounded-xl border border-border-default bg-surface p-5 transition-all hover:border-accent/30 hover:shadow-card"
+      className="group flex flex-col rounded-xl border border-border-default bg-surface p-6 transition-all hover:border-accent/30 hover:shadow-card"
     >
       {/* Header: brand logo + savings */}
       <div className="mb-4 flex items-center justify-between">
@@ -22,20 +23,24 @@ export function ModelCard({ model }: { model: ModelWithPricing }) {
         </span>
       </div>
 
-      {/* Model name */}
-      <h3 className="mb-4 text-lg font-semibold">{model.display_name}</h3>
+      {/* Model name + copyable API id */}
+      <div className="mb-4">
+        <h3 className="text-[17px] leading-snug font-semibold">
+          <ModelTag id={model.model} />
+        </h3>
+      </div>
 
       {/* Pricing block */}
       <div className="mt-auto space-y-2 border-t border-border-subtle pt-4">
         <div className="flex items-baseline justify-between">
-          <span className="text-sm text-text-secondary">Input</span>
+          <span className="text-[13px] text-text-secondary">Input</span>
           <span className="font-mono tabular text-text-primary">
             ${formatPrice(model.user_input)}
             <span className="text-text-muted">/1M</span>
           </span>
         </div>
         <div className="flex items-baseline justify-between">
-          <span className="text-sm text-text-secondary">Output</span>
+          <span className="text-[13px] text-text-secondary">Output</span>
           <span className="font-mono tabular text-text-primary">
             ${formatPrice(model.user_output)}
             <span className="text-text-muted">/1M</span>

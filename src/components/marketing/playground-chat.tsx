@@ -18,11 +18,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
-import { publicPlaygroundModel } from "@/lib/playground";
+import { publicPlaygroundFallbackModel, displayModelName } from "@/lib/playground";
 import {
   ChatCodeBlock,
   parseMessageContent,
 } from "@/components/chat/code-block";
+import { MarkdownMessage } from "@/components/chat/markdown-message";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -97,7 +98,7 @@ export function PlaygroundChat({
 }: PlaygroundChatProps) {
   const locked = lockModel ?? null;
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
-  const model = locked ?? selectedModel ?? models[0]?.model ?? publicPlaygroundModel;
+  const model = locked ?? selectedModel ?? models[0]?.model ?? publicPlaygroundFallbackModel;
   const modelPricing = models.find((m) => m.model === model);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -257,10 +258,10 @@ export function PlaygroundChat({
 
   // ─── Info bar ────────────────────────────────────────────
   const infoBar = (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border-default bg-surface p-3">
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border-default bg-surface p-4">
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-text-primary">
-          {modelPricing?.display_name ?? model}
+        <span className="text-[15px] font-medium text-text-primary">
+          {locked ? displayModelName(locked) : (modelPricing?.display_name ?? model)}
         </span>
         <span className="hidden text-xs text-text-muted sm:inline">
           {maxTokens.toLocaleString()} tokens · {temperature.toFixed(1)} temp
@@ -314,12 +315,12 @@ export function PlaygroundChat({
 
   // ─── Settings panel (slide-out / inline) ──────────────────
   const settingsPanel = showSettings && (
-    <div className="space-y-4 rounded-lg border border-border-default bg-surface p-4">
+    <div className="space-y-5 rounded-lg border border-border-default bg-surface p-5">
       <div>
-        <p className="mb-2 text-xs font-medium text-text-secondary">Model</p>
+        <p className="mb-2 text-[13px] font-medium text-text-secondary">Model</p>
         {locked ? (
           <div className="rounded-md border border-border-subtle bg-surface-2 px-3 py-2">
-            <p className="text-sm text-text-primary">{modelPricing?.display_name ?? model}</p>
+            <p className="text-sm text-text-primary">{locked ? displayModelName(locked) : (modelPricing?.display_name ?? model)}</p>
             <p className="font-mono text-xs text-text-muted">
               ${modelPricing?.user_input.toFixed(2) ?? "?"}/1M input
             </p>
@@ -474,14 +475,14 @@ export function PlaygroundChat({
                   seg.type === "code" ? (
                     <ChatCodeBlock key={si} code={seg.content} language={seg.language} />
                   ) : (
-                    <p key={si} className="whitespace-pre-wrap text-sm leading-relaxed">
-                      {seg.content}
+                    <div key={si}>
+                      <MarkdownMessage text={seg.content} />
                       {isStreamingSlot &&
                         si === parseMessageContent(msg.content).length - 1 &&
                         seg.type === "text" && (
                           <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-accent" />
                         )}
-                    </p>
+                    </div>
                   ),
                 )}
                 {msg.stopReason && !isStreamingSlot && (

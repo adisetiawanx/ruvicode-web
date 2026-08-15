@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { floorUsd } from "@/lib/models/display";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { getWallet } from "@/lib/db/queries/dashboard";
@@ -51,7 +52,7 @@ export function BalanceRefreshButton({
       className="flex items-center gap-1.5 font-mono text-sm tabular text-text-secondary transition-colors hover:text-text-primary disabled:opacity-50"
       aria-label="Refresh balance"
     >
-      <span>${Number(balance).toFixed(2)}</span>
+      <span>${floorUsd(balance).toFixed(2)}</span>
       <RefreshCw
         className={`h-3 w-3 text-text-muted transition-transform ${
           loading ? "animate-spin" : ""

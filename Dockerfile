@@ -11,7 +11,7 @@ WORKDIR /app
 RUN npm install -g pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm build
+RUN SKIP_ENV_VALIDATION=1 pnpm build
 
 FROM base AS runner
 WORKDIR /app

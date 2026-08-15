@@ -72,18 +72,18 @@ export function ModelFilters({
             value={filters.q}
             onChange={(e) => update({ q: e.target.value })}
             placeholder="Search models..."
-            className="h-9 w-full rounded-md border border-border-subtle bg-surface-2 pl-9 pr-3 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-accent"
+            className="h-10 w-full rounded-md border border-border-subtle bg-surface-2 pl-9 pr-3 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-accent"
           />
         </div>
       </div>
 
       <div>
-        <h4 className="mb-3 text-sm font-semibold">Sort by</h4>
+        <h4 className="mb-3 text-[15px] font-semibold">Sort by</h4>
         <div className="flex flex-col gap-2">
           {SORT_OPTIONS.map((s) => (
             <button
               key={s}
-              className={`text-left text-sm transition-colors ${
+              className={`text-left text-[15px] transition-colors ${
                 filters.sort === s
                   ? "text-accent"
                   : "text-text-secondary hover:text-text-primary"
@@ -97,7 +97,7 @@ export function ModelFilters({
       </div>
 
       <div>
-        <h4 className="mb-3 text-sm font-semibold">Type</h4>
+        <h4 className="mb-3 text-[15px] font-semibold">Type</h4>
         <div className="flex flex-wrap gap-1.5">
           {MODEL_TYPES.map((t) => (
             <button
@@ -116,7 +116,7 @@ export function ModelFilters({
       </div>
 
       <div>
-        <h4 className="mb-3 text-sm font-semibold">Provider</h4>
+        <h4 className="mb-3 text-[15px] font-semibold">Provider</h4>
         <div className="space-y-2">
           {providers.map((p) => (
             <div key={p} className="flex items-center gap-2">
@@ -127,7 +127,7 @@ export function ModelFilters({
               />
               <label
                 htmlFor={`provider-${p}`}
-                className="cursor-pointer text-sm text-text-secondary"
+                className="cursor-pointer text-[15px] text-text-secondary"
               >
                 {p}
               </label>
@@ -137,7 +137,7 @@ export function ModelFilters({
       </div>
 
       <div>
-        <h4 className="mb-3 text-sm font-semibold">
+        <h4 className="mb-3 text-[15px] font-semibold">
           Max price (per 1M tokens)
         </h4>
         <Slider

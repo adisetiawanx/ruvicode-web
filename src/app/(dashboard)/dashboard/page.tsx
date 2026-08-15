@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { floorUsd } from "@/lib/models/display";
 import { getSession } from "@/lib/session";
 import {
   getWallet,
@@ -36,8 +37,8 @@ export default async function DashboardPage() {
       getRecentActivity(userId, 10),
     ]);
 
-  const availableBalance = (
-    Number(wallet.balance) - Number(wallet.held)
+  const availableBalance = floorUsd(
+    Number(wallet.balance) - Number(wallet.held),
   ).toFixed(2);
 
   return (

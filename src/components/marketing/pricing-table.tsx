@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useQueryStates, parseAsStringEnum, parseAsInteger } from "nuqs";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { BrandLogo } from "@/components/shared/brand-logo";
+import { ModelTag } from "@/components/shared/model-tag";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
@@ -151,7 +152,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                   <td className="px-4 py-3">
                     <span className="flex items-center gap-2.5">
                       <BrandLogo brand={m.provider} className="h-5 w-5 shrink-0" />
-                      <span className="font-medium">{m.display_name}</span>
+                      <ModelTag id={m.model} className="min-w-0" />
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right font-mono tabular text-text-secondary">

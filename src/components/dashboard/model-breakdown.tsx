@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from "recharts";
 import { CHART_COLOR_ARRAY } from "@/lib/constants";
+import { displayModelName } from "@/lib/models/display";
 import type { ModelBreakdownEntry } from "@/lib/db/queries/dashboard";
 
 interface ModelBreakdownProps {
@@ -96,7 +97,7 @@ export function ModelBreakdown({ data }: ModelBreakdownProps) {
                       CHART_COLOR_ARRAY[i % CHART_COLOR_ARRAY.length],
                   }}
                 />
-                <span className="text-text-secondary">{item.model}</span>
+                <span className="text-text-secondary">{displayModelName(item.model)}</span>
               </div>
               <div className="flex items-center gap-3">
                 <span className="font-mono tabular text-text-muted">

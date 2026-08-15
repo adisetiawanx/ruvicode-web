@@ -1,11 +1,9 @@
 import { NextRequest } from "next/server";
-import { env } from "@/lib/env";
 import { limitPlaygroundRequest } from "@/lib/upstash";
 import {
   playgroundSchema,
-  playgroundProviderUrl,
-  publicPlaygroundModel,
   sanitizeSSELine,
+  publicPlaygroundFallbackModel,
 } from "@/lib/playground";
 
 export const runtime = "nodejs";
@@ -46,7 +44,19 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return Response.json({ error: "Invalid request parameters" }, { status: 400 });
   }
-  if (parsed.data.model !== publicPlaygroundModel) {
+  // 2a. The free model is whatever freedom currently serves; it rotates.
+  // Read env lazily (runtime only) so build-time page data collection,
+  // which runs without environment variables, never fails on validation.
+  const freedomKey = process.env.FREEDOM_PLAYGROUND_API_KEY;
+  const freedomBase = process.env.FREEDOM_PLAYGROUND_BASE_URL?.replace(/\/+$/, "");
+  if (!freedomKey || !freedomBase) {
+    return Response.json(
+      { error: "Playground is not configured. Please try again later." },
+      { status: 503 },
+    );
+  }
+  const freeModel = await resolveFreeModel(freedomBase, freedomKey);
+  if (parsed.data.model !== freeModel) {
     return Response.json(
       { error: "Only the free model is available without an account." },
       { status: 400 },
@@ -62,14 +72,8 @@ export async function POST(req: NextRequest) {
 
   // 3. Forward to the freedom endpoint (server-side; the key never reaches
   // the browser). Free playground traffic is isolated from paid routing.
-  const providerKey = env.FREEDOM_PLAYGROUND_API_KEY;
-  const url = env.FREEDOM_PLAYGROUND_BASE_URL?.replace(/\/+$/, "") + "/chat/completions";
-  if (!providerKey || !url || url === "/chat/completions") {
-    return Response.json(
-      { error: "Playground is not configured. Please try again later.", remaining },
-      { status: 503 },
-    );
-  }
+  const providerKey = freedomKey;
+  const url = `${freedomBase}/chat/completions`;
 
   let upstream: Response;
   try {
@@ -146,4 +150,40 @@ export async function POST(req: NextRequest) {
       "X-Accel-Buffering": "no",
     },
   });
+}
+
+/**
+ * Resolve the current free model id from the freedom endpoint, with a
+ * short timeout and a small cache so every chat request does not pay a
+ * models round trip. Falls back to the last known id when unavailable.
+ */
+let cachedFreeModel: { id: string; at: number } | null = null;
+const FREE_MODEL_TTL_MS = 5 * 60 * 1000;
+
+async function resolveFreeModel(
+  base: string,
+  key: string,
+): Promise<string> {
+  if (cachedFreeModel && Date.now() - cachedFreeModel.at < FREE_MODEL_TTL_MS) {
+    return cachedFreeModel.id;
+  }
+  try {
+    const res = await fetch(`${base}/models`, {
+      headers: { Authorization: `Bearer ${key}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.ok) {
+      const data = (await res.json()) as {
+        data?: Array<{ id?: string }>;
+      };
+      const id = data.data?.[0]?.id;
+      if (id) {
+        cachedFreeModel = { id, at: Date.now() };
+        return id;
+      }
+    }
+  } catch {
+    // fall through to cache or fallback
+  }
+  return cachedFreeModel?.id ?? publicPlaygroundFallbackModel;
 }

@@ -9,6 +9,9 @@ import { z } from "zod";
  * OAuth credentials are optional (auth works with email/password without them).
  */
 export const env = createEnv({
+  // Docker builds collect page data without runtime env vars; validation
+  // would fail there even though the values exist at run time.
+  skipValidation: process.env.SKIP_ENV_VALIDATION === "1",
   server: {
     DATABASE_URL: z.string().url().optional(),
     BETTER_AUTH_SECRET: z.string().min(32).optional(),

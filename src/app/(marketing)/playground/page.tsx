@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { BreadcrumbList, WithContext } from "schema-dts";
 import { getAllActiveModels } from "@/lib/db/queries/models";
 import { PlaygroundChat } from "@/components/marketing/playground-chat";
-import { publicPlaygroundModel } from "@/lib/playground";
+import { publicPlaygroundFallbackModel, displayModelName } from "@/lib/playground";
 import { Container } from "@/components/layout/container";
 import { LinkButton } from "@/components/shared/link-button";
 import { Lock } from "lucide-react";
@@ -38,7 +38,7 @@ export default async function PlaygroundPage({
   const params = await searchParams;
   const requested =
     typeof params.model === "string" ? params.model : undefined;
-  const isFree = !requested || requested === publicPlaygroundModel;
+  const isFree = !requested || requested === publicPlaygroundFallbackModel;
   const lockedModel = models.find((m) => m.model === requested);
 
   const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
@@ -85,8 +85,8 @@ export default async function PlaygroundPage({
                   </h2>
                   <p className="mb-6 max-w-md text-sm text-text-secondary">
                     The free playground only includes{" "}
-                    {models.find((m) => m.model === publicPlaygroundModel)
-                      ?.display_name ?? publicPlaygroundModel}
+                    {models.find((m) => m.model === publicPlaygroundFallbackModel)
+                      ?.display_name ?? displayModelName(publicPlaygroundFallbackModel)}
                     . Create a free account to try every model in the dashboard
                     playground with your own API key.
                   </p>
@@ -131,7 +131,7 @@ export default async function PlaygroundPage({
               <PlaygroundChat
                 models={models}
                 endpoint="/api/playground/chat"
-                lockModel={publicPlaygroundModel}
+                lockModel={publicPlaygroundFallbackModel}
                 showFreeBadges
               />
             )}

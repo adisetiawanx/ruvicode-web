@@ -12,6 +12,7 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { UsageFiltersClient } from "@/components/dashboard/usage-filters";
 import { UsageExportButton } from "@/components/dashboard/usage-export-button";
 import { EmptyState } from "@/components/shared/empty-state";
+import { ModelTag } from "@/components/shared/model-tag";
 import { FileSearch } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -142,7 +143,7 @@ export default async function UsagePage({ searchParams }: PageProps) {
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant="outline" className="font-mono text-xs">
-                          {row.model}
+                          <ModelTag id={row.model} />
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">

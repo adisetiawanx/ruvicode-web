@@ -1,5 +1,6 @@
 "use client";
 
+import { displayModelName } from "@/lib/models/display";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
@@ -54,8 +55,8 @@ export function UsageFiltersClient({
         >
           <option value="all">All models</option>
           {models.map((m) => (
-            <option key={m} value={m}>
-              {m}
+            <option key={displayModelName(m)} value={displayModelName(m)}>
+              {displayModelName(m)}
             </option>
           ))}
         </select>

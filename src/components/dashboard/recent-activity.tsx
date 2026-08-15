@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import { ModelTag } from "@/components/shared/model-tag";
 import type { RecentActivityEntry } from "@/lib/db/queries/dashboard";
 
 interface RecentActivityProps {
@@ -70,9 +70,7 @@ export function RecentActivity({ data }: RecentActivityProps) {
                     {timeAgo(row.createdAt)}
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant="outline" className="font-mono text-xs">
-                      {row.model}
-                    </Badge>
+                    <ModelTag id={row.model} className="[&>span:first-child]:text-xs" />
                   </td>
                   <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
                     {(

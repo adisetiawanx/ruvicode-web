@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { floorUsd } from "@/lib/models/display";
 import { getSession } from "@/lib/session";
 import { getTopups } from "@/lib/db/queries/management";
 import { getWallet } from "@/lib/db/queries/dashboard";
@@ -35,11 +36,11 @@ export default async function BillingPage() {
         <BalanceCard balance={wallet.balance} held={wallet.held} />
         <StatCard
           label="Total Loaded"
-          value={`$${Number(wallet.totalLoaded).toFixed(2)}`}
+          value={`$${floorUsd(wallet.totalLoaded).toFixed(2)}`}
         />
         <StatCard
           label="Total Spent"
-          value={`$${Number(wallet.totalSpent).toFixed(2)}`}
+          value={`$${floorUsd(wallet.totalSpent).toFixed(2)}`}
         />
       </div>
 
