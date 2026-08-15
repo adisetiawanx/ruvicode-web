@@ -1,22 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy } from "lucide-react";
 import { displayModelName } from "@/lib/models/display";
 
 /**
- * Model name plus its API id in a copyable chip. The id is what users
- * must send as "model" in API requests. Clicking the chip copies the id;
- * inside links the click does not navigate (stopPropagation).
+ * Model name plus its API id. The id is what users must send as "model"
+ * in API requests. Clicking the id copies it; inside links the click does
+ * not navigate (stopPropagation).
+ *
+ * `stacked` (default) puts the id under the name for cards and showcase;
+ * set stacked={false} for dense table rows where it sits beside the name.
  */
 export function ModelTag({
   id,
   className,
   showName = true,
+  stacked = true,
 }: {
   id: string;
   className?: string;
   showName?: boolean;
+  stacked?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -29,22 +33,23 @@ export function ModelTag({
   }
 
   return (
-    <span className={`inline-flex max-w-full flex-col items-start gap-1 ${className ?? ""}`}>
+    <span
+      className={`inline-flex max-w-full ${stacked ? "flex-col items-start gap-1" : "items-center gap-2"} ${className ?? ""}`}
+    >
       {showName && (
         <span className="truncate font-medium">{displayModelName(id)}</span>
       )}
       <button
         type="button"
         onClick={copy}
-        title={`Copy model id: ${id}`}
-        className="group inline-flex max-w-full shrink-0 items-center gap-1 rounded border border-border-subtle bg-surface-2 px-1.5 py-0.5 font-mono text-[11px] text-text-muted transition-colors hover:border-accent/40 hover:text-accent-text"
+        title={copied ? "Copied!" : `Copy model id: ${id}`}
+        className={`inline-flex max-w-full shrink-0 items-center rounded border px-1.5 py-0.5 font-mono text-[11px] transition-colors ${
+          copied
+            ? "border-success/40 bg-success-subtle text-success"
+            : "border-border-subtle bg-surface-2 text-text-muted hover:border-accent/40 hover:text-accent-text"
+        }`}
       >
         <span className="truncate">{id}</span>
-        {copied ? (
-          <Check className="h-3 w-3 shrink-0 text-success" />
-        ) : (
-          <Copy className="h-3 w-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
-        )}
       </button>
     </span>
   );

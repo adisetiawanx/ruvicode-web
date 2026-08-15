@@ -70,7 +70,7 @@ export function RecentActivity({ data }: RecentActivityProps) {
                     {timeAgo(row.createdAt)}
                   </td>
                   <td className="px-4 py-3">
-                    <ModelTag id={row.model} className="[&>span:first-child]:text-xs" />
+                    <ModelTag id={row.model} stacked={false} className="[&>span:first-child]:text-xs" />
                   </td>
                   <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
                     {(

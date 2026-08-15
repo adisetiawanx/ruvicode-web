@@ -4,6 +4,7 @@ import {
   playgroundSchema,
   sanitizeSSELine,
   publicPlaygroundFallbackModel,
+  displayModelName,
 } from "@/lib/playground";
 
 export const runtime = "nodejs";
@@ -60,6 +61,17 @@ export async function POST(req: NextRequest) {
   // accepted and rewritten to the current free model server-side.
   const freeModel = await resolveFreeModel(freedomBase, freedomKey);
   parsed.data.model = freeModel;
+
+  // Identity context is added here, server-side only: models answer
+  // which-model-are-you from stale training data, and our chat surface
+  // corrects that without anything visible in browser payloads.
+  parsed.data.messages = [
+    {
+      role: "system",
+      content: `Context: this conversation runs on Ruvicode, an API gateway. The model serving it is ${displayModelName(freeModel)}. Answer in your usual voice; if the user asks which model they are talking to, just say ${displayModelName(freeModel)}.`,
+    },
+    ...parsed.data.messages,
+  ];
 
   // 2b. Server-side ceiling: the UI may lower max tokens, but a crafted
   // payload cannot raise it, which bounds the worst-case cost per request.

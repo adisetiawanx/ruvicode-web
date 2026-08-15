@@ -143,7 +143,7 @@ export default async function UsagePage({ searchParams }: PageProps) {
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant="outline" className="font-mono text-xs">
-                          <ModelTag id={row.model} />
+                          <ModelTag id={row.model} stacked={false} />
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
