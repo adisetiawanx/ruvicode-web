@@ -14,16 +14,23 @@ import { Button } from "@/components/ui/button";
 const SORT_OPTIONS = ["cheapest", "name", "savings"] as const;
 type SortOption = (typeof SORT_OPTIONS)[number];
 
+const DEFAULT_MAX_PRICE = 20;
+
 export function ModelFilters({
   providers,
+  resultCount,
+  onPageReset,
 }: {
   providers: string[];
+  resultCount?: number;
+  /** Reset pagination whenever a filter changes. */
+  onPageReset?: () => void;
 }) {
   // nuqs: type-safe URL params — prevents injection via query strings.
   // Provider list is a comma-separated string, parsed safely.
   const [filters, setFilters] = useQueryStates({
     provider: parseAsString.withDefault(""),
-    max_price: parseAsFloat.withDefault(20),
+    max_price: parseAsFloat.withDefault(DEFAULT_MAX_PRICE),
     sort: parseAsStringEnum<SortOption>([...SORT_OPTIONS]).withDefault(
       "cheapest",
     ),
@@ -34,12 +41,17 @@ export function ModelFilters({
     [filters.provider],
   );
 
+  function update(patch: Partial<typeof filters>) {
+    onPageReset?.();
+    setFilters(patch);
+  }
+
   function toggleProvider(p: string) {
     const current = selectedProviders;
     const next = current.includes(p)
       ? current.filter((x) => x !== p)
       : [...current, p];
-    setFilters({ provider: next.join(",") });
+    update({ provider: next.join(",") });
   }
 
   return (
@@ -55,7 +67,7 @@ export function ModelFilters({
                   ? "text-accent"
                   : "text-text-secondary hover:text-text-primary"
               }`}
-              onClick={() => setFilters({ sort: s })}
+              onClick={() => update({ sort: s })}
             >
               <span className="capitalize">{s}</span>
             </button>
@@ -86,23 +98,44 @@ export function ModelFilters({
 
       <div>
         <h4 className="mb-3 text-sm font-semibold">
-          Max Price (per 1M tokens)
+          Max price (per 1M tokens)
         </h4>
         <Slider
           value={filters.max_price}
-          onValueChange={(v) => setFilters({ max_price: v as number })}
-          max={20}
+          onValueChange={(v) => update({ max_price: Number(v) })}
+          max={DEFAULT_MAX_PRICE}
           step={0.5}
         />
-        <p className="mt-2 font-mono text-xs text-text-muted">
-          ${filters.max_price.toFixed(2)}
-        </p>
+        {/* Precise manual entry: most models cost fractions of a dollar,
+            so the slider alone is too coarse. */}
+        <div className="mt-3 flex items-center gap-2">
+          <span className="font-mono text-sm text-text-muted">$</span>
+          <input
+            type="number"
+            min={0}
+            max={DEFAULT_MAX_PRICE}
+            step={0.01}
+            value={filters.max_price}
+            onChange={(e) => {
+              const v = e.target.value === "" ? 0 : Number(e.target.value);
+              if (!Number.isNaN(v)) update({ max_price: v });
+            }}
+            className="h-8 w-24 rounded-md border border-border-subtle bg-surface-2 px-2 font-mono text-sm tabular text-text-primary outline-none focus:border-accent"
+            aria-label="Max price per 1M tokens, exact value"
+          />
+          <span className="text-xs text-text-muted">/1M</span>
+        </div>
+        {typeof resultCount === "number" && (
+          <p className="mt-2 text-xs text-text-muted">
+            {resultCount} match{resultCount !== 1 ? "es" : ""}
+          </p>
+        )}
       </div>
 
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setFilters({ provider: "", max_price: 20 })}
+        onClick={() => update({ provider: "", max_price: DEFAULT_MAX_PRICE })}
       >
         Clear Filters
       </Button>

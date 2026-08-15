@@ -1,17 +1,21 @@
 import rehypePrettyCode, {
   type Options as PrettyCodeOptions,
 } from "rehype-pretty-code";
+import remarkGfm from "remark-gfm";
 
 /**
- * Shared rehype config for MDX content (docs + blog).
+ * Shared MDX pipeline config (docs + blog).
  *
- * rehype-pretty-code wraps Shiki, so code fences get the same VS Code-grade
- * highlighting as the marketing pages, with zero client JS.
+ * remark-gfm enables GitHub-style tables and task lists, rehype-pretty-code
+ * wraps Shiki so code fences get VS Code-grade highlighting with zero
+ * client JS.
  */
 const prettyCodeOptions: PrettyCodeOptions = {
   theme: "github-dark",
   keepBackground: true,
 };
+
+export const mdxRemarkPlugins = [remarkGfm];
 
 // Typed as a mutable tuple so it satisfies unified's PluggableList without
 // importing `unified` directly (it is a transitive dependency here).

@@ -5,7 +5,6 @@ import { Logo } from "@/components/shared/logo";
 const footerLinks = {
   Product: [
     { href: "/models", label: "Models" },
-    { href: "/pricing", label: "Pricing" },
     { href: "/playground", label: "Playground" },
     { href: "/calculator", label: "Calculator" },
     { href: "/docs", label: "Documentation" },

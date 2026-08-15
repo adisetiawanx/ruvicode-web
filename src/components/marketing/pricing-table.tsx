@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { useQueryStates, parseAsStringEnum } from "nuqs";
+import { useQueryStates, parseAsStringEnum, parseAsInteger } from "nuqs";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
@@ -26,6 +27,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
     sort: parseAsStringEnum<SortKey>(SORT_KEYS).withDefault("savings"),
     dir: parseAsStringEnum<SortDir>(["asc", "desc"]).withDefault("desc"),
     filter: parseAsStringEnum<Filter>(FILTERS).withDefault("all"),
+    tpage: parseAsInteger.withDefault(1),
   });
 
   const sorted = useMemo(() => {
@@ -54,11 +56,16 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
     });
   }, [models, state]);
 
+  const PAGE_SIZE = 25;
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const page = Math.min(Math.max(1, state.tpage), totalPages);
+  const pageRows = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   function toggleSort(key: SortKey) {
     if (state.sort === key) {
-      setState({ sort: key, dir: state.dir === "desc" ? "asc" : "desc" });
+      setState({ sort: key, dir: state.dir === "desc" ? "asc" : "desc", tpage: null });
     } else {
-      setState({ sort: key, dir: "desc" });
+      setState({ sort: key, dir: "desc", tpage: null });
     }
   }
 
@@ -115,7 +122,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
               </tr>
             </thead>
             <tbody>
-              {sorted.map((m) => (
+              {pageRows.map((m) => (
                 <tr
                   key={m.model}
                   className="border-b border-border-subtle transition-colors last:border-0 hover:bg-surface/50"
@@ -140,6 +147,31 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
           </table>
         </div>
       </div>
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-center gap-4">
+          <button
+            type="button"
+            disabled={page <= 1}
+            onClick={() => setState({ tpage: page - 1 })}
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-default transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-40"
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <span className="font-mono text-sm tabular text-text-secondary">
+            {page} / {totalPages}
+          </span>
+          <button
+            type="button"
+            disabled={page >= totalPages}
+            onClick={() => setState({ tpage: page + 1 })}
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-default transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-40"
+            aria-label="Next page"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
       <p className="mt-4 text-xs text-text-muted">
         Prices update every 2 minutes. Last updated:{" "}
         <span className="font-mono">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CommandPalette } from "@/components/shared/command-palette";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Container } from "./container";
@@ -17,7 +18,6 @@ import { LinkButton } from "@/components/shared/link-button";
 
 const navLinks = [
   { href: "/models", label: "Models" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/playground", label: "Playground" },
   { href: "/docs", label: "Docs" },
   { href: "/blog", label: "Blog" },
@@ -51,6 +51,7 @@ export function Navbar() {
 
           {/* Right actions (desktop) */}
           <div className="hidden items-center gap-2 md:flex">
+            <CommandPalette />
             <ThemeToggle />
             <LinkButton href="/login" variant="ghost" size="sm">
               Sign in

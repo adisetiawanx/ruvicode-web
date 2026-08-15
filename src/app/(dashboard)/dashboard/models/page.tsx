@@ -29,7 +29,7 @@ export default async function DashboardModelsPage() {
           variant="outline"
           size="sm"
           nativeButton={false}
-          render={<Link href="/pricing" />}
+          render={<Link href="/models" />}
         >
           Public pricing page →
         </Button>

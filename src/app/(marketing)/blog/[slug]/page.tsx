@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { mdxRehypePlugins } from "@/lib/mdx";
+import { mdxRehypePlugins, mdxRemarkPlugins } from "@/lib/mdx";
 import type { BlogPosting, BreadcrumbList, WithContext } from "schema-dts";
 import { getAllPosts, getPostBySlug } from "@/lib/content/blog";
 import { Container } from "@/components/layout/container";
@@ -169,7 +169,12 @@ export default async function BlogPostPage({
             <MDXRemote
             source={post.content}
             components={mdxComponents}
-            options={{ mdxOptions: { rehypePlugins: [...mdxRehypePlugins] } }}
+            options={{
+              mdxOptions: {
+                remarkPlugins: [...mdxRemarkPlugins],
+                rehypePlugins: [...mdxRehypePlugins],
+              },
+            }}
           />
           </div>
         </article>

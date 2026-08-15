@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { mdxRehypePlugins } from "@/lib/mdx";
+import { mdxRehypePlugins, mdxRemarkPlugins } from "@/lib/mdx";
 import type { BreadcrumbList, WithContext } from "schema-dts";
 import { getAllDocs, getDocBySlug } from "@/lib/content/docs";
 import { mdxComponents } from "@/components/shared/mdx-components";
@@ -85,7 +85,12 @@ export default async function DocPage({
           <MDXRemote
             source={doc.content}
             components={mdxComponents}
-            options={{ mdxOptions: { rehypePlugins: [...mdxRehypePlugins] } }}
+            options={{
+              mdxOptions: {
+                remarkPlugins: [...mdxRemarkPlugins],
+                rehypePlugins: [...mdxRehypePlugins],
+              },
+            }}
           />
         </div>
       </article>
