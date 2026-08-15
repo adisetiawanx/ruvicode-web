@@ -6,7 +6,7 @@ import { CODE_SAMPLES } from "@/lib/code-samples";
 import { highlightCode } from "@/lib/shiki";
 
 export const metadata: Metadata = {
-  title: "Integrations — Works with your tools",
+  title: "Integrations - Works with Your Tools",
   description:
     "Ruvicode works with Cursor, Aider, Claude Code, LangChain, and any OpenAI-compatible tool. One base URL change.",
   alternates: { canonical: "https://ruvicode.com/integrations" },

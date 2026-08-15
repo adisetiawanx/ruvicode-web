@@ -38,7 +38,7 @@ export async function generateMetadata({
   if (!model) return {};
 
   return {
-    title: `${model.display_name} API — Pricing & Docs`,
+    title: `${model.display_name} API - Pricing & Docs`,
     description: `${model.display_name} via Ruvicode. Input $${model.user_input.toFixed(2)}/1M, output $${model.user_output.toFixed(2)}/1M tokens. Save ${model.user_discount_pct.toFixed(0)}% vs OpenRouter. OpenAI-compatible endpoint.`,
     alternates: { canonical: `https://ruvicode.com/models/${model.model}` },
     openGraph: {

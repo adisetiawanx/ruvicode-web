@@ -2,7 +2,11 @@ import { NextRequest } from "next/server";
 import { getSession } from "@/lib/session";
 import { getApiKeys } from "@/lib/db/queries/management";
 import { env } from "@/lib/env";
-import { playgroundSchema, sanitizeSSELine } from "@/lib/playground";
+import {
+  playgroundSchema,
+  sanitizeSSELine,
+  displayModelName,
+} from "@/lib/playground";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -75,6 +79,11 @@ export async function POST(req: NextRequest) {
         user_id: session.user.id,
         key_id: key.id,
         ...parsed.data,
+        // Identity context (server-side only, never in browser payloads).
+        messages: [
+          { role: "system", content: `You are ${displayModelName(parsed.data.model)}, running behind an API gateway. Your knowledge of your own version may be out of date. When the user asks which model or version they are talking to, you are ${displayModelName(parsed.data.model)}. Keep the same tone and personality you normally have, and answer other questions as yourself.` },
+          ...parsed.data.messages,
+        ],
         stream: true,
       }),
     });

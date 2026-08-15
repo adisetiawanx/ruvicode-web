@@ -9,7 +9,7 @@ import {
 } from "@/components/shared/page-entrance";
 
 export const metadata: Metadata = {
-  title: "Blog — AI API Guides, Tutorials & Comparisons",
+  title: "Blog - AI API Guides, Tutorials & Comparisons",
   description:
     "Learn how to use AI APIs effectively. Comparison guides, pricing analysis, tutorials for Claude, GPT, GLM, DeepSeek and more.",
   alternates: { canonical: "https://ruvicode.com/blog" },

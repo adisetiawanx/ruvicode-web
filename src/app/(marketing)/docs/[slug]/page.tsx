@@ -21,11 +21,11 @@ export async function generateMetadata({
   if (!doc) return {};
 
   return {
-    title: `${doc.title} | Ruvicode Docs`,
+    title: `${doc.title} - Docs`,
     description: doc.description,
     alternates: { canonical: `https://ruvicode.com/docs/${doc.slug}` },
     openGraph: {
-      title: `${doc.title} | Ruvicode Docs`,
+      title: `${doc.title} - Docs`,
       description: doc.description,
       url: `https://ruvicode.com/docs/${doc.slug}`,
     },

@@ -4,6 +4,7 @@ import {
   playgroundSchema,
   sanitizeSSELine,
   publicPlaygroundFallbackModel,
+  displayModelName,
 } from "@/lib/playground";
 
 export const runtime = "nodejs";
@@ -60,6 +61,13 @@ export async function POST(req: NextRequest) {
   // accepted and rewritten to the current free model server-side.
   const freeModel = await resolveFreeModel(freedomBase, freedomKey);
   parsed.data.model = freeModel;
+
+  // Identity context (server-side only, never in browser payloads): models
+  // name themselves from stale training data, this states the actual model.
+  parsed.data.messages = [
+    { role: "system", content: `You are ${displayModelName(freeModel)}, running behind an API gateway. Your knowledge of your own version may be out of date. When the user asks which model or version they are talking to, you are ${displayModelName(freeModel)}. Keep the same tone and personality you normally have, and answer other questions as yourself.` },
+    ...parsed.data.messages,
+  ];
 
   // 2b. Server-side ceiling: the UI may lower max tokens, but a crafted
   // payload cannot raise it, which bounds the worst-case cost per request.

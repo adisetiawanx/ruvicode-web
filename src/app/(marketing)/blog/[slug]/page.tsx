@@ -25,7 +25,7 @@ export async function generateMetadata({
   if (!post) return {};
 
   return {
-    title: `${post.title} | Ruvicode Blog`,
+    title: `${post.title} - Blog`,
     description: post.description,
     alternates: { canonical: `https://ruvicode.com/blog/${post.slug}` },
     openGraph: {

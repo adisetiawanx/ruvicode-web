@@ -10,7 +10,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { tag } = await params;
   return {
-    title: `Posts tagged "${tag}" | Ruvicode Blog`,
+    title: `Posts tagged "${tag}" - Blog`,
     description: `Browse all blog posts tagged ${tag}.`,
     alternates: { canonical: `https://ruvicode.com/blog/tag/${tag}` },
   };

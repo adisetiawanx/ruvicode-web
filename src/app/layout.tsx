@@ -8,8 +8,8 @@ import "@/app/globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Ruvicode — One API Key, Every AI Model",
-    template: "%s | Ruvicode",
+    default: "Ruvicode - One API Key, Every AI Model",
+    template: "%s - Ruvicode",
   },
   description:
     "Transparent AI API gateway. Access Claude, GPT, Gemini, GLM, DeepSeek and more with one key. Real per-request pricing, hard spend limits.",
