@@ -434,16 +434,14 @@ export function PlaygroundChat({
       </div>
 
 
-      <div className="space-y-3 rounded-lg border border-border-subtle bg-surface-2 p-4">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-medium text-text-secondary">Last request</p>
-          {showFreeBadges && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-success/30 bg-success-subtle px-2 py-0.5 text-[11px] font-medium text-success">
-              <Heart className="h-3 w-3" />
-              Covered by Ruvicode
-            </span>
-          )}
-        </div>
+      <div className="space-y-2.5 rounded-lg border border-border-subtle bg-surface-2 p-4">
+        <p className="text-sm font-medium text-text-secondary">Last request</p>
+        {showFreeBadges && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-success/30 bg-success-subtle px-2 py-0.5 text-[11px] font-medium text-success">
+            <Heart className="h-3 w-3" />
+            Covered by Ruvicode
+          </span>
+        )}
 
         {/* Cost */}
         <div>
@@ -468,7 +466,7 @@ export function PlaygroundChat({
         )}
 
         {/* Input breakdown */}
-        <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2.5">
+        <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2">
           <p className="mb-1 text-[11px] uppercase tracking-wider text-text-muted">
             Input
           </p>
@@ -483,7 +481,7 @@ export function PlaygroundChat({
         </div>
 
         {/* Output breakdown */}
-        <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2.5">
+        <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2">
           <p className="mb-1 text-[11px] uppercase tracking-wider text-text-muted">
             Output
           </p>
