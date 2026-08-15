@@ -60,6 +60,8 @@ export const CURATED_MODELS: CuratedModel[] = [
   c("gpt-5.6-sol-pro", "GPT-5.6 Sol Pro", "OpenAI", ["text", "vision", "reasoning", "tools", "code"]),
   c("gpt-5.6-terra", "GPT-5.6 Terra", "OpenAI", ["text", "vision", "reasoning", "tools", "code"]),
   c("gpt-5.6-terra-pro", "GPT-5.6 Terra Pro", "OpenAI", ["text", "vision", "reasoning", "tools", "code"]),
+  c("gpt-5.6-luna", "GPT-5.6 Luna", "OpenAI", ["text", "vision", "reasoning", "tools", "code"]),
+  c("gpt-5.6-luna-pro", "GPT-5.6 Luna Pro", "OpenAI", ["text", "vision", "reasoning", "tools", "code"]),
   c("gpt-5.5", "GPT-5.5", "OpenAI", ["text", "vision", "reasoning", "tools", "code"]),
   c("gpt-5.4", "GPT-5.4", "OpenAI", ["text", "vision", "tools", "code"]),
   c("gpt-5.4-mini", "GPT-5.4 Mini", "OpenAI", ["text", "vision", "tools", "code"]),
@@ -79,6 +81,7 @@ export const CURATED_MODELS: CuratedModel[] = [
 
   // ── xAI ──
   c("grok-4.5", "Grok 4.5", "xAI", ["text", "vision", "reasoning", "tools", "code"]),
+  c("grok-4.3", "Grok 4.3", "xAI", ["text", "vision", "reasoning", "tools", "code"]),
 
   // ── Moonshot ──
   c("kimi-k3", "Kimi K3", "Moonshot", ["text", "vision", "reasoning", "tools", "code"]),
