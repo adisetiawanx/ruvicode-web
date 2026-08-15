@@ -277,6 +277,34 @@ export default async function IntegrationsPage() {
           </div>
         </div>
 
+        {/* Vision config note */}
+        <div className="mb-12 rounded-xl border border-accent/25 bg-accent-subtle p-6">
+          <p className="mb-1 font-medium text-text-primary">
+            Vision models need a config flag in some tools
+          </p>
+          <p className="mb-4 text-sm text-text-secondary">
+            OpenCode and OpenClaw refuse image attachments at the client
+            side when a custom provider model lacks a{" "}
+            <code className="rounded bg-surface px-1 py-0.5 font-mono text-xs">
+              modalities
+            </code>{" "}
+            declaration, even though the API serves vision fine. Add it to
+            each vision model entry:
+          </p>
+          <pre className="overflow-x-auto rounded-lg border border-border-default bg-surface p-4 font-mono text-xs">
+{`"modalities": { "input": ["text", "image"], "output": ["text"] }`}
+          </pre>
+          <p className="mt-3 text-xs text-text-muted">
+            Text-only models (DeepSeek V4, GLM-5.x, MiniMax M2.x) do not
+            need it. The API itself accepts image content blocks on any
+            model marked vision in the{" "}
+            <a href="/models" className="text-accent-text hover:text-accent-hover">
+              catalog
+            </a>
+            .
+          </p>
+        </div>
+
         {/* Integration cards */}
         <div className="space-y-6">
           {cards.map(({ integration, tabs }) => (

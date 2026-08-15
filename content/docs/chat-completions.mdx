@@ -113,7 +113,21 @@ Models marked with the vision tag in the [catalog](/models) accept image input u
 }
 ```
 
-For base64, use a data URL: `"url": "data:image/png;base64,iVBOR..."`.
+For base64, use a data URL: `"url": "data:image/png;base64,iVBOR..."}`.
+
+### Tool-specific vision config
+
+Some coding tools (OpenCode, OpenClaw) refuse image attachments at the
+client side when a custom provider model lacks a `modalities` declaration,
+even though the API serves vision fine. In those tools' config, add:
+
+```json
+"modalities": { "input": ["text", "image"], "output": ["text"] }
+```
+
+to each vision model entry. Text-only models (DeepSeek V4, GLM-5.x,
+MiniMax M2.x) do not need it. See the [integrations page](/integrations)
+for per-tool examples.
 
 ## Response
 
