@@ -44,6 +44,47 @@ export default function RefundPolicy() {
           deposit address.
         </p>
 
+        <h2>How Refunds Are Calculated</h2>
+        <p>
+          The refund covers your remaining wallet balance at the time we
+          process the request. API requests you have already made are
+          non-refundable, because each call incurs real upstream inference
+          cost the moment it is served. You are never charged for requests
+          that fail before a model response is returned.
+        </p>
+        <p>
+          If a single request is billed but the model never produced a
+          response (for example, a gateway 502 or a provider outage), that
+          request is already recorded as failed and is not deducted from
+          your balance. You do not need to claim a refund for it.
+        </p>
+
+        <h2>Persistent Errors</h2>
+        <p>
+          If you hit a recurring error on the same model, include the
+          following in your refund email so we can verify it quickly and
+          prevent false claims:
+        </p>
+        <ul>
+          <li>
+            The model slug and the approximate dates the errors occurred.
+          </li>
+          <li>
+            The request IDs from the <code>X-Ruvicode-Request-ID</code>{" "}
+            response header (find them in your dashboard usage history).
+          </li>
+          <li>
+            The HTTP status or error type you received (for example, 503
+            &ldquo;Service temporarily overloaded&rdquo;).
+          </li>
+        </ul>
+        <p>
+          We cross-check these against our usage records. Requests that
+          completed with a model response are charged and not refunded,
+          even if the output was not what you hoped for. The 30-day
+          guarantee still applies to your remaining balance regardless.
+        </p>
+
         <h2>Contact</h2>
         <p>
           For refund requests or questions, email{" "}

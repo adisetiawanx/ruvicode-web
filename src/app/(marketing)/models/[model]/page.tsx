@@ -13,7 +13,7 @@ import {
   CodeDemo,
   type CodeTab,
 } from "@/components/marketing/code-demo";
-import { ArrowLeft, ArrowRight, Sparkles, TrendingDown } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowDownToLine, ArrowUpFromLine, PanelTop, Sparkles, TrendingDown } from "lucide-react";
 
 export const revalidate = 300; // on-demand ISR — never prerendered at build
 
@@ -233,9 +233,22 @@ console.log(response.choices[0].message.content);`,
           </div>
 
           {/* Price strip */}
-          <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border-default bg-border-subtle sm:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border-default bg-border-subtle sm:grid-cols-2 lg:grid-cols-4">
             <div className="bg-surface p-5">
-              <p className="mb-1.5 text-xs font-medium uppercase tracking-wider text-text-muted">
+              <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                <PanelTop className="h-3.5 w-3.5" />
+                Context
+              </p>
+              <p className="font-mono text-2xl font-semibold tabular text-text-primary">
+                {model.context || "—"}
+                <span className="ml-1 text-sm font-normal text-text-muted">
+                  tokens
+                </span>
+              </p>
+            </div>
+            <div className="bg-surface p-5">
+              <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                <ArrowDownToLine className="h-3.5 w-3.5" />
                 Input
               </p>
               <p className="font-mono text-2xl font-semibold tabular text-text-primary">
@@ -246,12 +259,13 @@ console.log(response.choices[0].message.content);`,
                   </span>
                 )}
                 <span className="ml-1 text-sm font-normal text-text-muted">
-                  /1M tokens
+                  /1M
                 </span>
               </p>
             </div>
             <div className="bg-surface p-5">
-              <p className="mb-1.5 text-xs font-medium uppercase tracking-wider text-text-muted">
+              <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                <ArrowUpFromLine className="h-3.5 w-3.5" />
                 Output
               </p>
               <p className="font-mono text-2xl font-semibold tabular text-text-primary">
@@ -262,7 +276,7 @@ console.log(response.choices[0].message.content);`,
                   </span>
                 )}
                 <span className="ml-1 text-sm font-normal text-text-muted">
-                  /1M tokens
+                  /1M
                 </span>
               </p>
             </div>
@@ -346,13 +360,25 @@ console.log(response.choices[0].message.content);`,
             {model.context && (
               <div className="rounded-xl border border-border-default bg-surface p-6">
                 <h3 className="mb-4 font-semibold">Specs</h3>
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-text-secondary">
-                    Context window
-                  </span>
-                  <span className="font-mono text-sm tabular text-text-primary">
-                    {model.context}
-                  </span>
+                <div className="space-y-3">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-sm text-text-secondary">
+                      Context window
+                    </span>
+                    <span className="font-mono text-sm tabular text-text-primary">
+                      {model.context}
+                    </span>
+                  </div>
+                  {model.max_output && (
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-sm text-text-secondary">
+                        Max output
+                      </span>
+                      <span className="font-mono text-sm tabular text-text-primary">
+                        {model.max_output}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
