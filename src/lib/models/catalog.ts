@@ -118,11 +118,15 @@ export function getBrands(): string[] {
   return [...new Set(CURATED_MODELS.map((m) => m.brand))].sort();
 }
 
-/** Format a token count for display (e.g. 1_000_000 → "1M", 256_000 → "256K"). */
+/**
+ * Format a token count for display, following the OpenRouter convention:
+ * millions with up to 2 significant decimals ("1M", "1.05M"), thousands
+ * below that ("256K", "205K"). Never shows "1.0M" or rounds 1.05M up to 1.1M.
+ */
 export function formatContext(tokens: number): string {
   if (tokens >= 1_000_000) {
-    const m = tokens / 1_000_000;
-    return m === Math.floor(m) ? `${m}M` : `${m.toFixed(1)}M`;
+    const m = Math.round((tokens / 1_000_000) * 100) / 100;
+    return `${m}M`;
   }
   if (tokens >= 1_000) {
     return `${Math.round(tokens / 1_000)}K`;

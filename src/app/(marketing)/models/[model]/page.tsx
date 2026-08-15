@@ -240,6 +240,11 @@ console.log(response.choices[0].message.content);`,
               </p>
               <p className="font-mono text-2xl font-semibold tabular text-text-primary">
                 ${formatPrice(model.user_input)}
+                {model.ref_input > model.user_input && (
+                  <span className="ml-1.5 text-sm font-normal text-text-muted line-through">
+                    ${formatPrice(model.ref_input)}
+                  </span>
+                )}
                 <span className="ml-1 text-sm font-normal text-text-muted">
                   /1M tokens
                 </span>
@@ -251,6 +256,11 @@ console.log(response.choices[0].message.content);`,
               </p>
               <p className="font-mono text-2xl font-semibold tabular text-text-primary">
                 ${formatPrice(model.user_output)}
+                {model.ref_output > model.user_output && (
+                  <span className="ml-1.5 text-sm font-normal text-text-muted line-through">
+                    ${formatPrice(model.ref_output)}
+                  </span>
+                )}
                 <span className="ml-1 text-sm font-normal text-text-muted">
                   /1M tokens
                 </span>

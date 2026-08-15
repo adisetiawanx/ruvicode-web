@@ -70,6 +70,11 @@ export async function ModelShowcase() {
                   <span className="text-sm text-text-secondary">Input</span>
                   <span className="font-mono tabular text-text-primary">
                     ${formatPrice(m.user_input)}
+                    {m.ref_input > m.user_input && (
+                      <span className="ml-1 text-[11px] text-text-muted line-through">
+                        ${formatPrice(m.ref_input)}
+                      </span>
+                    )}
                     <span className="text-text-muted">/1M</span>
                   </span>
                 </div>
@@ -77,9 +82,20 @@ export async function ModelShowcase() {
                   <span className="text-sm text-text-secondary">Output</span>
                   <span className="font-mono tabular text-text-primary">
                     ${formatPrice(m.user_output)}
+                    {m.ref_output > m.user_output && (
+                      <span className="ml-1 text-[11px] text-text-muted line-through">
+                        ${formatPrice(m.ref_output)}
+                      </span>
+                    )}
                     <span className="text-text-muted">/1M</span>
                   </span>
                 </div>
+              </div>
+
+              {/* Footer: context window */}
+              <div className="mt-4 flex items-center justify-between border-t border-border-subtle pt-3 text-xs text-text-muted">
+                <span>Context</span>
+                <span className="font-mono">{m.context || "—"}</span>
               </div>
 
               <p className="mt-4 text-xs text-accent transition-colors group-hover:text-accent-hover">
