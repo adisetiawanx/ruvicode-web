@@ -106,6 +106,35 @@ resp = client.chat.completions.create(
     configLang: "python",
   },
   {
+    name: "OpenCode",
+    tagline: "Custom OpenAI-compatible provider with explicit model ids.",
+    steps: [
+      "Create or edit opencode.json in your project root (or ~/.config/opencode/opencode.json for global).",
+      "Add the ruvicode provider block below with your rvcd_ key.",
+      "Run /models in OpenCode and pick any of the listed models.",
+    ],
+    config: `{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "ruvicode": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ruvicode",
+      "options": {
+        "baseURL": "https://api.ruvicode.com/v1",
+        "apiKey": "rvcd_..."
+      },
+      "models": {
+        "glm-5.2": { "name": "GLM 5.2", "limit": { "context": 1000000, "output": 128000 } },
+        "claude-opus-5": { "name": "Claude Opus 5", "limit": { "context": 1000000, "output": 128000 } },
+        "deepseek-v4-flash": { "name": "DeepSeek V4 Flash", "limit": { "context": 1048576, "output": 384000 } }
+      }
+    }
+  }
+}`,
+    configLang: "json",
+    note: "OpenCode does not auto-fetch the model list for custom providers, so list the ids you want in the models block. Get all ids from GET /v1/models.",
+  },
+  {
     name: "Anything else OpenAI-compatible",
     tagline: "Continue, Roo Code, LibreChat, your own proxy, scripts.",
     steps: [
