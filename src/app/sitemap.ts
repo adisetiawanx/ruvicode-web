@@ -4,6 +4,11 @@ import { getAllPosts } from "@/lib/content/blog";
 import { getAllDocs } from "@/lib/content/docs";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Render per request: the build container has no database and would
+  // otherwise freeze the static fallback model list into the sitemap.
+  const { connection } = await import("next/server");
+  await connection();
+
   const baseUrl = "https://ruvicode.com";
 
   const staticPages = [
