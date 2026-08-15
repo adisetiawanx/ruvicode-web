@@ -21,11 +21,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false }, // Private page
 };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const session = await getSession();
   if (!session) return null; // Middleware (proxy.ts) handles redirect
 
   const userId = session.user.id;
+  const params = await searchParams;
+  const rpage = Math.max(1, Number(params.rpage) || 1);
 
   // Parallel data fetch — all parameterized, scoped to userId
   const [wallet, monthlySummary, weeklyUsage, modelBreakdown, recentActivity] =
@@ -34,7 +40,7 @@ export default async function DashboardPage() {
       getMonthlySummary(userId),
       getWeeklyUsage(userId),
       getModelBreakdown(userId),
-      getRecentActivity(userId, 10),
+      getRecentActivity(userId, 100),
     ]);
 
   const availableBalance = floorUsd(
@@ -67,7 +73,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Recent activity */}
-      <RecentActivity data={recentActivity} />
+      <RecentActivity data={recentActivity.slice((rpage - 1) * 10, rpage * 10)} page={rpage} total={recentActivity.length} />
 
       {/* Hidden available balance for potential client reads */}
       <span className="sr-only" aria-hidden="true">

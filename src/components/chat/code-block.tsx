@@ -29,7 +29,7 @@ export function ChatCodeBlock({ code, language }: CodeBlockProps) {
   };
 
   return (
-    <div className="my-3 overflow-hidden rounded-lg border border-border-default bg-code-bg">
+    <div className="my-3 overflow-hidden rounded-lg border-2 border-border-strong bg-code-bg">
       {/* Toolbar */}
       <div className="flex items-center justify-between border-b border-border-subtle bg-surface-2 px-3 py-1.5">
         {language ? (

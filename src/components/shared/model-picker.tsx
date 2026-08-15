@@ -35,8 +35,11 @@ export function ModelPicker({ models, value, onChange }: ModelPickerProps) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return models;
-    return models.filter(
+    const bySavings = [...models].sort(
+      (a, b) => b.user_discount_pct - a.user_discount_pct,
+    );
+    if (!q) return bySavings;
+    return bySavings.filter(
       (m) =>
         m.display_name.toLowerCase().includes(q) ||
         m.model.toLowerCase().includes(q),
@@ -85,7 +88,7 @@ export function ModelPicker({ models, value, onChange }: ModelPickerProps) {
             className="pl-9"
           />
         </div>
-        <div className="max-h-[50vh] space-y-1 overflow-y-auto pr-1">
+        <div className="mt-4 max-h-[50vh] space-y-1 overflow-y-auto pr-1">
           {filtered.length === 0 && (
             <p className="px-3 py-8 text-center text-sm text-text-muted">
               No models match &quot;{query}&quot;.

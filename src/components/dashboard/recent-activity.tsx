@@ -4,6 +4,9 @@ import type { RecentActivityEntry } from "@/lib/db/queries/dashboard";
 
 interface RecentActivityProps {
   data: RecentActivityEntry[];
+  /** 1-based page number for the 10-per-page pager on the overview. */
+  page?: number;
+  total?: number;
 }
 
 /** Format a past date as a relative "time ago" string. */
@@ -21,17 +24,45 @@ export function timeAgo(date: Date): string {
  * Dashboard recent activity table (last 10 requests).
  * Compact read-only table. Per PAGES.md, financial numbers use mono tabular.
  */
-export function RecentActivity({ data }: RecentActivityProps) {
+export function RecentActivity({ data, page = 1, total }: RecentActivityProps) {
+  const totalPages = total ? Math.ceil(total / 10) : 1;
   return (
     <div className="overflow-hidden rounded-lg border border-border-default bg-surface">
       <div className="flex items-center justify-between p-6 pb-4">
         <h3 className="font-semibold text-text-primary">Recent Activity</h3>
-        <Link
-          href="/dashboard/usage"
-          className="text-sm text-accent-text hover:text-accent-hover"
-        >
-          View All →
-        </Link>
+        <div className="flex items-center gap-3">
+          {totalPages > 1 && (
+            <>
+              {page > 1 && (
+                <Link
+                  href={`/dashboard?rpage=${page - 1}`}
+                  className="text-sm text-text-muted hover:text-text-secondary"
+                  aria-label="Previous page"
+                >
+                  ←
+                </Link>
+              )}
+              <span className="font-mono text-xs tabular text-text-muted">
+                {page} / {totalPages}
+              </span>
+              {page < totalPages && (
+                <Link
+                  href={`/dashboard?rpage=${page + 1}`}
+                  className="text-sm text-text-muted hover:text-text-secondary"
+                  aria-label="Next page"
+                >
+                  →
+                </Link>
+              )}
+            </>
+          )}
+          <Link
+            href="/dashboard/usage"
+            className="text-sm text-accent-text hover:text-accent-hover"
+          >
+            View All →
+          </Link>
+        </div>
       </div>
 
       {data.length === 0 ? (

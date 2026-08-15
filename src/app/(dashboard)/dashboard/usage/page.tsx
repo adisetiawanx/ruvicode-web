@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 25;
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

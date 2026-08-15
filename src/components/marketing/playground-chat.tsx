@@ -460,7 +460,7 @@ export function PlaygroundChat({
   // The chat area needs a bounded height, otherwise the message list grows
   // the whole page instead of scrolling internally.
   const chatArea = (
-    <div className="flex h-[600px] max-h-[75vh] flex-col rounded-lg border border-border-default bg-surface">
+    <div className="flex h-[600px] max-h-[75vh] flex-col rounded-lg border-2 border-border-strong bg-surface shadow-card">
       <div
         ref={scrollRef}
         onScroll={() => {

@@ -54,8 +54,10 @@ async function seed() {
       userId: testUserId,
       balance: "25.50",
       held: "0",
-      totalLoaded: "50.00",
-      totalSpent: "24.50",
+      // totalLoaded/totalSpent recomputed after usage records below so the
+      // dashboard stats stay consistent (balance + spent = loaded).
+      totalLoaded: "25.50",
+      totalSpent: "0",
     })
     .onConflictDoNothing();
 
