@@ -434,66 +434,54 @@ export function PlaygroundChat({
       </div>
 
 
-      <div className="space-y-2.5 rounded-lg border border-border-subtle bg-surface-2 p-4">
-        <p className="text-sm font-medium text-text-secondary">Last request</p>
+      <div className="space-y-2 rounded-lg border border-border-subtle bg-surface-2 p-3">
+        <p className="text-xs font-medium text-text-secondary">Last request</p>
         {showFreeBadges && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-success/30 bg-success-subtle px-2 py-0.5 text-[11px] font-medium text-success">
-            <Heart className="h-3 w-3" />
+          <span className="inline-flex items-center gap-1 rounded-full border border-success/30 bg-success-subtle px-2 py-0.5 text-[10px] font-medium text-success">
+            <Heart className="h-2.5 w-2.5" />
             Covered by Ruvicode
           </span>
         )}
 
         {/* Cost */}
         <div>
-          <p className="mb-0.5 text-[11px] uppercase tracking-wider text-text-muted">
-            Cost
-          </p>
-          <p className="font-mono text-lg tabular font-semibold text-text-primary">
+          <p className="text-[10px] uppercase tracking-wider text-text-muted">Cost</p>
+          <p className="font-mono text-base tabular font-semibold text-text-primary">
             ${(lastCost?.total ?? 0).toFixed(6)}
           </p>
         </div>
 
         {/* Savings */}
         {(lastCost?.saved ?? 0) > 0 && (
-          <div className="rounded-lg border border-success/20 bg-success-subtle px-3 py-2">
-            <p className="mb-0.5 text-[11px] uppercase tracking-wider text-success">
-              You saved
-            </p>
-            <p className="font-mono text-sm tabular font-medium text-success">
-              ${(lastCost?.saved ?? 0).toFixed(6)} ({(lastCost?.savedPct ?? 0).toFixed(0)}% vs reference)
+          <div className="rounded-md bg-success-subtle px-2.5 py-1.5">
+            <p className="text-[10px] uppercase tracking-wider text-success">You saved</p>
+            <p className="font-mono text-[11px] tabular text-success">
+              ${(lastCost?.saved ?? 0).toFixed(6)} ({(lastCost?.savedPct ?? 0).toFixed(0)}% vs ref)
             </p>
           </div>
         )}
 
-        {/* Input breakdown */}
-        <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2">
-          <p className="mb-1 text-[11px] uppercase tracking-wider text-text-muted">
-            Input
+        {/* Input */}
+        <div className="rounded-md border border-border-subtle bg-surface px-2.5 py-1.5">
+          <p className="text-[10px] uppercase tracking-wider text-text-muted">Input</p>
+          <p className="font-mono text-[11px] tabular text-text-secondary">
+            ${(lastCost?.input ?? 0).toFixed(6)}
           </p>
-          <div className="flex items-baseline justify-between">
-            <p className="font-mono text-xs tabular text-text-secondary">
-              ${(lastCost?.input ?? 0).toFixed(6)}
-            </p>
-            <p className="font-mono text-xs tabular font-medium text-accent-text">
-              {lastUsage?.prompt ?? 0} tokens
-            </p>
-          </div>
+          <p className="font-mono text-[11px] tabular font-medium text-accent-text">
+            {lastUsage?.prompt ?? 0} tokens
+          </p>
         </div>
 
-        {/* Output breakdown */}
-        <div className="rounded-lg border border-border-subtle bg-surface px-3 py-2">
-          <p className="mb-1 text-[11px] uppercase tracking-wider text-text-muted">
-            Output
+        {/* Output */}
+        <div className="rounded-md border border-border-subtle bg-surface px-2.5 py-1.5">
+          <p className="text-[10px] uppercase tracking-wider text-text-muted">Output</p>
+          <p className="font-mono text-[11px] tabular text-text-secondary">
+            ${(lastCost?.output ?? 0).toFixed(6)}
           </p>
-          <div className="flex items-baseline justify-between">
-            <p className="font-mono text-xs tabular text-text-secondary">
-              ${(lastCost?.output ?? 0).toFixed(6)}
-            </p>
-            <p className="font-mono text-xs tabular font-medium text-accent-text">
-              {lastUsage?.completion ?? 0} tokens
-              {lastReasoningTokens > 0 ? ` (+${lastReasoningTokens})` : ""}
-            </p>
-          </div>
+          <p className="font-mono text-[11px] tabular font-medium text-accent-text">
+            {lastUsage?.completion ?? 0} tokens
+            {lastReasoningTokens > 0 ? ` (+${lastReasoningTokens})` : ""}
+          </p>
         </div>
       </div>
 
