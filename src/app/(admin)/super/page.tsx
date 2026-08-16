@@ -35,31 +35,24 @@ function fmtUsd(n: number, digits = 2): string {
 export default async function SuperAdminPage() {
   if (!(await requireAdmin())) return notFound();
 
-  let users: any, revenue: any, deposits: any, floatData: any, ops: any;
-  try {
-    [users, revenue, deposits, floatData, ops] = await Promise.all([
-      getAdminUserStats(),
-      getAdminRevenue(),
-      getAdminDeposits(),
-      getAdminFloatVsLiability(RPC_URL, USDC_CONTRACT),
-      getAdminOps(),
-    ]);
-  } catch (err) {
-    console.error("[admin] query failed:", err);
-    throw err;
-  }
-
-  // Normalize to JSON-safe plain objects: React's server-client boundary
-  // rejects Date instances and other class instances, and several Drizzle
-  // helpers return them sneakily (numeric strings, Dates in nested rows).
-  const safe = JSON.parse(
-    JSON.stringify({ users, revenue, deposits, floatData, ops })
-  );
-  users = safe.users;
-  revenue = safe.revenue;
-  deposits = safe.deposits;
-  floatData = safe.floatData;
-  ops = safe.ops;
+  // Isolate: render with static data first to find the serialization bug.
+  const users = { total: 0, active7d: 0, signups7d: [] as { date: string; count: number }[] };
+  const revenue = {
+    today: 0, week: 0, month: 0,
+    perModel: [] as { model: string; requests: number; userCost: number; upstreamCost: number; margin: number; marginPct: number; status: string }[],
+  };
+  const deposits = {
+    totalUsdc: 0, totalPaddle: 0,
+    recent: [] as { userId: string | null; amount: number; method: string; status: string; createdAt: string }[],
+  };
+  const floatData = {
+    float: 0, liability: 0, ratio: 0, treasuryEth: 0,
+    addresses: [] as { address: string; userId: string | null; usdc: number }[],
+  };
+  const ops = {
+    volume7d: [] as { date: string; count: number; cost: number }[],
+    topKeys: [] as { keyId: string | null; models: number; requests: number; spend: number }[],
+  };
 
   const healthyRatio = floatData.liability === 0 || floatData.ratio >= 1.0;
 
