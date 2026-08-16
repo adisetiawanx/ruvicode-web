@@ -28,9 +28,9 @@ export function ClientTime({
   let text: string;
   switch (format) {
     case "date":
-      text = d.toLocaleDateString("en-US", {
-        month: "short",
+      text = d.toLocaleDateString("en-GB", {
         day: "numeric",
+        month: "short",
         year: "numeric",
       });
       break;
@@ -55,9 +55,11 @@ export function ClientTime({
     }
     case "datetime":
     default:
-      text = d.toLocaleString("en-US", {
-        month: "short",
+      // Day-first format (16 Aug, 14:30) without the year — these stamps
+      // are always recent, so the year is noise.
+      text = d.toLocaleString("en-GB", {
         day: "numeric",
+        month: "short",
         hour: "2-digit",
         minute: "2-digit",
       });

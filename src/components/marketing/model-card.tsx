@@ -35,24 +35,24 @@ export function ModelCard({ model }: { model: ModelWithPricing }) {
         <div className="flex items-baseline justify-between">
           <span className="text-[13px] text-text-secondary">Input</span>
           <span className="font-mono tabular text-text-primary">
-            ${formatPrice(model.user_input)}
             {model.ref_input > model.user_input && (
               <span className="ml-1 text-[11px] text-text-muted line-through">
                 ${formatPrice(model.ref_input)}
               </span>
-            )}
+            )}{" "}
+            ${formatPrice(model.user_input)}
             <span className="text-text-muted">/1M</span>
           </span>
         </div>
         <div className="flex items-baseline justify-between">
           <span className="text-[13px] text-text-secondary">Output</span>
           <span className="font-mono tabular text-text-primary">
-            ${formatPrice(model.user_output)}
             {model.ref_output > model.user_output && (
               <span className="ml-1 text-[11px] text-text-muted line-through">
                 ${formatPrice(model.ref_output)}
               </span>
-            )}
+            )}{" "}
+            ${formatPrice(model.user_output)}
             <span className="text-text-muted">/1M</span>
           </span>
         </div>

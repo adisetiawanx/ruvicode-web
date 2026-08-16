@@ -252,12 +252,12 @@ console.log(response.choices[0].message.content);`,
                 Input
               </p>
               <p className="font-mono text-2xl font-semibold tabular text-text-primary">
-                ${formatPrice(model.user_input)}
                 {model.ref_input > model.user_input && (
-                  <span className="ml-1.5 text-sm font-normal text-text-muted line-through">
+                  <span className="mr-1.5 text-sm font-normal text-text-muted line-through">
                     ${formatPrice(model.ref_input)}
                   </span>
-                )}
+                )}{" "}
+                ${formatPrice(model.user_input)}
                 <span className="ml-1 text-sm font-normal text-text-muted">
                   /1M
                 </span>
@@ -269,12 +269,12 @@ console.log(response.choices[0].message.content);`,
                 Output
               </p>
               <p className="font-mono text-2xl font-semibold tabular text-text-primary">
-                ${formatPrice(model.user_output)}
                 {model.ref_output > model.user_output && (
-                  <span className="ml-1.5 text-sm font-normal text-text-muted line-through">
+                  <span className="mr-1.5 text-sm font-normal text-text-muted line-through">
                     ${formatPrice(model.ref_output)}
                   </span>
-                )}
+                )}{" "}
+                ${formatPrice(model.user_output)}
                 <span className="ml-1 text-sm font-normal text-text-muted">
                   /1M
                 </span>

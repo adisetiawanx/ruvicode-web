@@ -10,8 +10,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Refresh every minute
-export const revalidate = 60;
+// Always render fresh: ISR caching served stale mock data in the Docker
+// image where the build step has no database access.
+export const dynamic = "force-dynamic";
 
 export default async function StatusPage() {
   const models = await getAllActiveModels();
@@ -27,14 +28,15 @@ export default async function StatusPage() {
         <h1 className="mb-2 text-h1 font-semibold text-text-primary">
           All systems operational
         </h1>
-        <p className="text-sm text-text-muted">
-          Last updated:{" "}
+        <div className="inline-flex items-center gap-2 rounded-full border border-success/25 bg-success-subtle px-3 py-1.5">
+          <span className="h-2 w-2 shrink-0 rounded-full bg-success" />
+          <span className="text-sm text-text-secondary">Last updated</span>
           <ClientTime
             utc={lastUpdated}
             format="datetime"
-            className="font-mono"
+            className="font-mono text-sm font-medium text-text-primary"
           />
-        </p>
+        </div>
       </div>
 
       {/* Overall status */}

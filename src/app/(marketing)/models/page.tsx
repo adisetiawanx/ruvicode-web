@@ -100,14 +100,15 @@ export default async function ModelsPage() {
                   </p>
                 </div>
                 {pricingLastUpdated && (
-                  <p className="text-xs text-text-muted">
-                    Last updated{" "}
+                  <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-subtle px-3 py-1">
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-accent" />
+                    <span className="text-xs text-text-muted">Updated</span>
                     <ClientTime
                       utc={pricingLastUpdated}
                       format="datetime"
-                      className="font-mono"
+                      className="font-mono text-xs font-medium text-text-primary"
                     />
-                  </p>
+                  </div>
                 )}
               </div>
               <ModelCatalogGrid models={models} providers={providers} />

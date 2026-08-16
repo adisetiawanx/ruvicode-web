@@ -159,23 +159,23 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="font-mono tabular text-text-secondary">
+                      {m.ref_input > m.user_input && (
+                        <span className="mr-1 font-mono tabular text-[11px] text-text-muted line-through">
+                          ${formatPrice(m.ref_input)}
+                        </span>
+                      )}{" "}
                       ${formatPrice(m.user_input)}
                     </span>
-                    {m.ref_input > m.user_input && (
-                      <span className="ml-1 font-mono tabular text-[11px] text-text-muted line-through">
-                        ${formatPrice(m.ref_input)}
-                      </span>
-                    )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="font-mono tabular text-text-secondary">
+                      {m.ref_output > m.user_output && (
+                        <span className="mr-1 font-mono tabular text-[11px] text-text-muted line-through">
+                          ${formatPrice(m.ref_output)}
+                        </span>
+                      )}{" "}
                       ${formatPrice(m.user_output)}
                     </span>
-                    {m.ref_output > m.user_output && (
-                      <span className="ml-1 font-mono tabular text-[11px] text-text-muted line-through">
-                        ${formatPrice(m.ref_output)}
-                      </span>
-                    )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="font-mono tabular font-medium text-success">

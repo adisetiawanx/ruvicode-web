@@ -69,24 +69,24 @@ export async function ModelShowcase() {
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">Input</span>
                   <span className="font-mono tabular text-text-primary">
-                    ${formatPrice(m.user_input)}
                     {m.ref_input > m.user_input && (
-                      <span className="ml-1 text-[11px] text-text-muted line-through">
+                      <span className="mr-1 text-[11px] text-text-muted line-through">
                         ${formatPrice(m.ref_input)}
                       </span>
-                    )}
+                    )}{" "}
+                    ${formatPrice(m.user_input)}
                     <span className="text-text-muted">/1M</span>
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">Output</span>
                   <span className="font-mono tabular text-text-primary">
-                    ${formatPrice(m.user_output)}
                     {m.ref_output > m.user_output && (
-                      <span className="ml-1 text-[11px] text-text-muted line-through">
+                      <span className="mr-1 text-[11px] text-text-muted line-through">
                         ${formatPrice(m.ref_output)}
                       </span>
-                    )}
+                    )}{" "}
+                    ${formatPrice(m.user_output)}
                     <span className="text-text-muted">/1M</span>
                   </span>
                 </div>
