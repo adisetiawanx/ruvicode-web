@@ -7,6 +7,7 @@ import {
 } from "@/lib/db/queries/admin";
 import { displayModelName } from "@/lib/models/display";
 import { ClientTime } from "@/components/shared/client-time";
+import { SweepPanel } from "@/components/admin/sweep-panel";
 import { getSession } from "@/lib/session";
 import { notFound } from "next/navigation";
 
@@ -35,23 +36,37 @@ function fmtUsd(n: number, digits = 2): string {
 export default async function SuperAdminPage() {
   if (!(await requireAdmin())) return notFound();
 
-  // Isolate: render with static data first to find the serialization bug.
-  const users = { total: 0, active7d: 0, signups7d: [] as { date: string; count: number }[] };
-  const revenue = {
-    today: 0, week: 0, month: 0,
-    perModel: [] as { model: string; requests: number; userCost: number; upstreamCost: number; margin: number; marginPct: number; status: string }[],
+  const data = await (async () => {
+    const [u, r, d, f, o] = await Promise.all([
+      getAdminUserStats(),
+      getAdminRevenue(),
+      getAdminDeposits(),
+      getAdminFloatVsLiability(RPC_URL, USDC_CONTRACT),
+      getAdminOps(),
+    ]);
+    // JSON round-trip: React's server-client boundary rejects Date
+    // instances and class instances that Drizzle/RPC helpers return.
+    return JSON.parse(JSON.stringify({ u, r, d, f, o }));
+  })();
+  const users = data.u as {
+    total: number; active7d: number;
+    signups7d: { date: string; count: number }[];
   };
-  const deposits = {
-    totalUsdc: 0, totalPaddle: 0,
-    recent: [] as { userId: string | null; amount: number; method: string; status: string; createdAt: string }[],
+  const revenue = data.r as {
+    today: number; week: number; month: number;
+    perModel: { model: string; requests: number; userCost: number; upstreamCost: number; margin: number; marginPct: number; status: string }[];
   };
-  const floatData = {
-    float: 0, liability: 0, ratio: 0, treasuryEth: 0,
-    addresses: [] as { address: string; userId: string | null; usdc: number }[],
+  const deposits = data.d as {
+    totalUsdc: number; totalPaddle: number;
+    recent: { userId: string | null; amount: number; method: string; status: string; createdAt: string }[];
   };
-  const ops = {
-    volume7d: [] as { date: string; count: number; cost: number }[],
-    topKeys: [] as { keyId: string | null; models: number; requests: number; spend: number }[],
+  const floatData = data.f as {
+    float: number; liability: number; ratio: number; treasuryEth: number;
+    addresses: { address: string; userId: string | null; usdc: number }[];
+  };
+  const ops = data.o as {
+    volume7d: { date: string; count: number; cost: number }[];
+    topKeys: { keyId: string | null; models: number; requests: number; spend: number }[];
   };
 
   const healthyRatio = floatData.liability === 0 || floatData.ratio >= 1.0;
@@ -324,6 +339,9 @@ export default async function SuperAdminPage() {
           <p className="text-sm text-text-muted">No usage yet.</p>
         )}
       </section>
+
+      {/* ── Section: Sweep (ADR-025) ── */}
+      <SweepPanel />
 
       {/* ── Section: Operations ── */}
       <section className="rounded-xl border border-border-default bg-surface p-6">
