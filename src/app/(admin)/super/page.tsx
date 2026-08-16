@@ -36,18 +36,28 @@ function fmtUsd(n: number, digits = 2): string {
 export default async function SuperAdminPage() {
   if (!(await requireAdmin())) return notFound();
 
-  const data = await (async () => {
-    const [u, r, d, f, o] = await Promise.all([
-      getAdminUserStats(),
-      getAdminRevenue(),
-      getAdminDeposits(),
-      getAdminFloatVsLiability(RPC_URL, USDC_CONTRACT),
-      getAdminOps(),
-    ]);
-    // JSON round-trip: React's server-client boundary rejects Date
-    // instances and class instances that Drizzle/RPC helpers return.
-    return JSON.parse(JSON.stringify({ u, r, d, f, o }));
-  })();
+  // Each section loads independently: one failing query (e.g. RPC
+  // timeout) must not take down the whole dashboard. JSON round-trip
+  // because React's server-client boundary rejects Date instances and
+  // class instances that Drizzle/RPC helpers return.
+  const safe = async <T,>(name: string, fn: () => Promise<T>, fallback: T): Promise<T> => {
+    try {
+      return JSON.parse(JSON.stringify(await fn())) as T;
+    } catch (e) {
+      console.error(`[super] ${name} failed:`, e);
+      return fallback;
+    }
+  };
+
+  const empty = { float: 0, liability: 0, ratio: 0, treasuryEth: 0, addresses: [] as { address: string; userId: string | null; usdc: number }[] };
+  const [u, r, d, f, o] = await Promise.all([
+    safe("users", getAdminUserStats, { total: 0, active7d: 0, signups7d: [] as { date: string; count: number }[] }),
+    safe("revenue", getAdminRevenue, { today: 0, week: 0, month: 0, perModel: [] as { model: string; requests: number; userCost: number; upstreamCost: number; margin: number; marginPct: number; status: string }[] }),
+    safe("deposits", getAdminDeposits, { totalUsdc: 0, totalPaddle: 0, recent: [] as { userId: string | null; amount: number; method: string; status: string; createdAt: string }[] }),
+    safe("float", () => getAdminFloatVsLiability(RPC_URL, USDC_CONTRACT), empty),
+    safe("ops", getAdminOps, { volume7d: [] as { date: string; count: number; cost: number }[], topKeys: [] as { keyId: string | null; models: number; requests: number; spend: number }[] }),
+  ]);
+  const data = { u, r, d, f, o };
   const users = data.u as {
     total: number; active7d: number;
     signups7d: { date: string; count: number }[];
