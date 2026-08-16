@@ -35,13 +35,31 @@ function fmtUsd(n: number, digits = 2): string {
 export default async function SuperAdminPage() {
   if (!(await requireAdmin())) return notFound();
 
-  const [users, revenue, deposits, floatData, ops] = await Promise.all([
-    getAdminUserStats(),
-    getAdminRevenue(),
-    getAdminDeposits(),
-    getAdminFloatVsLiability(RPC_URL, USDC_CONTRACT),
-    getAdminOps(),
-  ]);
+  let users: any, revenue: any, deposits: any, floatData: any, ops: any;
+  try {
+    [users, revenue, deposits, floatData, ops] = await Promise.all([
+      getAdminUserStats(),
+      getAdminRevenue(),
+      getAdminDeposits(),
+      getAdminFloatVsLiability(RPC_URL, USDC_CONTRACT),
+      getAdminOps(),
+    ]);
+  } catch (err) {
+    console.error("[admin] query failed:", err);
+    throw err;
+  }
+
+  // Normalize to JSON-safe plain objects: React's server-client boundary
+  // rejects Date instances and other class instances, and several Drizzle
+  // helpers return them sneakily (numeric strings, Dates in nested rows).
+  const safe = JSON.parse(
+    JSON.stringify({ users, revenue, deposits, floatData, ops })
+  );
+  users = safe.users;
+  revenue = safe.revenue;
+  deposits = safe.deposits;
+  floatData = safe.floatData;
+  ops = safe.ops;
 
   const healthyRatio = floatData.liability === 0 || floatData.ratio >= 1.0;
 
