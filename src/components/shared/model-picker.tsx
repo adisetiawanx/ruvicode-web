@@ -21,13 +21,16 @@ interface ModelPickerProps {
   models: ModelWithPricing[];
   value: string;
   onChange: (model: string) => void;
+  /** Compact mode: show only the model name in the trigger (prices stay
+   *  in the dialog rows). Used where prices are already shown elsewhere. */
+  compact?: boolean;
 }
 
 /**
  * Searchable model picker dialog. Replaces the cramped native select,
  * whose dropdown was clipped and unusable with 160 models.
  */
-export function ModelPicker({ models, value, onChange }: ModelPickerProps) {
+export function ModelPicker({ models, value, onChange, compact = false }: ModelPickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -64,11 +67,13 @@ export function ModelPicker({ models, value, onChange }: ModelPickerProps) {
               <span className="block truncate text-sm text-text-primary">
                 {selected?.display_name ?? value}
               </span>
-              <span className="block truncate font-mono text-xs text-text-muted">
-                ${formatPrice(selected?.user_input ?? 0)}/1M in · $
-                {formatPrice(selected?.user_output ?? 0)}/1M out · save{" "}
-                {(selected?.user_discount_pct ?? 0).toFixed(0)}%
-              </span>
+              {!compact && (
+                <span className="block truncate font-mono text-xs text-text-muted">
+                  ${formatPrice(selected?.user_input ?? 0)}/1M in · $
+                  {formatPrice(selected?.user_output ?? 0)}/1M out · save{" "}
+                  {(selected?.user_discount_pct ?? 0).toFixed(0)}%
+                </span>
+              )}
             </span>
             <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
           </button>

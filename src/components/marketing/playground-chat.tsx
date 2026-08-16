@@ -296,6 +296,7 @@ export function PlaygroundChat({
         {!locked ? (
           <div className="min-w-0 max-w-[220px]">
             <ModelPicker
+              compact
               models={models}
               value={model}
               onChange={(v) => {
