@@ -34,6 +34,20 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // /super must not reveal that it exists. Anonymous scanners get a
+  // hard 404 before any render: Next streams the document head (with a
+  // 200 status) before the layout's async allowlist check can call
+  // notFound(). Cookie presence is the coarse gate only; the email
+  // allowlist still runs in the layout, the page, and /api/admin/sweep.
+  if (pathname === "/super" || pathname.startsWith("/super/")) {
+    if (!sessionToken) {
+      return new NextResponse(null, { status: 404 });
+    }
+    const res = NextResponse.next();
+    res.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return res;
+  }
+
   // Redirect authenticated users away from auth pages
   if (isAuthPage && sessionToken) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
@@ -45,6 +59,7 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/super/:path*",
     "/login",
     "/register",
     "/forgot-password",

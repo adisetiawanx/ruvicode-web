@@ -22,19 +22,15 @@ export function SweepPanel() {
   const [confirmText, setConfirmText] = useState("");
   const [mode, setMode] = useState<"idle" | "preview" | "execute">("idle");
 
-  const gatewayUrl =
-    process.env.NEXT_PUBLIC_API_URL ?? "https://api.ruvicode.com";
-  const token = process.env.NEXT_PUBLIC_INTERNAL_API_TOKEN ?? "";
-
+  // Calls our own /api/admin/sweep route, which holds the internal
+  // token server-side. The browser never sees it and never talks to
+  // the gateway directly.
   async function doSweep(execute: boolean) {
     setLoading(true);
     try {
-      const res = await fetch(`${gatewayUrl}/internal/sweep`, {
+      const res = await fetch("/api/admin/sweep", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Internal-Token": token,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ execute }),
       });
       const data = await res.json();

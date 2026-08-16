@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/session";
 
@@ -7,10 +6,10 @@ import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Admin",
-  robots: { index: false, follow: false },
-};
+// No metadata export: Next streams the head before the async session
+// check finishes, which would leak an "Admin" title to anonymous
+// visitors even though the body renders as 404. The root layout title
+// applies instead, and the middleware sets X-Robots-Tag: noindex.
 
 function getAdminEmails(): string[] {
   const raw = process.env.ADMIN_EMAILS ?? "";
