@@ -336,28 +336,20 @@ export function PlaygroundChat({
             </p>
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Input</span>
-              <span className="tabular text-text-secondary">
-                <span className="flex items-baseline gap-1.5">
-                  <span className="text-[11px] text-text-muted line-through">
-                    ${modelPricing ? modelPricing.ref_input.toFixed(4) : "?"}
-                  </span>
-                  <span>
-                    ${modelPricing ? modelPricing.user_input.toFixed(4) : "?"}
-                  </span>
-                </span>/1M
+              <span className="whitespace-nowrap tabular text-text-secondary">
+                <span className="mr-1 text-[10px] text-text-muted line-through">
+                  ${modelPricing ? modelPricing.ref_input.toFixed(3) : "?"}
+                </span>
+                ${modelPricing ? modelPricing.user_input.toFixed(3) : "?"}/1M
               </span>
             </div>
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Output</span>
-              <span className="tabular text-text-secondary">
-                <span className="flex items-baseline gap-1.5">
-                  <span className="text-[11px] text-text-muted line-through">
-                    ${modelPricing ? modelPricing.ref_output.toFixed(4) : "?"}
-                  </span>
-                  <span>
-                    ${modelPricing ? modelPricing.user_output.toFixed(4) : "?"}
-                  </span>
-                </span>/1M
+              <span className="whitespace-nowrap tabular text-text-secondary">
+                <span className="mr-1 text-[10px] text-text-muted line-through">
+                  ${modelPricing ? modelPricing.ref_output.toFixed(3) : "?"}
+                </span>
+                ${modelPricing ? modelPricing.user_output.toFixed(3) : "?"}/1M
               </span>
             </div>
           </div>
@@ -379,24 +371,20 @@ export function PlaygroundChat({
           <div className="mt-2 space-y-2 rounded-md border border-border-subtle bg-surface-2 px-3 py-2.5">
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Input</span>
-              <span className="tabular text-text-secondary">
-                <span className="flex items-baseline gap-1.5">
-                  <span className="text-[11px] text-text-muted line-through">
-                    ${modelPricing.ref_input.toFixed(4)}
-                  </span>
-                  <span>${modelPricing.user_input.toFixed(4)}</span>
-                </span>/1M
+              <span className="whitespace-nowrap tabular text-text-secondary">
+                <span className="mr-1 text-[10px] text-text-muted line-through">
+                  ${modelPricing.ref_input.toFixed(3)}
+                </span>
+                ${modelPricing.user_input.toFixed(3)}/1M
               </span>
             </div>
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Output</span>
-              <span className="tabular text-text-secondary">
-                <span className="flex items-baseline gap-1.5">
-                  <span className="text-[11px] text-text-muted line-through">
-                    ${modelPricing.ref_output.toFixed(4)}
-                  </span>
-                  <span>${modelPricing.user_output.toFixed(4)}</span>
-                </span>/1M
+              <span className="whitespace-nowrap tabular text-text-secondary">
+                <span className="mr-1 text-[10px] text-text-muted line-through">
+                  ${modelPricing.ref_output.toFixed(3)}
+                </span>
+                ${modelPricing.user_output.toFixed(3)}/1M
               </span>
             </div>
             <div className="flex items-center justify-between font-mono text-xs">
