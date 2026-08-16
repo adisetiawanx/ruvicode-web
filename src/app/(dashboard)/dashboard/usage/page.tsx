@@ -147,7 +147,7 @@ export default async function UsagePage({ searchParams }: PageProps) {
                         <ClientTime utc={row.createdAt} format="datetime" />
                       </td>
                       <td className="px-4 py-3">
-                        <ModelTag id={row.model} stacked={false} />
+                        <ModelTag id={row.model} stacked={false} className="text-xs" />
                       </td>
                       <td className="px-4 py-3 text-xs text-text-secondary">
                         {row.keyLabel ?? <span className="text-text-muted">Deleted key</span>}
