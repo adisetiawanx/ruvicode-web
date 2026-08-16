@@ -35,7 +35,7 @@ export default async function DashboardModelsPage() {
           <p className="mt-1 text-sm text-text-secondary">
             Live pricing for all available models. Filter, sort, and compare.
             {pricingLastUpdated && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent-subtle px-2.5 py-0.5">
+              <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent-subtle px-2.5 py-0.5 align-middle">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                 <ClientTime
                   utc={pricingLastUpdated}

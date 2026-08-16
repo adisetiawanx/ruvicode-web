@@ -100,6 +100,55 @@ function costOf(
   return { input, output, total, saved, savedPct: refTotal > 0 ? (saved / refTotal) * 100 : 0 };
 }
 
+
+/** Simple searchable model list used inside the model picker dialog. */
+function ModelPickerList({
+  models,
+  value,
+  onPick,
+}: {
+  models: ModelWithPricing[];
+  value: string;
+  onPick: (model: string) => void;
+}) {
+  const [q, setQ] = useState("");
+  const filtered = models.filter(
+    (m) =>
+      !q ||
+      m.display_name.toLowerCase().includes(q.toLowerCase()) ||
+      m.model.toLowerCase().includes(q.toLowerCase()),
+  );
+  return (
+    <div className="space-y-2">
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Search models..."
+        className="h-9 w-full rounded-md border border-border-subtle bg-surface-2 px-3 text-sm text-text-primary outline-none focus:border-accent/40"
+      />
+      <div className="max-h-[300px] space-y-1 overflow-y-auto">
+        {filtered.map((m) => (
+          <button
+            key={m.model}
+            type="button"
+            onClick={() => onPick(m.model)}
+            className={`flex w-full items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition-colors ${
+              m.model === value
+                ? "border-accent/40 bg-accent-subtle text-text-primary"
+                : "border-border-subtle bg-surface-2 text-text-primary hover:border-border-default"
+            }`}
+          >
+            <span className="min-w-0 truncate">{m.display_name}</span>
+            <span className="ml-2 shrink-0 font-mono text-xs text-text-muted">
+              ${m.user_input.toFixed(3)}/1M
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function PlaygroundChat({
   models,
   endpoint,
@@ -117,6 +166,7 @@ export function PlaygroundChat({
     apiKeys?.[0]?.id ?? null,
   );
   const [showKeyPicker, setShowKeyPicker] = useState(false);
+  const [showModelPicker, setShowModelPicker] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const model = locked ?? selectedModel ?? models[0]?.model ?? publicPlaygroundFallbackModel;
   const modelPricing = models.find((m) => m.model === model);
@@ -292,9 +342,20 @@ export function PlaygroundChat({
   const infoBar = (
     <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border-default bg-surface p-4">
       <div className="flex items-center gap-3">
-        <span className="text-[15px] font-medium text-text-primary">
-          {locked ? displayModelName(locked) : (modelPricing?.display_name ?? model)}
-        </span>
+        {!locked ? (
+          <button
+            type="button"
+            onClick={() => setShowModelPicker(true)}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border-subtle bg-surface-2 px-3 py-1 text-sm font-medium text-text-primary transition-colors hover:border-border-default"
+          >
+            {modelPricing?.display_name ?? model}
+            <ChevronRight className="h-3.5 w-3.5 text-text-muted" />
+          </button>
+        ) : (
+          <span className="text-[15px] font-medium text-text-primary">
+            {displayModelName(locked)}
+          </span>
+        )}
         <span className="hidden text-xs text-text-muted sm:inline">
           {maxTokens.toLocaleString()} tokens · {temperature.toFixed(1)} temp
         </span>
@@ -316,19 +377,17 @@ export function PlaygroundChat({
           </>
         )}
         {apiKeys && apiKeys.length > 0 && (
-          <div>
-            <p className="mb-2 text-[13px] font-medium text-text-secondary">API Key</p>
-            <button
-              type="button"
-              onClick={() => setShowKeyPicker(true)}
-              className="flex w-full items-center justify-between gap-2 rounded-md border border-border-subtle bg-surface-2 px-3 py-2 text-left transition-colors hover:border-border-default"
-            >
-              <span className="min-w-0 truncate text-sm text-text-primary">
-                {apiKeys.find((k) => k.id === selectedKeyId)?.label ?? apiKeys[0]?.label ?? ""}
-              </span>
-              <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowKeyPicker(true)}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border-subtle bg-surface-2 px-3 py-1 text-xs text-text-primary transition-colors hover:border-border-default"
+          >
+            <KeyRound className="h-3 w-3 text-accent-text" />
+            <span className="max-w-[120px] truncate">
+              {apiKeys.find((k) => k.id === selectedKeyId)?.label ?? apiKeys[0]?.label ?? ""}
+            </span>
+            <ChevronRight className="h-3 w-3 text-text-muted" />
+          </button>
         )}
         {!apiKeys && activeKeyLabel && (
           <span className="hidden items-center gap-1.5 text-xs text-text-muted sm:inline-flex">
@@ -525,6 +584,27 @@ export function PlaygroundChat({
           </p>
         </div>
       </div>
+
+      {/* Model picker dialog (non-locked playgrounds) */}
+      <Dialog open={showModelPicker} onOpenChange={setShowModelPicker}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Choose a model</DialogTitle>
+          </DialogHeader>
+          <ModelPickerList
+            models={models}
+            value={model}
+            onPick={(v) => {
+              setSelectedModel(v);
+              setMessages([]);
+              setLastCost(null);
+              setLastUsage(null);
+              setInput("");
+              setShowModelPicker(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* API key picker dialog (dashboard playground) */}
       <Dialog open={showKeyPicker} onOpenChange={setShowKeyPicker}>
