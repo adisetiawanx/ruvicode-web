@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getSession } from "@/lib/session";
 import { TopUpPaddle } from "@/components/dashboard/topup-paddle";
 import { TopUpUSDC } from "@/components/dashboard/topup-usdc";
+import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
@@ -10,12 +11,32 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Placeholder deposit address — in production, generated per-user via HD wallet
-const MOCK_DEPOSIT_ADDRESS = "0x1a2b3c4d5e6f7890abcdef1234567890abcdef12";
-
 export default async function TopUpPage() {
   const session = await getSession();
   if (!session) return null;
+
+  // Fetch the user's deposit address from the gateway (ADR-027). The
+  // gateway derives it from the HD wallet and stores it in Postgres on
+  // first use. Falls back to a placeholder when the monitor is not
+  // configured (local dev without a mnemonic).
+  let depositAddress = "USDC deposits coming soon";
+
+  const gatewayUrl = env.GATEWAY_INTERNAL_URL ?? env.NEXT_PUBLIC_API_URL;
+  const token = env.INTERNAL_API_TOKEN;
+  if (gatewayUrl && token) {
+    try {
+      const res = await fetch(
+        `${gatewayUrl}/internal/deposit-address?user_id=${session.user.id}`,
+        { headers: { "X-Internal-Token": token } },
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.address) depositAddress = data.address as string;
+      }
+    } catch {
+      // Gateway not reachable or monitor not configured — keep placeholder.
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -25,7 +46,7 @@ export default async function TopUpPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <TopUpPaddle userId={session.user.id} />
-        <TopUpUSDC address={MOCK_DEPOSIT_ADDRESS} />
+        <TopUpUSDC address={depositAddress} />
       </div>
     </div>
   );
