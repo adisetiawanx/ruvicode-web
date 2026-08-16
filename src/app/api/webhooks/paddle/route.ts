@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { db, isDbAvailable } from "@/lib/db";
 import { topups, wallets, user } from "@/lib/db/schema";
-import { sendTopupConfirmationEmail } from "@/lib/email/send";
 import { eq, sql } from "drizzle-orm";
 import { env } from "@/lib/env";
 
@@ -156,23 +155,9 @@ export async function POST(req: NextRequest) {
       .where(eq(wallets.userId, userId))
       .limit(1);
 
-    const [userRow] = await db
-      .select({ email: user.email, name: user.name })
-      .from(user)
-      .where(eq(user.id, userId))
-      .limit(1);
-
-    if (userRow?.email) {
-      await sendTopupConfirmationEmail(
-        userRow.email,
-        amountInDollars.toFixed(2),
-        walletRow?.balance ?? "0",
-        "Card (Paddle)",
-      );
-    }
-  } catch (emailErr) {
-    // Log but don't fail the webhook — wallet is already credited
-    console.error("[paddle-webhook] Email send failed", emailErr);
+    void walletRow; // balance already committed; no email (ADR-014 revised)
+  } catch {
+    // Wallet is already credited; nothing else to do
   }
 
   // 10. Return 200 — Paddle stops retrying

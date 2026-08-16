@@ -15,7 +15,6 @@
 
 import { db, isDbAvailable } from "@/lib/db";
 import { topups, wallets, user } from "@/lib/db/schema";
-import { sendTopupConfirmationEmail } from "@/lib/email/send";
 import { eq, sql } from "drizzle-orm";
 import { env } from "@/lib/env";
 import crypto from "crypto";
@@ -136,20 +135,7 @@ export async function reconcilePaddleTransactions(): Promise<ReconcileResult> {
           .where(eq(wallets.userId, userId))
           .limit(1);
 
-        const [userRow] = await db
-          .select({ email: user.email })
-          .from(user)
-          .where(eq(user.id, userId))
-          .limit(1);
-
-        if (userRow?.email) {
-          await sendTopupConfirmationEmail(
-            userRow.email,
-            amountInDollars.toFixed(2),
-            walletRow?.balance ?? "0",
-            "Card (Paddle) — Reconciled",
-          );
-        }
+        void walletRow; // balance already committed; no email (ADR-014 revised)
       } catch (err: unknown) {
         if (err instanceof Error && "code" in err && err.code === "23505") {
           // Race condition — already processed by webhook between check and insert
