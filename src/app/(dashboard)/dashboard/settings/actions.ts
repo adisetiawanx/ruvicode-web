@@ -125,19 +125,22 @@ export async function setPasswordAction(input: {
   }
 }
 
-export async function deleteAccountAction(password: string) {
+export async function deleteAccountAction(confirmText: string) {
   const session = await getSession();
   if (!session) return { ok: false, message: "Unauthorized" };
 
-  // In production: verify password, cascade delete wallet/keys/usage/topups
-  // Better-auth's deleteUser accepts { password, callbackURL, token }.
-  // For now, this is a placeholder that shows the intended flow.
+  // Confirmation is a typed DELETE phrase (case-sensitive), which works for
+  // both OAuth-only users and users with a password. Better-auth's deleteUser
+  // needs no password in the body when called from an authenticated session.
+  if (confirmText !== "DELETE") {
+    return { ok: false, message: 'Please type "DELETE" to confirm.' };
+  }
+
   try {
     const h = await headers();
     await auth.api.deleteUser({
       headers: h,
       body: {
-        password,
         callbackURL: "/login?deleted=true",
       },
     });
@@ -146,7 +149,7 @@ export async function deleteAccountAction(password: string) {
   } catch {
     return {
       ok: false,
-      message: "Failed to delete account. Please verify your password.",
+      message: "Failed to delete account. Please try again.",
     };
   }
 }

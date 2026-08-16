@@ -71,15 +71,15 @@ export default async function UsagePage({ searchParams }: PageProps) {
 
       {/* Filters + export in one row */}
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <UsageFiltersClient
-          models={models}
-          keyLabels={keyLabels}
-          currentModel={model}
-          currentKeyLabel={keyLabel}
-          currentDateFrom={dateFrom}
-          currentDateTo={dateTo}
-        />
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-end gap-3">
+          <UsageFiltersClient
+            models={models}
+            keyLabels={keyLabels}
+            currentModel={model}
+            currentKeyLabel={keyLabel}
+            currentDateFrom={dateFrom}
+            currentDateTo={dateTo}
+          />
           {(model || keyLabel || dateFrom || dateTo) && (
             <a
               href="/dashboard/usage"
@@ -88,12 +88,12 @@ export default async function UsagePage({ searchParams }: PageProps) {
               Clear
             </a>
           )}
-          <UsageExportButton
-            model={model}
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-          />
         </div>
+        <UsageExportButton
+          model={model}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+        />
       </div>
 
       {/* Summary stats */}

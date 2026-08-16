@@ -18,17 +18,17 @@ import { deleteAccountAction } from "@/app/(dashboard)/dashboard/settings/action
 
 export function DeleteAccountButton() {
   const [open, setOpen] = useState(false);
-  const [password, setPassword] = useState("");
+  const [confirmText, setConfirmText] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!password) {
-      toast.error("Please enter your password to confirm");
+    if (confirmText !== "DELETE") {
+      toast.error('Please type "DELETE" to confirm');
       return;
     }
     setLoading(true);
-    const result = await deleteAccountAction(password);
+    const result = await deleteAccountAction(confirmText);
     setLoading(false);
 
     if (!result?.ok) {
@@ -60,22 +60,23 @@ export function DeleteAccountButton() {
               all usage data. <strong className="text-error">This cannot be undone.</strong>
             </p>
             <div className="space-y-1.5">
-              <Label htmlFor="delete-password">
-                Enter your password to confirm
+              <Label htmlFor="delete-confirm">
+                Type <code className="font-mono font-semibold text-error">DELETE</code> to confirm
               </Label>
               <Input
-                id="delete-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
+                id="delete-confirm"
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                autoComplete="off"
+                placeholder="DELETE"
               />
             </div>
             <DialogFooter>
               <DialogClose render={<Button variant="outline" />}>
                 Cancel
               </DialogClose>
-              <Button type="submit" variant="danger" disabled={loading}>
+              <Button type="submit" variant="danger" disabled={loading || confirmText !== "DELETE"}>
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
