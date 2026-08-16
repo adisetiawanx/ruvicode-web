@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Copy, Check, Coins, AlertTriangle } from "lucide-react";
+import { Copy, Check, Coins, AlertTriangle, Wallet, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 
@@ -13,14 +13,13 @@ export function TopUpUSDC({ address }: TopUpUSDCProps) {
   const [copied, setCopied] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
-  // Generate QR code from deposit address on mount
   useEffect(() => {
     QRCode.toDataURL(address, {
       width: 192,
       margin: 1,
       color: {
-        dark: "#0F0F0E", // warm near-black
-        light: "#FAF9F5", // ivory
+        dark: "#0F0F0E",
+        light: "#FAF9F5",
       },
     })
       .then(setQrDataUrl)
@@ -45,7 +44,7 @@ export function TopUpUSDC({ address }: TopUpUSDCProps) {
         <h3 className="font-semibold text-text-primary">Pay by USDC</h3>
       </div>
 
-      {/* QR Code — scan with mobile wallet to deposit */}
+      {/* QR Code */}
       <div className="mb-4 flex justify-center">
         <div className="rounded-lg border border-border-default bg-canvas p-3">
           {qrDataUrl ? (
@@ -85,23 +84,51 @@ export function TopUpUSDC({ address }: TopUpUSDCProps) {
         </button>
       </div>
 
-      {/* Info */}
+      {/* How it works */}
+      <div className="mb-4 space-y-2.5 rounded-md border border-border-subtle bg-surface-2 p-4">
+        <div className="flex items-start gap-2">
+          <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <div>
+            <p className="text-xs font-medium text-text-primary">Unique per user</p>
+            <p className="text-xs text-text-muted">
+              This address is yours alone, derived from a secure HD wallet.
+              Every Ruvicode user gets a different address.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-start gap-2">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <div>
+            <p className="text-xs font-medium text-text-primary">Auto-credited</p>
+            <p className="text-xs text-text-muted">
+              Deposits are detected on-chain and credited to your wallet
+              automatically after 3 block confirmations, usually within
+              a minute. No need to contact support or click anything.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Specs */}
       <div className="space-y-1 text-xs text-text-muted">
         <p>
-          • Network: <span className="font-mono">Base (Chain ID 8453)</span>
+          Network: <span className="font-mono text-text-secondary">Base (Chain ID 8453)</span>
         </p>
         <p>
-          • Token: <span className="font-mono">USDC</span>
+          Token: <span className="font-mono text-text-secondary">USDC</span>
         </p>
         <p>
-          • Minimum deposit: <span className="font-mono">$1.00</span>
+          Minimum deposit: <span className="font-mono text-text-secondary">$0.01</span>
         </p>
-        <p>• Auto-credited after 3 confirmations (~30 sec)</p>
+        <p>
+          Confirmations: <span className="font-mono text-text-secondary">3 blocks (~30 sec)</span>
+        </p>
         <div className="mt-2 flex items-start gap-1.5 rounded-md bg-warning-subtle p-2 text-warning">
           <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <span>
-            <strong>Only send USDC on Base network.</strong> Other tokens or
-            networks will be lost.
+            <strong>Only send USDC on the Base network.</strong> Sending
+            other tokens or using a different network will result in
+            permanent loss.
           </span>
         </div>
       </div>
