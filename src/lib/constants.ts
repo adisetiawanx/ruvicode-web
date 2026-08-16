@@ -163,6 +163,13 @@ export const CHART_COLORS = {
   tertiary: "#8FA876", // Olive — savings
   quaternary: "#D4A27F", // Kraft
   quinary: "#C46686", // Fig
+  sextary: "#B58AB8", // Mauve
+  septary: "#7FB8A4", // Sage
+  octonary: "#E0B050", // Amber
+  nonary: "#8B7FC7", // Iris
+  denary: "#C98B6B", // Rust
+  undenary: "#6BA3C9", // Steel
+  duodenary: "#A89070", // Tan
 } as const;
 
 export const CHART_COLOR_ARRAY = [
@@ -171,6 +178,13 @@ export const CHART_COLOR_ARRAY = [
   CHART_COLORS.tertiary,
   CHART_COLORS.quaternary,
   CHART_COLORS.quinary,
+  CHART_COLORS.sextary,
+  CHART_COLORS.septary,
+  CHART_COLORS.octonary,
+  CHART_COLORS.nonary,
+  CHART_COLORS.denary,
+  CHART_COLORS.undenary,
+  CHART_COLORS.duodenary,
 ] as const;
 
 /** Map a zero-based index to a chart color, cycling through the palette. */

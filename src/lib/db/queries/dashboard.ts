@@ -216,12 +216,39 @@ export async function getWeeklyUsage(userId: string): Promise<DailyUsage[]> {
     .groupBy(sql`DATE_TRUNC('day', ${usageRecords.createdAt})`)
     .orderBy(sql`DATE_TRUNC('day', ${usageRecords.createdAt})`);
 
-  return rows.map((r) => ({
-    date: r.date.trim(),
-    isoDate: r.isoDate?.trim() ?? null,
-    cost: Number(r.cost),
-    requests: Number(r.requests),
-  }));
+  // Build a map of isoDate -> row for quick lookup.
+  const byDate = new Map<string, { cost: number; requests: number; date: string }>();
+  for (const r of rows) {
+    const iso = r.isoDate?.trim() ?? "";
+    byDate.set(iso, {
+      date: r.date.trim(),
+      cost: Number(r.cost),
+      requests: Number(r.requests),
+    });
+  }
+
+  // Zero-fill all 7 days so the chart always shows Mon-Sun (or whatever
+  // the 7-day window is) even when there is no usage on a given day. The
+  // weekday label is derived from the ISO date so the client can relabel
+  // it in the viewer's timezone (see usage-chart.tsx).
+  const result: DailyUsage[] = [];
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setUTCDate(d.getUTCDate() - i);
+    d.setUTCHours(0, 0, 0, 0);
+    const iso = d.toISOString().slice(0, 10);
+    const weekday = d.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
+    const existing = byDate.get(iso);
+    result.push({
+      date: weekday,
+      isoDate: iso,
+      cost: existing?.cost ?? 0,
+      requests: existing?.requests ?? 0,
+    });
+  }
+
+  return result;
 }
 
 /**

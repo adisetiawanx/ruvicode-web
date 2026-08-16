@@ -58,7 +58,7 @@ export function ModelBreakdown({ data }: ModelBreakdownProps) {
               cy="50%"
               innerRadius={50}
               outerRadius={80}
-              paddingAngle={2}
+              paddingAngle={data.length > 8 ? 0.5 : 2}
               animationDuration={800}
             >
               {data.map((_, i) => (
