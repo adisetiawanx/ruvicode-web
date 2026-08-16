@@ -7,8 +7,22 @@ import {
 } from "@/lib/db/queries/admin";
 import { displayModelName } from "@/lib/models/display";
 import { ClientTime } from "@/components/shared/client-time";
+import { getSession } from "@/lib/session";
+import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
+
+/** Defense in depth: the layout already gates this, but the page
+ *  re-verifies so a future refactor cannot silently drop the check. */
+async function requireAdmin() {
+  const session = await getSession();
+  if (!session) return false;
+  const allowed = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return allowed.includes((session.user.email ?? "").toLowerCase());
+}
 
 const RPC_URL = process.env.BASE_RPC_URL ?? "https://mainnet.base.org";
 const USDC_CONTRACT =
@@ -19,6 +33,8 @@ function fmtUsd(n: number, digits = 2): string {
 }
 
 export default async function SuperAdminPage() {
+  if (!(await requireAdmin())) return notFound();
+
   const [users, revenue, deposits, floatData, ops] = await Promise.all([
     getAdminUserStats(),
     getAdminRevenue(),

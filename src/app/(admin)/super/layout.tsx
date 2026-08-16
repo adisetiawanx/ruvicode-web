@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/session";
 
+// Server-only auth check. Rendered as a plain 404 for anyone not on the
+// allowlist — the page must not leak that it exists.
+
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
