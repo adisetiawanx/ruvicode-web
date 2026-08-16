@@ -22,6 +22,7 @@ export { displayModelName } from "@/lib/models/display";
 
 export const playgroundSchema = z.object({
   model: z.string().min(1).max(50),
+  keyId: z.string().min(1).max(64).optional(),
   messages: z
     .array(
       z.object({

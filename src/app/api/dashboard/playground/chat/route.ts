@@ -42,9 +42,11 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Invalid request parameters" }, { status: 400 });
   }
 
-  // 3. Pick the user's first active key; if none, ask them to create one.
+  // 3. Pick the requested key (validated for ownership) or the first
+  //    active one as fallback; if none, ask the user to create one.
   const keys = await getApiKeys(session.user.id);
-  const key = keys[0];
+  const key =
+    keys.find((k) => k.id === parsed.data.keyId) ?? keys[0];
   if (!key) {
     return Response.json(
       {

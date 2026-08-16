@@ -5,6 +5,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ModelPicker } from "@/components/shared/model-picker";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -39,6 +45,8 @@ interface PlaygroundChatProps {
   lockModel?: string;
   /** Label of the API key the dashboard playground bills to. */
   activeKeyLabel?: string;
+  /** Selectable API keys for the dashboard playground (id + label). */
+  apiKeys?: Array<{ id: string; label: string }>;
   statsPosition?: "left" | "right";
   showSignupCta?: boolean;
   /** Public free playground shows Free/Unlimited badges; the dashboard does not. */
@@ -97,6 +105,7 @@ export function PlaygroundChat({
   endpoint,
   lockModel,
   activeKeyLabel,
+  apiKeys,
   showFreeBadges = false,
   statsPosition = "left",
   showSignupCta = true,
@@ -104,6 +113,10 @@ export function PlaygroundChat({
   hintSub = "Free, no account needed. Fair-use limits apply.",
 }: PlaygroundChatProps) {
   const locked = lockModel ?? null;
+  const [selectedKeyId, setSelectedKeyId] = useState<string | null>(
+    apiKeys?.[0]?.id ?? null,
+  );
+  const [showKeyPicker, setShowKeyPicker] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const model = locked ?? selectedModel ?? models[0]?.model ?? publicPlaygroundFallbackModel;
   const modelPricing = models.find((m) => m.model === model);
@@ -237,6 +250,7 @@ export function PlaygroundChat({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model,
+          ...(selectedKeyId ? { keyId: selectedKeyId } : {}),
           // Full conversation so the model remembers earlier turns. The
           // identity context is added server-side in the route, so it is
           // never visible in browser payloads.
@@ -301,7 +315,22 @@ export function PlaygroundChat({
             </Badge>
           </>
         )}
-        {activeKeyLabel && (
+        {apiKeys && apiKeys.length > 0 && (
+          <div>
+            <p className="mb-2 text-[13px] font-medium text-text-secondary">API Key</p>
+            <button
+              type="button"
+              onClick={() => setShowKeyPicker(true)}
+              className="flex w-full items-center justify-between gap-2 rounded-md border border-border-subtle bg-surface-2 px-3 py-2 text-left transition-colors hover:border-border-default"
+            >
+              <span className="min-w-0 truncate text-sm text-text-primary">
+                {apiKeys.find((k) => k.id === selectedKeyId)?.label ?? apiKeys[0]?.label ?? ""}
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" />
+            </button>
+          </div>
+        )}
+        {!apiKeys && activeKeyLabel && (
           <span className="hidden items-center gap-1.5 text-xs text-text-muted sm:inline-flex">
             <KeyRound className="h-3 w-3" />
             Key: <span className="font-medium text-text-secondary">{activeKeyLabel}</span>
@@ -496,6 +525,37 @@ export function PlaygroundChat({
           </p>
         </div>
       </div>
+
+      {/* API key picker dialog (dashboard playground) */}
+      <Dialog open={showKeyPicker} onOpenChange={setShowKeyPicker}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Choose an API key</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[320px] space-y-1 overflow-y-auto">
+            {(apiKeys ?? []).map((k) => (
+              <button
+                key={k.id}
+                type="button"
+                onClick={() => {
+                  setSelectedKeyId(k.id);
+                  setShowKeyPicker(false);
+                }}
+                className={`flex w-full items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition-colors ${
+                  k.id === selectedKeyId
+                    ? "border-accent/40 bg-accent-subtle text-text-primary"
+                    : "border-border-subtle bg-surface-2 text-text-primary hover:border-border-default"
+                }`}
+              >
+                <span className="truncate">{k.label}</span>
+                {k.id === selectedKeyId && (
+                  <span className="text-xs text-accent-text">Active</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {needKey && (
         <Button

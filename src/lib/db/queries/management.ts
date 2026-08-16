@@ -61,6 +61,7 @@ export interface UsageFilters {
   model?: string;
   dateFrom?: string;
   dateTo?: string;
+  keyLabel?: string;
   page: number;
   pageSize: number;
 }
@@ -379,6 +380,9 @@ export async function getUsageRecords(
   }
 
   const conditions = buildUsageConditions(userId, filters);
+  if (filters.keyLabel && filters.keyLabel !== "all") {
+    conditions.push(eq(apiKeys.label, filters.keyLabel));
+  }
 
   const rows = await db
     .select({
@@ -417,10 +421,14 @@ export async function getUsageCount(
   }
 
   const conditions = buildUsageConditions(userId, filters);
+  if (filters.keyLabel && filters.keyLabel !== "all") {
+    conditions.push(eq(apiKeys.label, filters.keyLabel));
+  }
 
   const [row] = await db
     .select({ count: sql<number>`COUNT(*)` })
     .from(usageRecords)
+    .leftJoin(apiKeys, eq(usageRecords.apiKeyId, apiKeys.id))
     .where(and(...conditions));
 
   // COUNT(*) also arrives as a string from pg; coerce for an honest number.
@@ -460,6 +468,24 @@ export async function getUsageSummary(
     totalTokens: Number(row?.totalTokens ?? 0),
     totalCost: Number(row?.totalCost ?? 0),
   };
+}
+
+export async function getUniqueKeyLabels(userId: string): Promise<string[]> {
+  if (!isDbAvailable()) {
+    return Array.from(
+      new Set(
+        ALL_USAGE_RECORDS.map((r) => r.keyLabel).filter((k): k is string => !!k),
+      ),
+    ).sort();
+  }
+
+  const rows = await db
+    .selectDistinct({ label: apiKeys.label })
+    .from(usageRecords)
+    .leftJoin(apiKeys, eq(usageRecords.apiKeyId, apiKeys.id))
+    .where(eq(usageRecords.userId, userId));
+
+  return rows.map((r) => r.label).filter((l): l is string => !!l).sort();
 }
 
 export async function getUniqueModels(userId: string): Promise<string[]> {

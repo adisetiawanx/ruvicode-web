@@ -46,6 +46,7 @@ export default async function DashboardPlaygroundPage() {
           endpoint="/api/dashboard/playground/chat"
           statsPosition="right"
           showSignupCta={false}
+          apiKeys={keys.map((k) => ({ id: k.id, label: k.label }))}
           activeKeyLabel={keys[0]?.label}
           hint="Try any model with your own key."
           hintSub="Billed to your wallet at real per-request prices. Chat history is not stored."

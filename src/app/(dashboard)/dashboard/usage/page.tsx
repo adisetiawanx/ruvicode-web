@@ -6,8 +6,8 @@ import {
   getUsageCount,
   getUsageSummary,
   getUniqueModels,
+  getUniqueKeyLabels,
 } from "@/lib/db/queries/management";
-import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { UsageFiltersClient } from "@/components/dashboard/usage-filters";
 import { UsageExportButton } from "@/components/dashboard/usage-export-button";
@@ -38,15 +38,18 @@ export default async function UsagePage({ searchParams }: PageProps) {
   const dateFrom =
     typeof params.dateFrom === "string" ? params.dateFrom : undefined;
   const dateTo = typeof params.dateTo === "string" ? params.dateTo : undefined;
+  const keyLabel =
+    typeof params.keyLabel === "string" ? params.keyLabel : undefined;
   const page = Math.max(1, Number(params.page) || 1);
 
   const filterBase = {
     model: model && model !== "all" ? model : undefined,
     dateFrom,
     dateTo,
+    keyLabel: keyLabel && keyLabel !== "all" ? keyLabel : undefined,
   };
 
-  const [records, totalCount, summary, models] = await Promise.all([
+  const [records, totalCount, summary, models, keyLabels] = await Promise.all([
     getUsageRecords(session.user.id, {
       ...filterBase,
       page,
@@ -55,6 +58,7 @@ export default async function UsagePage({ searchParams }: PageProps) {
     getUsageCount(session.user.id, filterBase),
     getUsageSummary(session.user.id, filterBase),
     getUniqueModels(session.user.id),
+    getUniqueKeyLabels(session.user.id),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -68,7 +72,9 @@ export default async function UsagePage({ searchParams }: PageProps) {
       {/* Filters */}
       <UsageFiltersClient
         models={models}
+        keyLabels={keyLabels}
         currentModel={model}
+        currentKeyLabel={keyLabel}
         currentDateFrom={dateFrom}
         currentDateTo={dateTo}
       />
@@ -141,20 +147,10 @@ export default async function UsagePage({ searchParams }: PageProps) {
                         <ClientTime utc={row.createdAt} format="datetime" />
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant="outline" className="font-mono text-xs">
-                          <ModelTag id={row.model} stacked={false} />
-                        </Badge>
+                        <ModelTag id={row.model} stacked={false} />
                       </td>
-                      <td className="px-4 py-3">
-                        {row.keyLabel ? (
-                          <Badge variant="outline" className="text-xs">
-                            {row.keyLabel}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-text-muted">
-                            Deleted key
-                          </span>
-                        )}
+                      <td className="px-4 py-3 text-xs text-text-secondary">
+                        {row.keyLabel ?? <span className="text-text-muted">Deleted key</span>}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
                         {row.promptTokens.toLocaleString()}
@@ -182,7 +178,7 @@ export default async function UsagePage({ searchParams }: PageProps) {
             <div className="flex gap-2">
               {page > 1 ? (
                 <Link
-                  href={`/dashboard/usage?${buildParams({ model, dateFrom, dateTo, page: page - 1 })}`}
+                  href={`/dashboard/usage?${buildParams({ model, keyLabel, dateFrom, dateTo, page: page - 1 })}`}
                   className="inline-flex h-8 items-center rounded-md border border-border-default px-3 text-sm text-text-secondary transition-colors hover:bg-surface-2"
                 >
                   ← Prev
@@ -194,7 +190,7 @@ export default async function UsagePage({ searchParams }: PageProps) {
               )}
               {page < totalPages ? (
                 <Link
-                  href={`/dashboard/usage?${buildParams({ model, dateFrom, dateTo, page: page + 1 })}`}
+                  href={`/dashboard/usage?${buildParams({ model, keyLabel, dateFrom, dateTo, page: page + 1 })}`}
                   className="inline-flex h-8 items-center rounded-md border border-border-default px-3 text-sm text-text-secondary transition-colors hover:bg-surface-2"
                 >
                   Next →
@@ -214,12 +210,14 @@ export default async function UsagePage({ searchParams }: PageProps) {
 
 function buildParams(opts: {
   model?: string;
+  keyLabel?: string;
   dateFrom?: string;
   dateTo?: string;
   page: number;
 }): string {
   const params = new URLSearchParams();
   if (opts.model && opts.model !== "all") params.set("model", opts.model);
+  if (opts.keyLabel && opts.keyLabel !== "all") params.set("keyLabel", opts.keyLabel);
   if (opts.dateFrom) params.set("dateFrom", opts.dateFrom);
   if (opts.dateTo) params.set("dateTo", opts.dateTo);
   params.set("page", String(opts.page));

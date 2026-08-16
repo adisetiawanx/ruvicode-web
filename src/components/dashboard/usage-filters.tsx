@@ -6,7 +6,9 @@ import { useCallback } from "react";
 
 interface UsageFiltersClientProps {
   models: string[];
+  keyLabels: string[];
   currentModel?: string;
+  currentKeyLabel?: string;
   currentDateFrom?: string;
   currentDateTo?: string;
 }
@@ -17,7 +19,9 @@ interface UsageFiltersClientProps {
  */
 export function UsageFiltersClient({
   models,
+  keyLabels,
   currentModel,
+  currentKeyLabel,
   currentDateFrom,
   currentDateTo,
 }: UsageFiltersClientProps) {
@@ -51,7 +55,7 @@ export function UsageFiltersClient({
           id="filter-model"
           value={currentModel ?? "all"}
           onChange={(e) => updateParam("model", e.target.value)}
-          className="h-8 rounded-lg border border-input bg-input/30 px-2.5 text-sm text-text-primary outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="h-8 rounded-lg border border-input bg-input/30 px-2.5 pr-8 text-sm text-text-primary outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <option value="all">All models</option>
           {models.map((m) => (
@@ -61,6 +65,30 @@ export function UsageFiltersClient({
           ))}
         </select>
       </div>
+
+      {keyLabels.length > 0 && (
+        <div className="space-y-1.5">
+          <label
+            htmlFor="filter-key"
+            className="block text-xs font-medium text-text-secondary"
+          >
+            API Key
+          </label>
+          <select
+            id="filter-key"
+            value={currentKeyLabel ?? "all"}
+            onChange={(e) => updateParam("keyLabel", e.target.value)}
+            className="h-8 rounded-lg border border-input bg-input/30 px-2.5 pr-8 text-sm text-text-primary outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <option value="all">All keys</option>
+            {keyLabels.map((k) => (
+              <option key={k} value={k}>
+                {k}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <label
