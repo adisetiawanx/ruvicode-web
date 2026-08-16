@@ -465,3 +465,102 @@ body {
 .shiki {
   background-color: var(--code-bg) !important;
 }
+
+/* ─── highlight.js theme (playground code blocks) ─────────────────────────
+   The client-side highlighter emits <span class="hljs-*"> markup; these
+   rules color it. Dark mode follows GitHub-dark conventions, light mode
+   GitHub-light, both tuned to the Ruvicode palette. Dual-theme like Shiki:
+   [data-theme] switches the variables. */
+:root,
+:root[data-theme="dark"] {
+  --hljs-fg: #d4d4d4;
+  --hljs-keyword: #ff7b72;
+  --hljs-string: #a5d6ff;
+  --hljs-title: #d2a8ff;
+  --hljs-attr: #79c0ff;
+  --hljs-number: #f2cc60;
+  --hljs-comment: #8b949e;
+  --hljs-type: #ffa657;
+  --hljs-built_in: #ffa657;
+  --hljs-meta: #79c0ff;
+  --hljs-section: #ffa657;
+  --hljs-name: #7ee787;
+  --hljs-tag: #7ee787;
+  --hljs-literal: #79c0ff;
+  --hljs-params: #d4d4d4;
+  --hljs-punctuation: #d4d4d4;
+  --hljs-operator: #ff7b72;
+  --hljs-variable: #ffa657;
+  --hljs-symbol: #f2cc60;
+  --hljs-regexp: #7ee787;
+  --hljs-selector-class: #7ee787;
+  --hljs-selector-tag: #7ee787;
+  --hljs-template-variable: #ffa657;
+  --hljs-addition: #7ee787;
+  --hljs-deletion: #ff7b72;
+}
+
+:root[data-theme="light"] {
+  --hljs-fg: #24292f;
+  --hljs-keyword: #cf222e;
+  --hljs-string: #0a3069;
+  --hljs-title: #8250df;
+  --hljs-attr: #0550ae;
+  --hljs-number: #953800;
+  --hljs-comment: #6e7781;
+  --hljs-type: #953800;
+  --hljs-built_in: #0550ae;
+  --hljs-meta: #0550ae;
+  --hljs-section: #953800;
+  --hljs-name: #116329;
+  --hljs-tag: #116329;
+  --hljs-literal: #0550ae;
+  --hljs-params: #24292f;
+  --hljs-punctuation: #24292f;
+  --hljs-operator: #cf222e;
+  --hljs-variable: #953800;
+  --hljs-symbol: #953800;
+  --hljs-regexp: #116329;
+  --hljs-selector-class: #116329;
+  --hljs-selector-tag: #116329;
+  --hljs-template-variable: #953800;
+  --hljs-addition: #116329;
+  --hljs-deletion: #cf222e;
+}
+
+.hljs {
+  color: var(--hljs-fg);
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-operator { color: var(--hljs-keyword); }
+.hljs-string,
+.hljs-quote { color: var(--hljs-string); }
+.hljs-title,
+.hljs-title.function_ { color: var(--hljs-title); }
+.hljs-title.class_,
+.hljs-type,
+.hljs-built_in { color: var(--hljs-type); }
+.hljs-attr,
+.hljs-attribute,
+.hljs-variable.language_ { color: var(--hljs-attr); }
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet { color: var(--hljs-number); }
+.hljs-comment,
+.hljs-code { color: var(--hljs-comment); font-style: italic; }
+.hljs-meta,
+.hljs-doctag { color: var(--hljs-meta); }
+.hljs-section { color: var(--hljs-section); }
+.hljs-name,
+.hljs-tag { color: var(--hljs-name); }
+.hljs-literal,
+.hljs-boolean { color: var(--hljs-literal); }
+.hljs-params { color: var(--hljs-params); }
+.hljs-punctuation { color: var(--hljs-punctuation); }
+.hljs-variable { color: var(--hljs-variable); }
+.hljs-regexp { color: var(--hljs-regexp); }
+.hljs-selector-class { color: var(--hljs-selector-class); }
+.hljs-template-variable { color: var(--hljs-template-variable); }
+.hljs-addition { color: var(--hljs-addition); }
+.hljs-deletion { color: var(--hljs-deletion); }
