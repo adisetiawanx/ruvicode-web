@@ -35,6 +35,9 @@ export const env = createEnv({
     // Secret shared with the Go gateway for the internal playground endpoint
     // (POST /internal/playground/chat). Sent as X-Internal-Token.
     INTERNAL_API_TOKEN: z.string().optional(),
+    BASE_RPC_URL: z.string().optional(),
+    USDC_CONTRACT: z.string().optional(),
+    ADMIN_EMAILS: z.string().optional(),
     // Server-to-server gateway URL. Inside Docker the browser-facing
     // api host is not resolvable, so the web container talks to the
     // gateway service directly. Falls back to the public API URL.
@@ -67,6 +70,9 @@ export const env = createEnv({
     PROVIDER_BASE_URL: process.env.PROVIDER_BASE_URL,
     REDIS_URL: process.env.REDIS_URL,
     INTERNAL_API_TOKEN: process.env.INTERNAL_API_TOKEN,
+    BASE_RPC_URL: process.env.BASE_RPC_URL,
+    USDC_CONTRACT: process.env.USDC_CONTRACT,
+    ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     GATEWAY_INTERNAL_URL: process.env.GATEWAY_INTERNAL_URL,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
