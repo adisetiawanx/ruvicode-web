@@ -134,7 +134,7 @@ export async function getAdminDeposits() {
       amount: Number(r.amount),
       method: r.method,
       status: r.status,
-      createdAt: r.createdAt,
+      createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : String(r.createdAt),
     })),
   };
 }

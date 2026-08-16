@@ -237,7 +237,7 @@ export default async function SuperAdminPage() {
                       </span>
                     </td>
                     <td className="px-3 py-2 text-right text-xs text-text-muted">
-                      <ClientTime utc={d.createdAt.toISOString()} format="datetime" />
+                      <ClientTime utc={d.createdAt} format="datetime" />
                     </td>
                   </tr>
                 ))}
