@@ -230,6 +230,7 @@
   --color-surface-2: var(--bg-surface-2);
   --color-surface-3: var(--bg-surface-3);
   --color-inset: var(--bg-inset);
+  --color-code-bg: var(--code-bg);
 
   --color-border-default: var(--border-default);
   --color-border-subtle: var(--border-subtle);

@@ -337,13 +337,27 @@ export function PlaygroundChat({
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Input</span>
               <span className="tabular text-text-secondary">
-                ${modelPricing ? modelPricing.user_input.toFixed(4) : "?"}/1M
+                <span className="flex items-baseline gap-1.5">
+                  <span className="text-[11px] text-text-muted line-through">
+                    ${modelPricing ? modelPricing.ref_input.toFixed(4) : "?"}
+                  </span>
+                  <span>
+                    ${modelPricing ? modelPricing.user_input.toFixed(4) : "?"}
+                  </span>
+                </span>/1M
               </span>
             </div>
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Output</span>
               <span className="tabular text-text-secondary">
-                ${modelPricing ? modelPricing.user_output.toFixed(4) : "?"}/1M
+                <span className="flex items-baseline gap-1.5">
+                  <span className="text-[11px] text-text-muted line-through">
+                    ${modelPricing ? modelPricing.ref_output.toFixed(4) : "?"}
+                  </span>
+                  <span>
+                    ${modelPricing ? modelPricing.user_output.toFixed(4) : "?"}
+                  </span>
+                </span>/1M
               </span>
             </div>
           </div>
@@ -366,13 +380,23 @@ export function PlaygroundChat({
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Input</span>
               <span className="tabular text-text-secondary">
-                ${modelPricing.user_input.toFixed(4)}/1M
+                <span className="flex items-baseline gap-1.5">
+                  <span className="text-[11px] text-text-muted line-through">
+                    ${modelPricing.ref_input.toFixed(4)}
+                  </span>
+                  <span>${modelPricing.user_input.toFixed(4)}</span>
+                </span>/1M
               </span>
             </div>
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Output</span>
               <span className="tabular text-text-secondary">
-                ${modelPricing.user_output.toFixed(4)}/1M
+                <span className="flex items-baseline gap-1.5">
+                  <span className="text-[11px] text-text-muted line-through">
+                    ${modelPricing.ref_output.toFixed(4)}
+                  </span>
+                  <span>${modelPricing.user_output.toFixed(4)}</span>
+                </span>/1M
               </span>
             </div>
             <div className="flex items-center justify-between font-mono text-xs">
