@@ -337,10 +337,14 @@ function buildUsageConditions(
     conditions.push(eq(usageRecords.model, filters.model));
   }
   if (filters.dateFrom) {
-    conditions.push(gte(usageRecords.createdAt, new Date(filters.dateFrom)));
+    // date inputs send YYYY-MM-DD, parsed as UTC midnight by the Date
+    // constructor. Extend the window to the full local day so the from/to
+    // dates are inclusive: from = start of day, to = end of day.
+    conditions.push(gte(usageRecords.createdAt, new Date(`${filters.dateFrom}T00:00:00`)));
   }
   if (filters.dateTo) {
-    conditions.push(lte(usageRecords.createdAt, new Date(filters.dateTo)));
+    const end = new Date(`${filters.dateTo}T23:59:59.999`);
+    conditions.push(lte(usageRecords.createdAt, end));
   }
   return conditions;
 }

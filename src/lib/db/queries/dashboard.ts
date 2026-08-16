@@ -249,7 +249,7 @@ export async function getModelBreakdown(
       ),
     )
     .groupBy(usageRecords.model)
-    .orderBy(sql`COALESCE(SUM(${usageRecords.cost}),0)`);
+    .orderBy(sql`COALESCE(SUM(${usageRecords.cost}),0) DESC`);
 
   const total = rows.reduce((acc, r) => acc + Number(r.cost), 0);
   if (total === 0) return [];

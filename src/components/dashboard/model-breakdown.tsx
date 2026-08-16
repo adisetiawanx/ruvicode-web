@@ -82,9 +82,9 @@ export function ModelBreakdown({ data }: ModelBreakdownProps) {
           </PieChart>
         </ResponsiveContainer>
 
-        {/* Legend */}
-        <div className="space-y-2">
-          {data.slice(0, 6).map((item, i) => (
+        {/* Legend — scrollable so many models never stretch the card */}
+        <div className="max-h-[220px] space-y-2 overflow-y-auto pr-1">
+          {data.map((item, i) => (
             <div
               key={item.model}
               className="flex items-center justify-between text-sm"

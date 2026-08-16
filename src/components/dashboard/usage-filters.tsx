@@ -55,7 +55,7 @@ export function UsageFiltersClient({
         >
           <option value="all">All models</option>
           {models.map((m) => (
-            <option key={displayModelName(m)} value={displayModelName(m)}>
+            <option key={m} value={m}>
               {displayModelName(m)}
             </option>
           ))}
