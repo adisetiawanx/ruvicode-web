@@ -207,8 +207,7 @@ export const usageRecords = pgTable(
   {
     id: text("id").primaryKey(),
     userId: text("user_id")
-      .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "set null" }),
     apiKeyId: text("api_key_id")
       .notNull()
       .references(() => apiKeys.id),
@@ -259,8 +258,7 @@ export const topups = pgTable(
   {
     id: text("id").primaryKey(),
     userId: text("user_id")
-      .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "set null" }),
     amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
     method: topupMethodEnum("method").notNull(),
     paddleTransactionId: text("paddle_transaction_id"), // for idempotency
@@ -335,8 +333,7 @@ export const depositAddresses = pgTable(
   {
     id: text("id").primaryKey(),
     userId: text("user_id")
-      .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "set null" }),
     chain: integer("chain").notNull().default(8453), // Base
     address: text("address").notNull(),
     derivationIndex: integer("derivation_index").notNull(),
@@ -371,8 +368,7 @@ export const usageHourly = pgTable(
   "usage_hourly",
   {
     userId: text("user_id")
-      .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "set null" }),
     hourBucket: timestamp("hour_bucket").notNull(), // truncated to hour
     model: text("model").notNull(),
     requestCount: integer("request_count").notNull().default(0),
