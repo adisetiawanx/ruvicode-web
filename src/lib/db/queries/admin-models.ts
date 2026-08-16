@@ -1,0 +1,8 @@
+import { sql } from "drizzle-orm";
+import { db, isDbAvailable } from "@/lib/db";
+import { modelPrices, usageRecords } from "@/lib/db/schema";
+export async function getAdminModels() {
+  if (!isDbAvailable()) return [];
+  const rows = await db.select({ model: modelPrices.model, displayName: modelPrices.displayName, active: modelPrices.isActive, refInput: modelPrices.refInput, refOutput: modelPrices.refOutput, providerInput: modelPrices.providerInput, providerOutput: modelPrices.providerOutput, userInput: modelPrices.userInput, userOutput: modelPrices.userOutput, updatedAt: modelPrices.updatedAt, requests: sql<number>`COUNT(${usageRecords.id})`, charges: sql<number>`COALESCE(SUM(${usageRecords.cost}), 0)`, upstreamCost: sql<number>`COALESCE(SUM(${usageRecords.upstreamCost}), 0)` }).from(modelPrices).leftJoin(usageRecords, sql`${usageRecords.model} = ${modelPrices.model}`).groupBy(modelPrices.model).orderBy(modelPrices.model);
+  return rows.map((row) => { const charges = Number(row.charges); const upstreamCost = Number(row.upstreamCost); const margin = charges - upstreamCost; return { ...row, requests: Number(row.requests), refInput: Number(row.refInput), refOutput: Number(row.refOutput), providerInput: Number(row.providerInput), providerOutput: Number(row.providerOutput), userInput: Number(row.userInput), userOutput: Number(row.userOutput), charges, upstreamCost, margin, marginPct: charges > 0 ? (margin / charges) * 100 : 0, updatedAt: new Date(row.updatedAt).toISOString() }; });
+}

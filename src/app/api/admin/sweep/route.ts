@@ -5,73 +5,45 @@ import { env } from "@/lib/env";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/**
- * Admin sweep proxy.
- *
- * The browser never talks to the gateway directly and the internal token
- * never leaves the server. Same admin gate as /super: a session whose
- * email is on the ADMIN_EMAILS allowlist. Everyone else gets a 404 so
- * the endpoint's existence stays invisible.
- */
+function isAdmin(email: string | null | undefined) {
+  return !!email && (process.env.ADMIN_EMAILS ?? "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean).includes(email.toLowerCase());
+}
+
 export async function POST(req: NextRequest) {
-  // 1. Admin gate (same rule as the /super page).
   const session = await getSession();
-  if (!session) {
-    return Response.json({ error: "Not found" }, { status: 404 });
-  }
-  const allowed = (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  if (!allowed.includes((session.user.email ?? "").toLowerCase())) {
-    return Response.json({ error: "Not found" }, { status: 404 });
-  }
+  if (!session || !isAdmin(session.user.email)) return Response.json({ error: "Not found" }, { status: 404 });
 
-  // 2. Validate the body: only the execute flag is accepted.
-  let execute = false;
+  let body: unknown;
   try {
-    const body = await req.json();
-    execute = body?.execute === true;
+    body = await req.json();
   } catch {
-    // Empty or invalid body defaults to a dry-run preview.
+    return Response.json({ error: { message: "Invalid request body" } }, { status: 400 });
   }
+  if (!body || typeof body !== "object") return Response.json({ error: { message: "Invalid request body" } }, { status: 400 });
+  const input = body as Record<string, unknown>;
+  const execute = input.execute === true;
+  const previewId = typeof input.preview_id === "string" ? input.preview_id : undefined;
+  const confirmation = typeof input.confirmation === "string" ? input.confirmation : undefined;
+  if (Object.keys(input).some((key) => !["execute", "preview_id", "confirmation"].includes(key))) return Response.json({ error: { message: "Invalid request fields" } }, { status: 400 });
+  if (execute && (!previewId || confirmation !== "SWEEP")) return Response.json({ error: { message: "A valid preview and confirmation are required" } }, { status: 400 });
 
-  // 3. Forward to the gateway's internal endpoint (server-to-server).
-  const gatewayUrl = (
-    env.GATEWAY_INTERNAL_URL ?? env.NEXT_PUBLIC_API_URL ?? ""
-  ).replace(/\/+$/, "");
-  const token = env.INTERNAL_API_TOKEN;
-  if (!gatewayUrl || !token) {
-    return Response.json(
-      { error: "Sweep is not configured. Please try again later." },
-      { status: 503 },
-    );
-  }
+  const gatewayUrl = (env.GATEWAY_INTERNAL_URL ?? env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
+  if (!gatewayUrl || !env.INTERNAL_API_TOKEN) return Response.json({ error: { message: "Sweep is not configured" } }, { status: 503 });
 
-  let upstream: Response;
   try {
-    upstream = await fetch(`${gatewayUrl}/internal/sweep`, {
+    const upstream = await fetch(`${gatewayUrl}/internal/sweep`, {
       method: "POST",
       headers: {
-        "X-Internal-Token": token,
+        "X-Internal-Token": env.INTERNAL_API_TOKEN,
+        "X-Admin-Actor": session.user.email,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ execute }),
-      // A full sweep round (gas funding + 1 block wait + transfers) can
-      // take a while with many addresses; do not cut it off early.
+      body: JSON.stringify({ execute, preview_id: previewId ?? null, confirmation: execute ? confirmation : undefined }),
       signal: AbortSignal.timeout(120_000),
     });
+    const responseBody = await upstream.text();
+    return new Response(responseBody, { status: upstream.status, headers: { "Content-Type": "application/json", "X-Robots-Tag": "noindex, nofollow" } });
   } catch {
-    return Response.json(
-      { error: "Gateway unreachable. Please try again." },
-      { status: 502 },
-    );
+    return Response.json({ error: { message: "Gateway unreachable" } }, { status: 502 });
   }
-
-  // 4. Pass the gateway's reply through unchanged.
-  const text = await upstream.text();
-  return new Response(text, {
-    status: upstream.status,
-    headers: { "Content-Type": "application/json" },
-  });
 }

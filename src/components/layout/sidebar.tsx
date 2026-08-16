@@ -1,37 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Key,
-  BarChart3,
-  CreditCard,
-  Wallet,
-  Settings,
-  Menu,
-  LogOut,
-  Tags,
-  FlaskConical,
-  type LucideIcon,
-} from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { BarChart3, ClipboardList, CreditCard, FlaskConical, Key, LayoutDashboard, LogOut, Menu, Settings, Tags, Users, Wallet, Wrench, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/shared/logo";
 import { authClient } from "@/lib/auth-client";
 
-interface NavItem {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-}
+interface NavItem { href: string; label: string; icon: LucideIcon }
 
-const navItems: NavItem[] = [
+const customerItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/keys", label: "API Keys", icon: Key },
   { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
@@ -42,92 +22,26 @@ const navItems: NavItem[] = [
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
-/** Desktop sidebar (persistent, md+). */
-export function DashboardSidebar() {
-  const pathname = usePathname();
+const adminItems: NavItem[] = [
+  { href: "/super", label: "Overview", icon: LayoutDashboard },
+  { href: "/super/users", label: "Users", icon: Users },
+  { href: "/super/financial", label: "Financial", icon: CreditCard },
+  { href: "/super/usage", label: "Usage", icon: BarChart3 },
+  { href: "/super/tools", label: "Tools", icon: Wrench },
+  { href: "/super/models", label: "Models", icon: Tags },
+  { href: "/super/audit", label: "Audit Log", icon: ClipboardList },
+];
 
-  return (
-    <aside className="sticky top-0 hidden h-screen w-60 flex-col border-r border-border-subtle bg-canvas md:flex">
-      <SidebarContent pathname={pathname} />
-    </aside>
-  );
-}
+export function DashboardSidebar() { return <aside className="sticky top-0 hidden h-screen w-60 flex-col border-r border-border-subtle bg-canvas md:flex"><SidebarContent pathname={usePathname()} items={customerItems} /></aside>; }
+export function AdminDashboardSidebar() { return <aside className="sticky top-0 hidden h-screen w-60 flex-col border-r border-border-subtle bg-canvas md:flex"><AdminSidebarContent pathname={usePathname()} /></aside>; }
+export function MobileSidebarTrigger() { return <MobileSheet pathname={usePathname()} items={customerItems} label="Open navigation menu" />; }
+export function AdminMobileSidebarTrigger() { return <MobileSheet pathname={usePathname()} items={adminItems} admin label="Open admin navigation menu" />; }
 
-/** Mobile sidebar trigger + slide-in sheet. */
-export function MobileSidebarTrigger() {
-  const pathname = usePathname();
+function MobileSheet({ pathname, items, admin, label }: { pathname: string; items: NavItem[]; admin?: boolean; label: string }) { return <Sheet><SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden" aria-label={label} />}><Menu className="h-5 w-5" /></SheetTrigger><SheetContent side="left" className="w-60 bg-canvas p-0">{admin ? <AdminSidebarContent pathname={pathname} /> : <SidebarContent pathname={pathname} items={items} />}</SheetContent></Sheet>; }
 
-  return (
-    <Sheet>
-      <SheetTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            aria-label="Open navigation menu"
-          />
-        }
-      >
-        <Menu className="h-5 w-5" />
-      </SheetTrigger>
-      <SheetContent side="left" className="w-60 bg-canvas p-0">
-        <SidebarContent pathname={pathname} />
-      </SheetContent>
-    </Sheet>
-  );
-}
+function SidebarContent({ pathname, items }: { pathname: string; items: NavItem[] }) { return <div className="flex h-full flex-col"><div className="flex h-16 items-center border-b border-border-subtle px-6"><Link href="/" className="flex items-center gap-2"><Logo /><span className="font-semibold">Ruvicode</span></Link></div><nav className="flex-1 space-y-1 px-3 py-4">{items.map((item) => <NavLink key={item.href} pathname={pathname} item={item} root="/dashboard" />)}</nav><div className="border-t border-border-subtle p-3"><SignOut /></div></div>; }
 
-function SidebarContent({ pathname }: { pathname: string }) {
-  return (
-    <div className="flex h-full flex-col">
-      {/* Logo header */}
-      <div className="flex h-16 items-center border-b border-border-subtle px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Logo />
-          <span className="font-semibold">Ruvicode</span>
-        </Link>
-      </div>
+function AdminSidebarContent({ pathname }: { pathname: string }) { return <div className="flex h-full flex-col"><div className="flex h-16 items-center border-b border-border-subtle px-6"><Link href="/" className="flex items-center gap-2"><Logo /><span className="font-semibold">Ruvicode</span></Link></div><nav className="flex-1 space-y-1 px-3 py-5">{adminItems.map((item) => <NavLink key={item.href} pathname={pathname} item={item} root="/super" />)}</nav><div className="border-t border-border-subtle p-3"><SignOut /></div></div>; }
 
-      {/* Nav items */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
-        {navItems.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/dashboard" && pathname.startsWith(item.href));
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                isActive
-                  ? "bg-accent-subtle text-accent-text"
-                  : "text-text-secondary hover:bg-surface-2 hover:text-text-primary",
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Sign out button at bottom */}
-      <div className="border-t border-border-subtle p-3">
-        <button
-          onClick={async () => {
-            await authClient.signOut();
-            window.location.href = "/login";
-          }}
-          className="flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary"
-        >
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </button>
-      </div>
-    </div>
-  );
-}
+function NavLink({ pathname, item, root }: { pathname: string; item: NavItem; root: string }) { const Icon = item.icon; const active = pathname === item.href || (item.href !== root && pathname.startsWith(`${item.href}/`)); return <Link href={item.href} className={cn("flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors", active ? "bg-accent-subtle text-accent-text" : "text-text-secondary hover:bg-surface-2 hover:text-text-primary")}><Icon className="h-4 w-4" />{item.label}</Link>; }
+function SignOut() { return <button onClick={async () => { await authClient.signOut(); window.location.href = "/login"; }} className="mt-1 flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-text-secondary hover:bg-surface-2 hover:text-text-primary"><LogOut className="h-4 w-4" />Sign Out</button>; }

@@ -402,3 +402,19 @@ export const providerKeys = pgTable("provider_keys", {
   notes: text("notes"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+export const adminAuditLog = pgTable(
+  "admin_audit_log",
+  {
+    id: text("id").primaryKey(),
+    adminEmail: text("admin_email").notNull(),
+    action: text("action").notNull(),
+    operationId: text("operation_id"),
+    status: text("status").notNull(),
+    details: text("details").notNull().default("{}"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    createdIdx: index("idx_admin_audit_created").on(table.createdAt),
+  }),
+);
