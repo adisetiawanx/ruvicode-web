@@ -69,15 +69,32 @@ export default async function UsagePage({ searchParams }: PageProps) {
         Usage History
       </h1>
 
-      {/* Filters */}
-      <UsageFiltersClient
-        models={models}
-        keyLabels={keyLabels}
-        currentModel={model}
-        currentKeyLabel={keyLabel}
-        currentDateFrom={dateFrom}
-        currentDateTo={dateTo}
-      />
+      {/* Filters + export in one row */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <UsageFiltersClient
+          models={models}
+          keyLabels={keyLabels}
+          currentModel={model}
+          currentKeyLabel={keyLabel}
+          currentDateFrom={dateFrom}
+          currentDateTo={dateTo}
+        />
+        <div className="flex items-center gap-2">
+          {(model || keyLabel || dateFrom || dateTo) && (
+            <a
+              href="/dashboard/usage"
+              className="inline-flex h-8 items-center rounded-lg border border-border-default px-3 text-sm text-text-secondary transition-colors hover:bg-surface-2"
+            >
+              Clear
+            </a>
+          )}
+          <UsageExportButton
+            model={model}
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+          />
+        </div>
+      </div>
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -95,16 +112,8 @@ export default async function UsagePage({ searchParams }: PageProps) {
         />
       </div>
 
-      {/* Table + export */}
+      {/* Table */}
       <div className="space-y-3">
-        <div className="flex items-center justify-end">
-          <UsageExportButton
-            model={model}
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-          />
-        </div>
-
         <div className="overflow-hidden rounded-lg border border-border-default bg-surface">
           {records.length === 0 ? (
             <EmptyState
