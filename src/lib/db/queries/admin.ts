@@ -31,6 +31,12 @@ export interface AdminAddressBalance {
 
 const emptyAudit: AdminAuditEntry[] = [];
 
+/** Env value that treats an empty or whitespace-only string as unset. */
+export function envValue(name: string, fallback: string) {
+  const value = process.env[name]?.trim();
+  return value ? value : fallback;
+}
+
 function utcStart(daysAgo: number) {
   const now = new Date();
   const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
@@ -130,11 +136,30 @@ export async function getAdminFloatVsLiability(rpcUrl: string, usdcContract: str
 }
 
 async function rpc(rpcUrl: string, method: string, params: unknown[]) {
-  const response = await fetch(rpcUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", method, params, id: 1 }), signal: AbortSignal.timeout(10_000) });
+  const response = await fetch(rpcUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", method, params, id: 1 }), signal: AbortSignal.timeout(5_000) });
   if (!response.ok) throw new Error(`RPC HTTP ${response.status}`);
   const json = await response.json();
   if (json.error) throw new Error("RPC request failed");
   return json.result as string;
+}
+
+const chainNotConfigured: AdminChainData = { available: false, error: "Treasury is not configured", float: 0, treasuryUsdc: 0, liability: 0, held: 0, ratio: null, treasuryEth: 0, treasury: "", addresses: [] };
+const chainTimedOut: AdminChainData = { available: false, error: "Chain data unavailable", float: 0, treasuryUsdc: 0, liability: 0, held: 0, ratio: null, treasuryEth: 0, treasury: "", addresses: [] };
+
+/** Chain overview for the admin console; never rejects and never blocks the page beyond `ms`. */
+export async function getAdminChainData(ms = 8_000): Promise<AdminChainData> {
+  const treasury = envValue("TREASURY_ADDRESS", "");
+  if (!treasury) return chainNotConfigured;
+  const rpcUrl = envValue("BASE_RPC_URL", "https://mainnet.base.org");
+  const contract = envValue("USDC_CONTRACT", "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913");
+  const guarded = getAdminFloatVsLiability(rpcUrl, contract, treasury).catch(() => chainTimedOut);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<AdminChainData>((resolve) => { timer = setTimeout(() => resolve(chainTimedOut), ms); });
+  try {
+    return await Promise.race([guarded, timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 async function getTokenBalance(rpcUrl: string, contract: string, address: string) {

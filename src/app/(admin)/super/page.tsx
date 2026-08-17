@@ -21,6 +21,9 @@ export default async function SuperOverviewPage() {
     data.health.find((item) => item.name === "Treasury gas" && item.state === "Warning") ? "Treasury ETH is low" : null,
     data.health.some((item) => item.state === "Unavailable") ? "One or more services are unavailable" : null,
   ].filter(Boolean).slice(0, 5) as string[];
+  const reserveRatio = data.chain.ratio;
+  const reserveValue = reserveRatio !== null ? `${reserveRatio.toFixed(2)}×` : data.chain.available ? "N/A" : "Unavailable";
+  const reserveSub = reserveRatio !== null ? (reserveRatio >= 1 ? "Healthy" : "Under-reserved") : data.chain.available ? "No wallet liability yet" : "Chain data unavailable";
   return (
     <div className="space-y-6">
       <div><h1 className="text-2xl font-semibold text-text-primary">Overview</h1><p className="mt-1 text-sm text-text-secondary">Product health at a glance</p></div>
@@ -28,7 +31,7 @@ export default async function SuperOverviewPage() {
         <StatCard label="Users" value={data.users.total.toLocaleString()} sublabel={`${data.users.active7d.toLocaleString()} active in 7 days`} />
         <StatCard label="Charges" value={usd(data.revenue.chargesToday)} sublabel="Today" />
         <StatCard label="Margin" value={usd(data.revenue.today)} sublabel={`${data.revenue.marginPct.toFixed(1)}% today`} />
-        <StatCard label="Reserve" value={data.chain.ratio === null ? "Unavailable" : `${data.chain.ratio.toFixed(2)}×`} sublabel={data.chain.ratio === null ? (data.chain.liability > 0 ? "Chain data unavailable" : "No wallet liability yet") : data.chain.ratio >= 1 ? "Healthy" : "Under-reserved"} accent={data.chain.ratio !== null && data.chain.ratio >= 1} />
+        <StatCard label="Reserve" value={reserveValue} sublabel={reserveSub} accent={reserveRatio !== null && reserveRatio >= 1} />
       </div>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <AdminRequestsChart data={data.ops.volume7d} />
