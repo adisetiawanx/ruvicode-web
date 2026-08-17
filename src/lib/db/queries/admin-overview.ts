@@ -86,17 +86,20 @@ export async function getAdminHealth(chain: AdminChainData): Promise<AdminHealth
     checkDepositMonitor(),
   ]);
   const emptyChainUsed = chain.available ? undefined : chain.error;
+  // Treasury gas only matters when there are USDC deposits to sweep.
+  const hasSweepableUsdc = chain.available && chain.addresses.some((a) => a.usdc > 0);
+  const treasuryGas: AdminHealthItem = !chain.available
+    ? { name: "Treasury gas", state: "Unknown", detail: emptyChainUsed }
+    : hasSweepableUsdc
+      ? { name: "Treasury gas", state: chain.treasuryEth >= 0.005 ? "Healthy" : "Warning", detail: `${chain.treasuryEth.toFixed(4)} ETH` }
+      : { name: "Treasury gas", state: "Healthy", detail: `${chain.treasuryEth.toFixed(4)} ETH` };
   return [
     { name: "Database", state: database },
     { name: "Redis", state: redis },
     { name: "Gateway", state: gateway },
     pricing,
     monitor,
-    {
-      name: "Treasury gas",
-      state: chain.available ? (chain.treasuryEth >= 0.005 ? "Healthy" : "Warning") : "Unknown",
-      detail: chain.available ? `${chain.treasuryEth.toFixed(4)} ETH` : emptyChainUsed,
-    },
+    treasuryGas,
   ];
 }
 
