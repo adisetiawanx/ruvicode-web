@@ -30,7 +30,7 @@ export default async function AdminToolsPage() {
       <SweepPanel />
       <section className="rounded-lg border border-border-default bg-surface p-6">
         <h2 className="mb-4 font-semibold text-text-primary">Recent operational activity</h2>
-        {audit.length === 0 ? <p className="text-sm text-text-muted">Belum ada data yang ditampilkan.</p> : (
+        {audit.length === 0 ? <p className="text-sm text-text-muted">No data to display.</p> : (
           <ul className="space-y-2">
             {audit.map((entry) => (
               <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border-subtle pb-2 text-sm">

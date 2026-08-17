@@ -20,7 +20,7 @@ function EmptyChart({ label }: { label: string }) {
   return (
     <div className="flex h-[220px] items-center justify-center text-center">
       <div>
-        <p className="text-sm text-text-muted">Belum ada data yang ditampilkan.</p>
+        <p className="text-sm text-text-muted">No data to display.</p>
         <p className="mt-1 text-xs text-text-muted">{label}</p>
       </div>
     </div>

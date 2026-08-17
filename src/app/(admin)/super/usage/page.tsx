@@ -2,6 +2,81 @@ import { getSession } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { getAdminUsage } from "@/lib/db/queries/admin-usage";
 import { ClientTime } from "@/components/shared/client-time";
+import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
+import Link from "next/link";
+
 export const dynamic = "force-dynamic";
-function ok(email: string | null | undefined) { return !!email && (process.env.ADMIN_EMAILS ?? "").split(",").map((x) => x.trim().toLowerCase()).includes(email.toLowerCase()); }
-export default async function AdminUsagePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) { const session = await getSession(); if (!session || !ok(session.user.email)) return notFound(); const params = await searchParams; const page = Math.max(1, Number(params.page ?? 1)); const search = typeof params.search === "string" ? params.search.toLowerCase() : ""; const model = typeof params.model === "string" ? params.model : ""; const status = typeof params.status === "string" ? params.status : ""; const data = await getAdminUsage(); const filtered = data.rows.filter((row) => (!search || row.model.toLowerCase().includes(search) || (row.keyLabel ?? "").toLowerCase().includes(search) || (row.requestId ?? "").toLowerCase().includes(search)) && (!model || row.model === model) && (!status || row.status === status)); const rows = filtered.slice((page - 1) * 50, page * 50); return <div className="space-y-6"><div><h1 className="text-2xl font-semibold text-text-primary">Usage</h1><p className="mt-1 text-sm text-text-secondary">Request traffic and metadata-only usage records</p></div><form className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_180px_160px_auto]"><input name="search" defaultValue={search} placeholder="Search model, key, request ID" className="h-8 rounded-lg border border-input bg-transparent px-3 text-sm" /><select name="model" defaultValue={model} className="h-8 rounded-lg border border-input bg-transparent px-3 text-sm"><option value="">All models</option>{data.models.map((row) => <option key={row.model} value={row.model}>{row.model}</option>)}</select><select name="status" defaultValue={status} className="h-8 rounded-lg border border-input bg-transparent px-3 text-sm"><option value="">All statuses</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="partial">Partial</option></select><button className="rounded-lg bg-accent px-3 text-sm text-text-inverse">Filter</button></form><div className="grid grid-cols-1 gap-4 lg:grid-cols-2"><section className="rounded-lg border border-border-default bg-surface p-6"><h2 className="mb-4 font-semibold">By model</h2><div className="space-y-2">{data.models.length === 0 ? <p className="text-sm text-text-muted">Belum ada data yang ditampilkan.</p> : data.models.map((row) => <div key={row.model} className="flex justify-between border-b border-border-subtle pb-2 text-sm"><span>{row.model}</span><span className="font-mono">{row.requests} · ${row.cost.toFixed(4)}</span></div>)}</div></section><section className="rounded-lg border border-border-default bg-surface p-6"><h2 className="mb-4 font-semibold">By API key</h2><div className="space-y-2">{data.keys.length === 0 ? <p className="text-sm text-text-muted">Belum ada data yang ditampilkan.</p> : data.keys.map((row) => <div key={row.keyLabel} className="flex justify-between border-b border-border-subtle pb-2 text-sm"><span>{row.keyLabel}</span><span className="font-mono">{row.requests} · ${row.cost.toFixed(4)}</span></div>)}</div></section></div><section className="rounded-lg border border-border-default bg-surface p-6"><h2 className="mb-4 font-semibold">Request records</h2><div className="overflow-x-auto"><table className="w-full min-w-[900px] text-sm"><thead className="bg-surface-2 text-xs text-text-muted"><tr><th className="px-3 py-2 text-left">Time</th><th className="px-3 py-2 text-left">Model</th><th className="px-3 py-2 text-left">Key</th><th className="px-3 py-2 text-right">Input</th><th className="px-3 py-2 text-right">Output</th><th className="px-3 py-2 text-right">Cost</th><th className="px-3 py-2 text-left">Status</th></tr></thead><tbody>{rows.map((row) => <tr key={row.id} className="border-b border-border-subtle"><td className="px-3 py-2 text-xs"><ClientTime utc={row.createdAt} /></td><td className="px-3 py-2">{row.model}</td><td className="px-3 py-2">{row.keyLabel ?? "Deleted key"}</td><td className="px-3 py-2 text-right font-mono">{row.promptTokens.toLocaleString()}</td><td className="px-3 py-2 text-right font-mono">{row.completionTokens.toLocaleString()}</td><td className="px-3 py-2 text-right font-mono">${row.cost.toFixed(6)}</td><td className="px-3 py-2">{row.status}</td></tr>)}</tbody></table></div><div className="mt-3 flex justify-between text-sm text-text-muted"><span>{filtered.length} matching records</span><span className="flex gap-3">{page > 1 && <a className="text-accent-text" href={`/super/usage?page=${page - 1}&search=${encodeURIComponent(search)}&model=${encodeURIComponent(model)}&status=${status}`}>Previous</a>}{rows.length === 50 && <a className="text-accent-text" href={`/super/usage?page=${page + 1}&search=${encodeURIComponent(search)}&model=${encodeURIComponent(model)}&status=${status}`}>Next</a>}</span></div></section></div>; }
+function ok(email: string | null | undefined) { return !!email && (process.env.ADMIN_EMAILS ?? "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).includes(email.toLowerCase()); }
+function usd(n: number) { return `$${n.toFixed(4)}`; }
+
+export default async function AdminUsagePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const session = await getSession(); if (!session || !ok(session.user.email)) return notFound();
+  const params = await searchParams;
+  const page = Math.max(1, Number(params.page ?? 1) || 1);
+  const search = typeof params.search === "string" ? params.search.toLowerCase() : "";
+  const model = typeof params.model === "string" ? params.model : "";
+  const status = typeof params.status === "string" ? params.status : "";
+  const data = await getAdminUsage();
+  const filtered = data.rows.filter((row) =>
+    (!search || row.model.toLowerCase().includes(search) || (row.keyLabel ?? "").toLowerCase().includes(search) || (row.requestId ?? "").toLowerCase().includes(search))
+    && (!model || row.model === model)
+    && (!status || row.status === status),
+  );
+  const pageSize = 50;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const rows = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const start = filtered.length === 0 ? 0 : (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, filtered.length);
+
+  return (
+    <div className="space-y-6">
+      <div><h1 className="text-2xl font-semibold text-text-primary">Usage</h1><p className="mt-1 text-sm text-text-secondary">Request traffic and metadata-only usage records</p></div>
+      <AdminFilterBar
+        fields={[
+          { name: "search", type: "search", label: "Model, key, request ID", placeholder: "Search model, key, request ID" },
+          { name: "model", type: "select", label: "Model", options: data.models.map((m) => ({ value: m.model, label: m.model })) },
+          { name: "status", type: "select", label: "Status", options: [{ value: "completed", label: "Completed" }, { value: "failed", label: "Failed" }, { value: "partial", label: "Partial" }] },
+        ]}
+      />
+      <section className="overflow-hidden rounded-lg border border-border-default bg-surface">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[1000px] text-sm">
+            <thead className="bg-surface-2 text-xs text-text-muted">
+              <tr>
+                <th className="px-3 py-2 text-left">Time</th>
+                <th className="px-3 py-2 text-left">Model</th>
+                <th className="px-3 py-2 text-left">Key</th>
+                <th className="px-3 py-2 text-right">Tokens</th>
+                <th className="px-3 py-2 text-right">Cost</th>
+                <th className="px-3 py-2 text-left">Status</th>
+                <th className="px-3 py-2 text-left">Request ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.length === 0 ? (
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-sm text-text-muted">No data to display.</td></tr>
+              ) : rows.map((row, i) => (
+                <tr key={i} className="border-b border-border-subtle last:border-0">
+                  <td className="whitespace-nowrap px-3 py-3 text-xs text-text-muted"><ClientTime utc={row.createdAt} /></td>
+                  <td className="px-3 py-3">{row.model}</td>
+                  <td className="px-3 py-3 text-xs text-text-muted">{row.keyLabel ?? "Deleted key"}</td>
+                  <td className="px-3 py-3 text-right font-mono text-xs">{(row.promptTokens + row.completionTokens).toLocaleString()}</td>
+                  <td className="px-3 py-3 text-right font-mono">{usd(row.cost)}</td>
+                  <td className="px-3 py-3 text-xs"><span className={row.status === "completed" ? "text-success" : row.status === "failed" ? "text-error" : "text-warning"}>{row.status}</span></td>
+                  <td className="px-3 py-3 text-xs text-text-muted">{row.requestId ?? "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex items-center justify-between gap-4 border-t border-border-subtle px-4 py-3 text-sm text-text-muted">
+          <span>{filtered.length.toLocaleString()} records{filtered.length > 0 ? ` · ${start}–${end}` : ""}</span>
+          <div className="flex gap-3">
+            {page > 1 && <Link className="text-accent-text" href={`/super/usage?${new URLSearchParams({ page: String(page - 1), ...(search ? { search } : {}), ...(model ? { model } : {}), ...(status ? { status } : {}) }).toString()}`}>Previous</Link>}
+            {page < totalPages && <Link className="text-accent-text" href={`/super/usage?${new URLSearchParams({ page: String(page + 1), ...(search ? { search } : {}), ...(model ? { model } : {}), ...(status ? { status } : {}) }).toString()}`}>Next</Link>}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

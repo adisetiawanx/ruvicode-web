@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { listAdminUsers } from "@/lib/db/queries/admin-users";
 import { ClientTime } from "@/components/shared/client-time";
+import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
 
 export const dynamic = "force-dynamic";
 function ok(email: string | null | undefined) { return !!email && (process.env.ADMIN_EMAILS ?? "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).includes(email.toLowerCase()); }
@@ -20,7 +21,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
   return (
     <div className="space-y-6">
       <div><h1 className="text-2xl font-semibold text-text-primary">Users</h1><p className="mt-1 text-sm text-text-secondary">Accounts, balances, activity, and usage</p></div>
-      <form className="flex gap-2"><input name="search" defaultValue={search} placeholder="Search name or email" className="h-8 flex-1 rounded-lg border border-input bg-transparent px-3 text-sm" /><button className="rounded-lg bg-accent px-3 text-sm text-text-inverse">Search</button></form>
+      <AdminFilterBar fields={[{ name: "search", type: "search", label: "Name or email", placeholder: "Search name or email" }]} />
       <section className="rounded-lg border border-border-default bg-surface">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1080px] text-sm">
@@ -32,14 +33,14 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                 <th className="px-3 py-2 text-right font-medium">Requests</th>
                 <th className="px-3 py-2 text-right font-medium">Charges</th>
                 <th className="px-3 py-2 text-right font-medium">Balance</th>
-                <th className="px-3 py-2 text-right font-medium">Held</th>
-                <th className="px-3 py-2 text-left font-medium">Deposits</th>
+                <th className="whitespace-nowrap px-3 py-2 text-right font-medium">Held</th>
+                <th className="whitespace-nowrap px-3 py-2 text-left font-medium">Deposits</th>
                 <th className="px-3 py-2 text-left font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
               {data.rows.length === 0 ? (
-                <tr><td colSpan={9} className="px-4 py-12 text-center text-sm text-text-muted">Belum ada data yang ditampilkan.</td></tr>
+                <tr><td colSpan={9} className="px-4 py-12 text-center text-sm text-text-muted">No data to display.</td></tr>
               ) : data.rows.map((row) => (
                 <tr key={row.id} className="border-b border-border-subtle last:border-0">
                   <td className="max-w-[220px] px-3 py-3"><Link href={`/super/users/${row.id}`} className="block truncate text-accent-text hover:text-accent-hover">{row.name || row.email}</Link><p className="truncate text-xs text-text-muted">{row.email}</p></td>
@@ -48,8 +49,8 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                   <td className="px-3 py-3 text-right font-mono">{row.requests.toLocaleString()}</td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.charges)}</td>
                   <td className="px-3 py-3 text-right font-mono">${row.balance.toFixed(2)}</td>
-                  <td className="px-3 py-3 text-right font-mono">${row.held.toFixed(2)}</td>
-                  <td className="px-3 py-3 text-xs"><span className="text-success">{row.completedDeposits} completed</span>{row.pendingDeposits > 0 && <span className="ml-1 text-warning">· {row.pendingDeposits} pending</span>}{row.failedDeposits > 0 && <span className="ml-1 text-error">· {row.failedDeposits} failed</span>}<span className="block text-text-muted">{row.depositAddresses} address</span></td>
+                  <td className="whitespace-nowrap px-3 py-3 text-right font-mono">${row.held.toFixed(2)}</td>
+                  <td className="whitespace-nowrap px-3 py-3 text-xs"><span className="text-success">{row.completedDeposits} completed</span>{row.pendingDeposits > 0 && <span className="ml-1 text-warning">· {row.pendingDeposits} pending</span>}{row.failedDeposits > 0 && <span className="ml-1 text-error">· {row.failedDeposits} failed</span>}<span className="block text-text-muted">{row.depositAddresses} address</span></td>
                   <td className="px-3 py-3 text-xs text-success">{row.status}</td>
                 </tr>
               ))}
