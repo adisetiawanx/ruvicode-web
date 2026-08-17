@@ -52,8 +52,12 @@ interface SweepResponse {
   audit_id?: string;
 }
 
-function usd(value: number) {
-  return `$${Number(value).toFixed(2)}`;
+function usd(value: number | undefined | null) {
+  return `$${Number(value ?? 0).toFixed(2)}`;
+}
+
+function eth(value: number | undefined | null) {
+  return `${Number(value ?? 0).toFixed(5)} ETH`;
 }
 
 function short(value: string) {
@@ -149,8 +153,8 @@ export function SweepPanel() {
             {[
               ["Sweepable", usd(preview.total_usdc)],
               ["Addresses", String(preview.addresses.length)],
-              ["Gas needed", `${preview.total_gas_needed_eth.toFixed(5)} ETH`],
-              ["Treasury ETH", `${preview.treasury_eth.toFixed(5)} ETH`],
+              ["Gas needed", eth(preview.total_gas_needed_eth)],
+              ["Treasury ETH", eth(preview.treasury_eth)],
             ].map(([label, value]) => (
               <div key={label} className="rounded-md border border-border-subtle bg-surface-2 p-3">
                 <p className="text-xs text-text-muted">{label}</p>
@@ -182,7 +186,7 @@ export function SweepPanel() {
                   <tr key={address.address} className="border-b border-border-subtle last:border-0">
                     <td className="px-3 py-2 font-mono text-xs text-text-secondary">{short(address.address)}</td>
                     <td className="px-3 py-2 text-right font-mono">{usd(address.usdc_balance)}</td>
-                    <td className="px-3 py-2 text-right font-mono">{address.eth_balance.toFixed(5)}</td>
+                    <td className="px-3 py-2 text-right font-mono">{eth(address.eth_balance).replace(" ETH", "")}</td>
                     <td className="px-3 py-2 text-xs">
                       <span className={address.needs_gas ? "text-warning" : "text-success"}>
                         {address.needs_gas ? "Needs funding" : "Ready"}
@@ -216,7 +220,7 @@ export function SweepPanel() {
         <div className="space-y-4">
           <div className={result.status === "completed" ? "rounded-md border border-success/30 bg-success-subtle p-4" : "rounded-md border border-warning/30 bg-warning-subtle p-4"}>
             <p className="font-medium text-text-primary">Sweep {result.status ?? "finished"}</p>
-            <p className="mt-1 font-mono text-sm">{usd(result.total_swept ?? 0)} swept · {(result.gas_funded_eth ?? 0).toFixed(5)} ETH funded</p>
+            <p className="mt-1 font-mono text-sm">{usd(result.total_swept)} swept · {eth(result.gas_funded_eth)}</p>
           </div>
           <div className="overflow-x-auto rounded-md border border-border-subtle">
             <table className="w-full min-w-[620px] text-sm">
