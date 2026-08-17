@@ -39,6 +39,7 @@ interface SweepResult {
   tx_hash?: string;
   status: string;
   skip_reason?: string;
+  gas_funded_eth?: number;
 }
 
 interface SweepResponse {
@@ -224,12 +225,13 @@ export function SweepPanel() {
           </div>
           <div className="overflow-x-auto rounded-md border border-border-subtle">
             <table className="w-full min-w-[620px] text-sm">
-              <thead className="bg-surface-2 text-xs text-text-muted"><tr><th className="px-3 py-2 text-left">Address</th><th className="px-3 py-2 text-right">USDC</th><th className="px-3 py-2 text-left">Status</th><th className="px-3 py-2 text-left">Transaction</th></tr></thead>
+              <thead className="bg-surface-2 text-xs text-text-muted"><tr><th className="px-3 py-2 text-left">Address</th><th className="px-3 py-2 text-right">USDC</th><th className="px-3 py-2 text-right">Gas funded</th><th className="px-3 py-2 text-left">Status</th><th className="px-3 py-2 text-left">Transaction</th></tr></thead>
               <tbody>
                 {(result.results ?? []).map((item) => (
                   <tr key={`${item.address}-${item.tx_hash ?? item.status}`} className="border-b border-border-subtle last:border-0">
                     <td className="px-3 py-2 font-mono text-xs">{short(item.address)}</td>
                     <td className="px-3 py-2 text-right font-mono">{usd(item.swept_usdc ?? 0)}</td>
+                    <td className="px-3 py-2 text-right font-mono text-xs">{item.gas_funded_eth ? eth(item.gas_funded_eth).replace(" ETH", "") : "-"}</td>
                     <td className="px-3 py-2 text-xs">{item.status}</td>
                     <td className="px-3 py-2 text-xs">
                       {item.tx_hash ? <a className="inline-flex items-center gap-1 text-accent-text hover:text-accent-hover" href={explorer(item.tx_hash)} target="_blank" rel="noreferrer">{short(item.tx_hash)} <ExternalLink className="h-3 w-3" /></a> : item.skip_reason ?? "No transaction"}
