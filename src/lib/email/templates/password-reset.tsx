@@ -97,7 +97,7 @@ export function PasswordResetTemplate({
         email. Your password has not been changed.
       </Text>
       <Text style={{ fontSize: 12, color: "#87867f" }}>
-        Ruvicode · Operated by Adi, Sole Trader, Indonesia
+        Ruvicode · Operated by the Ruvicode team
       </Text>
     </Container>
   );

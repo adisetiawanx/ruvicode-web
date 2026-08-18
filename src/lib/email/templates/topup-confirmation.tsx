@@ -136,7 +136,7 @@ export function TopupConfirmationTemplate({
       <Hr style={{ borderColor: "#e8e6dc", margin: "32px 0" }} />
 
       <Text style={{ fontSize: 12, color: "#87867f" }}>
-        Ruvicode · Operated by Adi, Sole Trader, Indonesia
+        Ruvicode · Operated by the Ruvicode team
       </Text>
     </Container>
   );
