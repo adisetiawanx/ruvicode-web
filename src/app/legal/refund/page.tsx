@@ -94,7 +94,7 @@ export default function RefundPolicy() {
         </p>
 
         <h2>Entity</h2>
-        <p>Ruvicode is operated by Adi, Sole Trader, Indonesia.</p>
+        <p>Ruvicode is operated by the Ruvicode team.</p>
       </div>
     </article>
   );

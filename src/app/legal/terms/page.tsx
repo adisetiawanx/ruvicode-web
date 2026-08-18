@@ -115,7 +115,7 @@ export default function TermsOfService() {
 
         <h2>10. Contact &amp; Entity</h2>
         <p>
-          Ruvicode is operated by Adi, Sole Trader, Indonesia. For questions
+          Ruvicode is operated by the Ruvicode team. For questions
           about these Terms, email{" "}
           <a href="mailto:support@ruvicode.com">support@ruvicode.com</a>.
         </p>

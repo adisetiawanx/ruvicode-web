@@ -98,7 +98,7 @@ export default function PrivacyPolicy() {
         </p>
 
         <h2>9. Entity</h2>
-        <p>Ruvicode is operated by Adi, Sole Trader, Indonesia.</p>
+        <p>Ruvicode is operated by the Ruvicode team.</p>
       </div>
     </article>
   );
