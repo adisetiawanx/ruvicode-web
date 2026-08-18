@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { BreadcrumbList, WithContext } from "schema-dts";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Container } from "@/components/layout/container";
+import Link from "next/link";
 import { CodeDemo, type CodeTab } from "@/components/marketing/code-demo";
 import { highlightCode } from "@/lib/shiki";
 
@@ -10,6 +11,29 @@ export const metadata: Metadata = {
   description:
     "Ruvicode works with Cursor, Aider, Cline, LangChain, and any OpenAI-compatible tool. One base URL change.",
   alternates: { canonical: "https://ruvicode.com/integrations" },
+  openGraph: {
+    title: "Integrations - Works with Your Tools",
+    description:
+      "Ruvicode works with Cursor, Aider, Cline, LangChain, and any OpenAI-compatible tool.",
+    url: "https://ruvicode.com/integrations",
+    siteName: "Ruvicode",
+    type: "website",
+    images: [
+      {
+        url: "https://ruvicode.com/og/ruvicode-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Ruvicode integrations",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Integrations - Works with Your Tools",
+    description:
+      "Ruvicode works with Cursor, Aider, Cline, LangChain, and any OpenAI-compatible tool.",
+    images: ["https://ruvicode.com/og/ruvicode-default.png"],
+  },
 };
 
 interface Integration {
@@ -298,9 +322,12 @@ export default async function IntegrationsPage() {
             Text-only models (DeepSeek V4, GLM-5.x, MiniMax M2.x) do not
             need it. The API itself accepts image content blocks on any
             model marked vision in the{" "}
-            <a href="/models" className="text-accent-text hover:text-accent-hover">
+            <Link
+              href="/models"
+              className="text-accent-text hover:text-accent-hover"
+            >
               catalog
-            </a>
+            </Link>
             .
           </p>
         </div>
@@ -363,13 +390,13 @@ export default async function IntegrationsPage() {
             >
               Get started free
             </a>
-            <a
+            <Link
               href="/docs/quickstart"
               className="inline-flex h-10 items-center gap-1 rounded-md border border-border-default px-5 text-sm font-medium text-text-primary transition-colors hover:border-accent/40"
             >
               Read the quickstart
               <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </Container>

@@ -6,6 +6,27 @@ export const metadata: Metadata = {
   description: "How Ruvicode collects, uses, and protects your data.",
   alternates: { canonical: "https://ruvicode.com/legal/privacy" },
   robots: { index: true, follow: true },
+  openGraph: {
+    title: "Privacy Policy",
+    description: "How Ruvicode collects, uses, and protects your data.",
+    url: "https://ruvicode.com/legal/privacy",
+    siteName: "Ruvicode",
+    type: "website",
+    images: [
+      {
+        url: "https://ruvicode.com/og/ruvicode-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Ruvicode privacy policy",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy",
+    description: "How Ruvicode collects, uses, and protects your data.",
+    images: ["https://ruvicode.com/og/ruvicode-default.png"],
+  },
 };
 
 /**

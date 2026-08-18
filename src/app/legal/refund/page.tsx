@@ -6,6 +6,27 @@ export const metadata: Metadata = {
   description: "Ruvicode's 30-day money-back guarantee on wallet top-ups.",
   alternates: { canonical: "https://ruvicode.com/legal/refund" },
   robots: { index: true, follow: true },
+  openGraph: {
+    title: "Refund Policy",
+    description: "Ruvicode's 30-day money-back guarantee on wallet top-ups.",
+    url: "https://ruvicode.com/legal/refund",
+    siteName: "Ruvicode",
+    type: "website",
+    images: [
+      {
+        url: "https://ruvicode.com/og/ruvicode-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Ruvicode refund policy",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Refund Policy",
+    description: "Ruvicode's 30-day money-back guarantee on wallet top-ups.",
+    images: ["https://ruvicode.com/og/ruvicode-default.png"],
+  },
 };
 
 /**

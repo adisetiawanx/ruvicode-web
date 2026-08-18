@@ -9,10 +9,32 @@ export async function generateMetadata({
   params: Promise<{ tag: string }>;
 }): Promise<Metadata> {
   const { tag } = await params;
+  const url = `https://ruvicode.com/blog/tag/${tag}`;
   return {
     title: `Posts tagged "${tag}" - Blog`,
     description: `Browse all blog posts tagged ${tag}.`,
-    alternates: { canonical: `https://ruvicode.com/blog/tag/${tag}` },
+    alternates: { canonical: url },
+    openGraph: {
+      title: `Posts tagged "${tag}" - Blog`,
+      description: `Browse all blog posts tagged ${tag}.`,
+      url,
+      siteName: "Ruvicode",
+      type: "website",
+      images: [
+        {
+          url: "https://ruvicode.com/og/ruvicode-default.png",
+          width: 1200,
+          height: 630,
+          alt: `Ruvicode blog posts tagged ${tag}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Posts tagged "${tag}" - Blog`,
+      description: `Browse all blog posts tagged ${tag}.`,
+      images: ["https://ruvicode.com/og/ruvicode-default.png"],
+    },
   };
 }
 

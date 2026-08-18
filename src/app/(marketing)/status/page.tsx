@@ -7,6 +7,7 @@ import { ClientTime } from "@/components/shared/client-time";
 // Don't index transient status page
 export const metadata: Metadata = {
   title: "Status",
+  alternates: { canonical: "https://ruvicode.com/status" },
   robots: { index: false, follow: false },
 };
 
