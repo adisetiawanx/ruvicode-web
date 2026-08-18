@@ -1,0 +1,34 @@
+name: SEO verification
+
+# Runs the ADR-029 verification harness against the deployed public site.
+# Deploy is manual (Docker on the founder's machine), so this workflow acts
+# as a post-deploy smoke gate and a regression detector: a bad deploy that
+# drops a canonical, breaks JSON-LD, leaks a noindex, or regresses the
+# Lighthouse scores fails here instead of silently tanking rankings.
+#
+# No third-party SEO action is used; the checks live in scripts/verify-seo.sh.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Page-level SEO checks (title, canonical, OG, JSON-LD, robots, sitemap)
+        run: bash scripts/verify-seo.sh
+        env:
+          BASE_URL: https://ruvicode.com
+
+      - name: Lighthouse score gate (SEO 100, performance >= 0.95)
+        run: bash scripts/verify-seo.sh --lighthouse
+        env:
+          BASE_URL: https://ruvicode.com
