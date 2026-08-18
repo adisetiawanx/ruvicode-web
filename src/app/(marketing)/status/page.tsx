@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { BreadcrumbList, WithContext } from "schema-dts";
 import { CheckCircle2, Activity, Zap, Layers } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { getAllActiveModels } from "@/lib/db/queries/models";
@@ -19,8 +20,22 @@ export default async function StatusPage() {
   const models = await getAllActiveModels();
   const lastUpdated = new Date().toISOString();
 
+  const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://ruvicode.com" },
+      { "@type": "ListItem", position: 2, name: "Status", item: "https://ruvicode.com/status" },
+    ],
+  };
+
   return (
-    <Container size="wide" className="py-16">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Container size="wide" className="py-16">
       {/* Header */}
       <div className="mb-10">
         <p className="mb-2 font-mono text-xs uppercase tracking-widest text-accent-text">
@@ -122,5 +137,6 @@ export default async function StatusPage() {
         latency depends on the upstream provider.
       </p>
     </Container>
+    </>
   );
 }

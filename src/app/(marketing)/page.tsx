@@ -13,6 +13,7 @@ import { highlightCode } from "@/lib/shiki";
 import type { CodeTab } from "@/components/marketing/code-demo";
 import {
   organizationJsonLd,
+  websiteJsonLd,
   faqJsonLd,
   JsonLdScript,
 } from "@/lib/seo/json-ld";
@@ -32,11 +33,20 @@ export const metadata: Metadata = {
     url: "https://ruvicode.com",
     siteName: "Ruvicode",
     type: "website",
+    images: [
+      {
+        url: "https://ruvicode.com/og/ruvicode-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Ruvicode - One API Key, Every AI Model",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Ruvicode - One API Key, Every AI Model",
     description: "Transparent AI API gateway. Save up to 99% vs list price.",
+    images: ["https://ruvicode.com/og/ruvicode-default.png"],
   },
 };
 
@@ -53,6 +63,7 @@ export default async function LandingPage() {
   return (
     <>
       <JsonLdScript data={organizationJsonLd()} />
+      <JsonLdScript data={websiteJsonLd()} />
       <JsonLdScript data={faqJsonLd(FAQS as unknown as Array<{ q: string; a: string }>)} />
       <HeroSection codeTabs={codeTabs} />
       <StatBar />

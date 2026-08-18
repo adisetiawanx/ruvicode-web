@@ -28,6 +28,22 @@ export async function generateMetadata({
       title: `${doc.title} - Docs`,
       description: doc.description,
       url: `https://ruvicode.com/docs/${doc.slug}`,
+      siteName: "Ruvicode",
+      type: "website",
+      images: [
+        {
+          url: "https://ruvicode.com/og/ruvicode-default.png",
+          width: 1200,
+          height: 630,
+          alt: `Ruvicode docs - ${doc.title}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${doc.title} - Docs`,
+      description: doc.description,
+      images: ["https://ruvicode.com/og/ruvicode-default.png"],
     },
   };
 }

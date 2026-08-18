@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { BreadcrumbList, WithContext } from "schema-dts";
 import Link from "next/link";
 import { ArrowRight, Clock, Sparkles } from "lucide-react";
 import { getAllPosts, getAllTags } from "@/lib/content/blog";
@@ -18,6 +19,22 @@ export const metadata: Metadata = {
     title: "Ruvicode Blog",
     description: "AI API guides, tutorials, and comparisons.",
     url: "https://ruvicode.com/blog",
+    siteName: "Ruvicode",
+    type: "website",
+    images: [
+      {
+        url: "https://ruvicode.com/og/ruvicode-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Ruvicode blog",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ruvicode Blog",
+    description: "AI API guides, tutorials, and comparisons.",
+    images: ["https://ruvicode.com/og/ruvicode-default.png"],
   },
 };
 
@@ -39,8 +56,22 @@ export default function BlogIndex() {
   const featured = posts.find((p) => p.featured) ?? posts[0];
   const rest = posts.filter((p) => p.slug !== featured?.slug);
 
+  const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://ruvicode.com" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://ruvicode.com/blog" },
+    ],
+  };
+
   return (
-    <Container size="wide" className="py-12">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Container size="wide" className="py-12">
       <PageEntrance>
         {/* Header */}
         <PageEntranceItem>
@@ -200,5 +231,6 @@ export default function BlogIndex() {
         </PageEntranceItem>
       </PageEntrance>
     </Container>
+    </>
   );
 }

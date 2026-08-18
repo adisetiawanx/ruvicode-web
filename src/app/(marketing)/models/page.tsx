@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { BreadcrumbList, WithContext } from "schema-dts";
+import type { BreadcrumbList, ItemList, WithContext } from "schema-dts";
 import { getAllActiveModels, getAllProviders, getPricingLastUpdated } from "@/lib/db/queries/models";
 import { ModelCatalogGrid } from "@/components/marketing/model-catalog-grid";
 import { PricingHero } from "@/components/marketing/pricing-hero";
@@ -26,12 +26,22 @@ export const metadata: Metadata = {
     description:
       "Browse every AI model with live transparent pricing. Save up to 99% vs list price.",
     url: "https://ruvicode.com/models",
+    siteName: "Ruvicode",
     type: "website",
+    images: [
+      {
+        url: "https://ruvicode.com/og/ruvicode-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Ruvicode AI models catalog",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "AI Models - Catalog & Transparent Pricing",
     description: "Browse every AI model with live transparent pricing.",
+    images: ["https://ruvicode.com/og/ruvicode-default.png"],
   },
 };
 
@@ -61,11 +71,27 @@ export default async function ModelsPage() {
     ],
   };
 
+  const itemListJsonLd: WithContext<ItemList> = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Ruvicode AI Models",
+    itemListElement: models.map((m, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: m.display_name,
+      url: `https://ruvicode.com/models/${m.model}`,
+    })),
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
 
       <PageEntrance>

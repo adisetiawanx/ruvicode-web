@@ -20,12 +20,22 @@ export const metadata: Metadata = {
     title: "AI Playground",
     description: "Try DeepSeek V4 Flash in your browser. Free, fair-use limits apply.",
     url: "https://ruvicode.com/playground",
+    siteName: "Ruvicode",
     type: "website",
+    images: [
+      {
+        url: "https://ruvicode.com/og/ruvicode-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Ruvicode AI playground",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "AI Playground",
     description: "Try DeepSeek V4 Flash free. No account needed.",
+    images: ["https://ruvicode.com/og/ruvicode-default.png"],
   },
 };
 

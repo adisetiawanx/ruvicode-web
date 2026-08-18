@@ -18,12 +18,22 @@ export const metadata: Metadata = {
     description:
       "Calculate your savings with Ruvicode vs official provider pricing.",
     url: "https://ruvicode.com/calculator",
+    siteName: "Ruvicode",
     type: "website",
+    images: [
+      {
+        url: "https://ruvicode.com/og/ruvicode-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Ruvicode cost calculator",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "AI API Cost Calculator",
     description: "See how much you'll save with Ruvicode.",
+    images: ["https://ruvicode.com/og/ruvicode-default.png"],
   },
 };
 

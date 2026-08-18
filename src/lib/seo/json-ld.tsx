@@ -1,6 +1,7 @@
 import type {
   Organization,
   WebSite,
+  SearchAction,
   BreadcrumbList,
   Product,
   FAQPage,
@@ -24,6 +25,11 @@ export function organizationJsonLd(): WithContext<Organization> {
     url: BASE_URL,
     description:
       "Transparent AI API gateway with unified access to 20+ AI models.",
+    logo: {
+      "@type": "ImageObject",
+      url: `${BASE_URL}/ruvicode-logo.webp`,
+    },
+    // sameAs added here as public social profiles are published.
   };
 }
 
@@ -33,6 +39,13 @@ export function websiteJsonLd(): WithContext<WebSite> {
     "@type": "WebSite",
     name: "Ruvicode",
     url: BASE_URL,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${BASE_URL}/models?search={search_term_string}`,
+      // schema-dts's SearchActionLeaf omits query-input; the cast is
+      // deliberate, the emitted JSON-LD keeps the schema.org spelling.
+      "query-input": "required name=search_term_string",
+    } as SearchAction,
   };
 }
 

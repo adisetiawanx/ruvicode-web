@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { BreadcrumbList, WithContext } from "schema-dts";
 import { getPostsByTag } from "@/lib/content/blog";
 import { Container } from "@/components/layout/container";
 
@@ -46,8 +47,28 @@ export default async function BlogTagPage({
   const { tag } = await params;
   const posts = getPostsByTag(tag);
 
+  const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://ruvicode.com" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://ruvicode.com/blog" },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `#${tag}`,
+        item: `https://ruvicode.com/blog/tag/${tag}`,
+      },
+    ],
+  };
+
   return (
-    <Container className="py-12">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <Container className="py-12">
       <nav className="mb-8 flex items-center gap-2 text-sm text-text-muted">
         <Link href="/blog" className="hover:text-text-secondary">
           Blog
@@ -92,5 +113,6 @@ export default async function BlogTagPage({
         </div>
       )}
     </Container>
+    </>
   );
 }
