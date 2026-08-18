@@ -24,7 +24,6 @@ export function organizationJsonLd(): WithContext<Organization> {
     url: BASE_URL,
     description:
       "Transparent AI API gateway with unified access to 20+ AI models.",
-    founder: { "@type": "Person", name: "Adi" },
   };
 }
 
