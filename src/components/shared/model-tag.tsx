@@ -47,7 +47,7 @@ export function ModelTag({
           copied
             ? "border-success/40 bg-success-subtle text-success"
             : "border-border-subtle bg-surface-2 text-text-muted hover:border-accent/40 hover:text-accent-text"
-        }`}
+        } min-h-6`}
       >
         <span className="truncate">{id}</span>
       </button>

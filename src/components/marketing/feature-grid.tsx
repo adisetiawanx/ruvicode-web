@@ -67,10 +67,10 @@ export function FeatureGrid() {
               className="rounded-lg border border-border-default bg-surface p-6 transition-colors hover:border-accent/30"
             >
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-accent-subtle">
-                <Icon className="h-5 w-5 text-accent" />
-              </div>
-              <h3 className="mb-2 font-semibold">{feature.title}</h3>
-              <p className="text-sm text-text-secondary">{feature.desc}</p>
+                              <Icon className="h-5 w-5 text-accent" />
+                            </div>
+                            <h2 className="mb-2 font-semibold">{feature.title}</h2>
+                            <p className="text-sm text-text-secondary">{feature.desc}</p>
             </motion.div>
           );
         })}

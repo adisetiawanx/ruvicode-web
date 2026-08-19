@@ -37,7 +37,7 @@ export async function highlightCode(
   lang: BundledLanguage = "bash",
 ): Promise<string> {
   const hl = await getHighlighter();
-  return hl.codeToHtml(code, {
+  const html = hl.codeToHtml(code, {
     lang,
     themes: {
       light: "github-light" as BundledTheme,
@@ -47,4 +47,8 @@ export async function highlightCode(
     // globals.css picks the right one per theme. This keeps both modes crisp.
     defaultColor: false,
   });
+  // A11y: github-dark's comment gray (#6A737D) is below WCAG AA contrast on
+  // the darker card background. Brighten it for dark mode only; the light
+  // theme keeps the original comment color (it passes on the light card).
+  return html.replace(/--shiki-dark:#6[Aa]737[Dd]/g, "--shiki-dark:#9FB3C8");
 }

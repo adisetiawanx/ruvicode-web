@@ -109,7 +109,7 @@ export async function ModelShowcase() {
           Plus more frontier and open models in the{" "}
           <Link
             href="/models"
-            className="text-accent-text hover:text-accent-hover"
+            className="text-accent-text underline decoration-accent/40 underline-offset-2 hover:text-accent-hover"
           >
             full catalog
           </Link>
