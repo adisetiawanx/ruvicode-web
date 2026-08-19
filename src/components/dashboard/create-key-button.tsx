@@ -141,7 +141,7 @@ export function CreateKeyButton() {
                   id="key-rpm"
                   type="number"
                   min="1"
-                  max="10000"
+                  max="1000000"
                   value={rateLimitRpm}
                   onChange={(e) => setRateLimitRpm(e.target.value)}
                   aria-invalid={!!errors.rateLimitRpm}

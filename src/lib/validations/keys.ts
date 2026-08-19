@@ -9,7 +9,7 @@ export const createKeySchema = z.object({
     .number()
     .int("Must be a whole number")
     .min(1, "Must be at least 1")
-    .max(10000, "Maximum is 10,000 RPM"),
+    .max(1000000, "Maximum is 1,000,000 RPM"),
   spendLimitDaily: z
     .number()
     .positive("Must be greater than 0")

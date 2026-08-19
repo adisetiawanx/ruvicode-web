@@ -212,7 +212,7 @@ export function KeyRow({ keyData }: KeyRowProps) {
                     id="edit-key-rpm"
                     type="number"
                     min="1"
-                    max="10000"
+                    max="1000000"
                     value={rateLimitRpm}
                     onChange={(e) => setRateLimitRpm(e.target.value)}
                     aria-invalid={!!editErrors.rateLimitRpm}
