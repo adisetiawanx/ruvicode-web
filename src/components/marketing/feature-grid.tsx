@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import {
   Key,
   DollarSign,
@@ -55,25 +52,21 @@ export function FeatureGrid() {
   return (
     <Container size="wide" className="py-24">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {features.map((feature, i) => {
-          const Icon = feature.icon;
-          return (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
-              className="rounded-lg border border-border-default bg-surface p-6 transition-colors hover:border-accent/30"
-            >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-accent-subtle">
-                <Icon className="h-5 w-5 text-accent" />
-              </div>
-              <h3 className="mb-2 font-semibold">{feature.title}</h3>
-              <p className="text-sm text-text-secondary">{feature.desc}</p>
-            </motion.div>
-          );
-        })}
+        {features.map((feature) => {
+                  const Icon = feature.icon;
+                  return (
+                    <div
+                      key={feature.title}
+                      className="rounded-lg border border-border-default bg-surface p-6 transition-colors hover:border-accent/30"
+                    >
+                      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-accent-subtle">
+                        <Icon className="h-5 w-5 text-accent" />
+                      </div>
+                      <h3 className="mb-2 font-semibold">{feature.title}</h3>
+                      <p className="text-sm text-text-secondary">{feature.desc}</p>
+                    </div>
+                  );
+                })}
       </div>
     </Container>
   );
