@@ -146,7 +146,7 @@ export const apiKeys = pgTable(
     label: text("label").notNull().default("Default"),
     keyPrefix: text("key_prefix").notNull(), // first 8 chars after rvcd_ for identification
     keyHash: text("key_hash").notNull().unique(), // SHA-256 of full key
-    rateLimitRpm: integer("rate_limit_rpm").notNull().default(60),
+    rateLimitRpm: integer("rate_limit_rpm").notNull().default(700),
     spendLimitDaily: decimal("spend_limit_daily", { precision: 10, scale: 4 }),
     spendLimitMonthly: decimal("spend_limit_monthly", {
       precision: 10,

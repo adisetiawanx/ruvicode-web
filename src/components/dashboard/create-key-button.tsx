@@ -34,7 +34,7 @@ export function CreateKeyButton() {
 
   // Form fields
   const [label, setLabel] = useState("");
-  const [rateLimitRpm, setRateLimitRpm] = useState("60");
+  const [rateLimitRpm, setRateLimitRpm] = useState("700");
   const [spendLimitDaily, setSpendLimitDaily] = useState("");
   const [spendLimitMonthly, setSpendLimitMonthly] = useState("");
 
