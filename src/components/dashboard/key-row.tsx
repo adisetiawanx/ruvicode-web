@@ -212,7 +212,7 @@ export function KeyRow({ keyData }: KeyRowProps) {
                     id="edit-key-rpm"
                     type="number"
                     min="1"
-                    max="1000000"
+                    max="3000"
                     value={rateLimitRpm}
                     onChange={(e) => setRateLimitRpm(e.target.value)}
                     aria-invalid={!!editErrors.rateLimitRpm}
@@ -231,7 +231,7 @@ export function KeyRow({ keyData }: KeyRowProps) {
                     </p>
                   ) : (
                     <p className="text-xs text-text-muted">
-                      Max 1,000,000 RPM.
+                      Max 3,000 RPM.
                     </p>
                   )}
                 </div>

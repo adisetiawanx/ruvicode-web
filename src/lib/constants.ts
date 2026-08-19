@@ -31,7 +31,7 @@ export const STATS = [
   { value: "30+", label: "AI Models" },
   { value: "99%", label: "Up to vs official" },
   { value: "$0", label: "Hidden Fees" },
-  { value: "2 min", label: "Live price refresh" },
+  { value: "3K", label: "RPM per key" },
 ] as const;
 
 interface ShowcaseModel {
