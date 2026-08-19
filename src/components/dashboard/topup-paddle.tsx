@@ -103,7 +103,7 @@ export function TopUpPaddle({ userId }: { userId: string }) {
           <span>${finalAmount?.toFixed(2) ?? "0.00"}</span>
         </div>
         <div className="flex justify-between">
-          <span>Paddle fee (5% + $0.50):</span>
+          <span>Card processing fee:</span>
           <span>−${fee.toFixed(2)}</span>
         </div>
         <div className="flex justify-between font-semibold text-text-secondary">

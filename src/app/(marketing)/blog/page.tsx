@@ -80,11 +80,11 @@ export default function BlogIndex() {
               The Ruvicode Blog
             </p>
             <h1 className="mb-3 text-h1 font-semibold text-text-primary">
-              Practical guides for building with AI APIs
+              Guides and updates
             </h1>
             <p className="text-text-secondary">
-              Comparisons, pricing breakdowns, and integration tutorials.
-              Written for developers who ship.
+              Practical writing on AI API pricing, model selection, and
+              building with Ruvicode. New posts every week.
             </p>
           </div>
         </PageEntranceItem>

@@ -21,33 +21,33 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: Key,
-    title: "One Key, All Models",
-    desc: "Access Claude, GPT, Gemini, GLM, DeepSeek, Kimi, and more from a single API key.",
+    title: "One key, every model",
+    desc: "Claude, GPT, Gemini, GLM, DeepSeek, Kimi, and more. One key, one endpoint, one bill. Switch models by changing the model id, nothing else.",
   },
   {
     icon: DollarSign,
-    title: "Transparent Costs",
-    desc: "See exact per-request pricing in real-time via X-Cost headers. No opaque credit conversions.",
+    title: "Real costs, every request",
+    desc: "Every response includes an X-Cost header showing exactly what you paid. No credit conversion, no rounding, no surprises at the end of the month.",
   },
   {
     icon: Shield,
-    title: "Hard Spend Limits",
-    desc: "Set per-key daily and monthly spend caps. Auto-suspend when limit is hit. Prevent runaway costs.",
+    title: "Spend limits that hold",
+    desc: "Set daily and monthly spend caps per key. When a limit is hit, requests stop. No runaway agent loops, no surprise bills.",
   },
   {
     icon: CreditCard,
-    title: "Pay Your Way",
-    desc: "Top up with card via Paddle or USDC crypto. No foreign card barriers.",
+    title: "Card or crypto",
+    desc: "Top up with any major card or USDC on Base. No foreign card rejections, no minimum balance.",
   },
   {
     icon: Zap,
-    title: "OpenAI Compatible",
-    desc: "Works with Cursor, Aider, LangChain, Claude Code, and any OpenAI-compatible tool.",
+    title: "Works with your tools",
+    desc: "Change one base URL and your existing OpenAI SDK, Cursor, Aider, Cline, LangChain, or agent works. No SDK swap, no code rewrite.",
   },
   {
     icon: Gauge,
-    title: "Hard Rate Limits",
-    desc: "Per-key rate limiting with sliding window. Protect your budget from runaway agents.",
+    title: "Rate limits that scale",
+    desc: "Per-key rate limiting with a sliding window, configurable up to 1,000,000 RPM. Built for agentic workloads that burst.",
   },
 ];
 

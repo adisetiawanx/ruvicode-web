@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = {
   title: "Integrations - Works with Your Tools",
   description:
-    "Ruvicode works with Cursor, Aider, Cline, LangChain, and any OpenAI-compatible tool. One base URL change.",
+    "Ruvicode works with Cursor, Aider, Cline, LangChain, and any OpenAI-compatible tool. Change one base URL, paste your key, and go.",
   alternates: { canonical: "https://ruvicode.com/integrations" },
   openGraph: {
     title: "Integrations - Works with Your Tools",
@@ -271,12 +271,12 @@ export default async function IntegrationsPage() {
             Integrations
           </p>
           <h1 className="mb-3 text-h1 font-semibold text-text-primary">
-            Works with the tools you already use
+            Works with your tools
           </h1>
           <p className="text-lg text-text-secondary">
-            Ruvicode speaks the OpenAI API format. Change one base URL, paste
-            your key, and every model in the catalog is available in your
-            tool of choice.
+            Change one base URL, paste your key, and every model in the
+            catalog is available in your tool of choice. If it speaks the
+            OpenAI API format, it works with Ruvicode.
           </p>
         </div>
         </PageEntranceItem>
@@ -285,11 +285,12 @@ export default async function IntegrationsPage() {
         <PageEntranceItem>
         <div className="mb-6 rounded-xl border border-accent/25 bg-accent-subtle p-6">
           <p className="mb-1 font-medium text-text-primary">
-            The two values every tool needs
+            Two values, every tool
           </p>
           <p className="mb-4 text-sm text-text-secondary">
             Whatever the settings screen calls them, you are always providing
-            these two things.
+            these two things. Everything else is just finding the right input
+            field.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-lg border border-border-default bg-surface p-4">
@@ -392,8 +393,8 @@ export default async function IntegrationsPage() {
             Get your key in under a minute
           </h2>
           <p className="mx-auto mb-5 max-w-md text-sm text-text-secondary">
-            Register, top up, generate an rvcd_ key, and paste it into any
-            setup above.
+            Register, top up, generate an rvcd_ key, and paste it into any tool
+            above. No subscription, no minimum spend.
           </p>
           <div className="flex items-center justify-center gap-3">
             <a

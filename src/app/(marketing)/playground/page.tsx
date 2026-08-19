@@ -14,7 +14,7 @@ import {
 export const metadata: Metadata = {
   title: "AI Playground - Try DeepSeek V4 Flash Free",
   description:
-    "Try DeepSeek V4 Flash in your browser. Free, no account needed, fair-use limits apply. Sign up for every model with real per-request pricing.",
+    "Try DeepSeek V4 Flash free in your browser. No account needed. Sign up for every model with real per-request pricing and hard spend limits.",
   alternates: { canonical: "https://ruvicode.com/playground" },
   openGraph: {
     title: "AI Playground",
@@ -79,10 +79,10 @@ export default async function PlaygroundPage({
       <Container size="wide" className="py-12">
         <PageEntrance>
           <PageEntranceItem>
-            <h1 className="mb-2 text-h1 font-semibold">AI Playground</h1>
+            <h1 className="mb-2 text-h1 font-semibold">Try it free</h1>
             <p className="mb-8 text-text-secondary">
-              Try a model in your browser. Free, no account needed, fair-use
-              limits apply.
+              Send a real request to DeepSeek V4 Flash right now. No account,
+              no key, no setup. Fair-use limits apply.
             </p>
           </PageEntranceItem>
           <PageEntranceItem>
@@ -91,14 +91,14 @@ export default async function PlaygroundPage({
                 <div className="flex h-[400px] flex-col items-center justify-center rounded-lg border border-border-default bg-surface p-8 text-center">
                   <Lock className="mb-4 h-10 w-10 text-accent" />
                   <h2 className="mb-2 text-xl font-semibold">
-                    {lockedModel.display_name} needs an account
+                    {lockedModel.display_name} is a paid model
                   </h2>
                   <p className="mb-6 max-w-md text-sm text-text-secondary">
-                    The free playground only includes{" "}
+                    The free playground runs on{" "}
                     {models.find((m) => m.model === publicPlaygroundFallbackModel)
                       ?.display_name ?? displayModelName(publicPlaygroundFallbackModel)}
-                    . Create a free account to try every model in the dashboard
-                    playground with your own API key.
+                    . Create a free account to try every model in the
+                    catalog with your own API key and real per-request pricing.
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-3">
                     <LinkButton href="/register" variant="primary">
@@ -126,7 +126,7 @@ export default async function PlaygroundPage({
                       </p>
                       <p className="text-success">
                         Save {lockedModel.user_discount_pct.toFixed(0)}% vs
-                        OpenRouter
+                        official
                       </p>
                     </div>
                   </div>

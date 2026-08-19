@@ -49,7 +49,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
                 variant="outline"
                 className="mb-6 border-accent/30 text-accent-text"
               >
-                Save up to 99% vs list price
+                Save up to 99% vs official provider pricing
               </Badge>
             </motion.div>
 
@@ -57,19 +57,20 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
               variants={item}
               className="mb-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl"
             >
-              One API Key.
+              Every frontier AI model.
               <br />
-              Every AI Model.
+              One API key.
               <br />
-              <span className="text-accent">Transparent Pricing.</span>
+              <span className="text-accent">Real per-request pricing.</span>
             </motion.h1>
 
             <motion.p
               variants={item}
               className="mb-8 max-w-xl text-lg text-text-secondary"
             >
-              Pay per request, see exact costs in real-time, set hard spend
-              limits. No credit card required to start.
+              Access Claude, GPT, Gemini, GLM, DeepSeek, Kimi, and more. Pay
+              only for what you use, see exact costs in every response header,
+              and set hard spend limits per key. No credit card to start.
             </motion.p>
 
             <motion.div
@@ -80,17 +81,16 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
                 Get Started Free →
               </LinkButton>
               <LinkButton href="/models" variant="outline" size="lg">
-                View Models
+                Browse Models
               </LinkButton>
             </motion.div>
           </motion.div>
 
-          {/* Right column — code demo with Shiki highlighting */}
+          {/* Right column — code demo */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
-            className="lg:pl-4"
+            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
           >
             <CodeDemo tabs={codeTabs} />
           </motion.div>

@@ -30,9 +30,9 @@ export function HowPricingWorks() {
               We buy where inference is cheapest
             </h3>
             <p className="text-sm leading-relaxed text-text-secondary">
-              A competitive marketplace of inference providers bids on every
-              request, so capacity is sourced far below list prices. Those
-              savings become your price, not our markup story.
+              We buy inference capacity at market rates, well below what
+              the official APIs charge, and pass most of the difference to
+              you. Those savings become your price, not our markup story.
             </p>
           </div>
 
@@ -57,7 +57,7 @@ export function HowPricingWorks() {
               <Wallet className="h-5 w-5 text-accent" />
             </div>
             <h3 className="mb-2 text-lg font-semibold">
-              Save up to 99% vs list price
+              Save up to 99% vs official
             </h3>
             <p className="text-sm leading-relaxed text-text-secondary">
               Same models, same OpenAI-compatible API, a fraction of the

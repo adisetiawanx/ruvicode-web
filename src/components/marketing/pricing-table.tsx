@@ -136,7 +136,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                   align="right"
                 />
                 <SortHeader
-                  label="vs OpenRouter"
+                  label="vs official"
                   sortKey="savings"
                   current={state}
                   onToggle={toggleSort}

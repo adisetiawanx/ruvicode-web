@@ -13,8 +13,8 @@ export interface ModelPricing {
   model: string;
   display_name: string;
   provider: string;
-  ref_input: number; // OpenRouter reference $/1M input
-  ref_output: number; // OpenRouter reference $/1M output
+  ref_input: number; // official reference $/1M input
+  ref_output: number; // official reference $/1M output
   user_input: number; // Ruvicode user $/1M input
   user_output: number; // Ruvicode user $/1M output
   discount_pct: number; // Provider discount %

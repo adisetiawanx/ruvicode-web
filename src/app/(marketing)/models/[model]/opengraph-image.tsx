@@ -74,7 +74,7 @@ export default async function Image({
               fontSize: 26,
             }}
           >
-            Save {model.user_discount_pct.toFixed(0)}% vs OpenRouter
+            Save {model.user_discount_pct.toFixed(0)}% vs official
           </span>
         </div>
 

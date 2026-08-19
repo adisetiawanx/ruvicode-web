@@ -16,11 +16,11 @@ export function CtaSection() {
           className="rounded-xl border border-border-default bg-surface p-12 text-center"
         >
           <h2 className="mb-4 text-3xl font-semibold">
-            Ready to simplify your AI API access?
+            Start building with one key.
           </h2>
           <p className="mb-8 text-text-secondary">
-            Join developers building with one key, transparent pricing, and hard
-            spend limits.
+            No credit card, no subscription, no lock-in. Top up what you need
+            and pay per request.
           </p>
           <LinkButton href="/register" variant="primary" size="lg">
             Get Started Free →

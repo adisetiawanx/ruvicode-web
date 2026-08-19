@@ -9,12 +9,12 @@ export const PRICING_FAQS = [
     a: "Yes. Our pricing engine fetches live marketplace prices every 2 minutes and updates the table accordingly. You always see the current rate, not a stale estimate.",
   },
   {
-    q: "How are you cheaper than OpenRouter?",
-    a: "We source model capacity through a competitive marketplace where sellers compete on price. Our dynamic pricing engine passes most of the savings to you while keeping a small margin.",
+    q: "How are you cheaper than official provider pricing?",
+    a: "We buy inference capacity at market rates, well below official list prices, and pass most of the difference to you. The price you see on each model page is the price you pay per request.",
   },
   {
     q: "Do my credits expire?",
-    a: "No. Your wallet balance never expires. Unlike OpenRouter, which expires credits after a period of inactivity, your balance is yours to use whenever you want.",
+    a: "No. Your wallet balance never expires. Your balance is yours to use whenever you want. No inactivity timeout, no expiry.",
   },
   {
     q: "What happens if a model becomes unavailable?",

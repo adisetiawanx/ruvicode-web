@@ -6,20 +6,20 @@
 
 export const FAQS = [
   {
-    q: "How is Ruvicode cheaper than OpenRouter?",
-    a: "We source model capacity through a decentralized marketplace that offers significant discounts. Our dynamic pricing engine passes most of those savings to you while maintaining a small margin.",
+    q: "How is Ruvicode cheaper than official provider pricing?",
+    a: "We buy inference capacity at market rates, well below what the official APIs charge, and pass most of the difference to you. The price you see on each model page is the price you pay per request.",
   },
   {
-    q: "Do you store my prompts?",
-    a: "No. We do not log or store the content of your prompts or AI responses by default. Only usage metadata (token counts, cost, model) is retained for billing.",
+    q: "Do you store my prompts or responses?",
+    a: "No. We do not log or store the content of your prompts or AI responses. Only usage metadata (token counts, cost, model) is retained for billing.",
   },
   {
-    q: "Can I set spending limits?",
-    a: "Yes. Every API key can have daily and monthly spend caps. When a limit is hit, the key is automatically suspended until the next period.",
+    q: "Can I set spending limits per key?",
+    a: "Yes. Every API key can have daily and monthly spend caps. When a limit is hit, the key stops accepting requests until the next period. You can also set rate limits up to 1,000,000 RPM per key.",
   },
   {
     q: "What payment methods do you accept?",
-    a: "We accept global credit and debit cards via Paddle (our payment processor), and USDC cryptocurrency deposits on the Base network.",
+    a: "We accept global credit and debit cards and USDC deposits on the Base network. Top up once, pay per request. Your balance never expires.",
   },
   {
     q: "Is it OpenAI-compatible?",
@@ -28,10 +28,10 @@ export const FAQS = [
 ] as const;
 
 export const STATS = [
-  { value: "20+", label: "AI Models" },
-  { value: "99%", label: "Cheaper vs list price" },
+  { value: "30+", label: "AI Models" },
+  { value: "99%", label: "Up to vs official" },
   { value: "$0", label: "Hidden Fees" },
-  { value: "30K", label: "Requests/min Capacity" },
+  { value: "1M", label: "RPM per key" },
 ] as const;
 
 interface ShowcaseModel {

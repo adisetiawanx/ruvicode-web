@@ -75,7 +75,7 @@ export default async function StatusPage() {
                     Operational
                   </p>
                   <p className="text-sm text-text-secondary">
-                    The gateway is serving requests normally.
+                    The gateway is serving requests normally. Last checked just now.
                   </p>
                 </div>
               </div>

@@ -77,7 +77,7 @@ export default async function CalculatorPage() {
               </h1>
               <p className="text-text-secondary">
                 Pick a model, enter your monthly token usage, and compare what
-                you pay with Ruvicode versus the official provider price. The
+                you pay with Ruvicode versus official provider pricing. The
                 savings are real, not a teaser rate.
               </p>
             </div>

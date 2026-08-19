@@ -43,18 +43,18 @@ export async function generateMetadata({
 
   return {
     title: `${model.display_name} API - Pricing & Docs`,
-    description: `${model.display_name} via Ruvicode. Input $${model.user_input.toFixed(2)}/1M, output $${model.user_output.toFixed(2)}/1M tokens. Save ${model.user_discount_pct.toFixed(0)}% vs OpenRouter. OpenAI-compatible endpoint.`,
+    description: `${model.display_name} via Ruvicode. Input $${model.user_input.toFixed(2)}/1M, output $${model.user_output.toFixed(2)}/1M tokens. Save ${model.user_discount_pct.toFixed(0)}% vs official provider pricing. OpenAI-compatible endpoint.`,
     alternates: { canonical: `https://ruvicode.com/models/${model.model}` },
     openGraph: {
       title: `${model.display_name} API`,
-      description: `Save ${model.user_discount_pct.toFixed(0)}% vs OpenRouter on ${model.display_name}.`,
+      description: `Save ${model.user_discount_pct.toFixed(0)}% vs official provider pricing on ${model.display_name}.`,
       url: `https://ruvicode.com/models/${model.model}`,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: `${model.display_name} API`,
-      description: `Save ${model.user_discount_pct.toFixed(0)}% vs OpenRouter on ${model.display_name}.`,
+      description: `Save ${model.user_discount_pct.toFixed(0)}% vs official provider pricing on ${model.display_name}.`,
     },
   };
 }
@@ -211,7 +211,7 @@ console.log(response.choices[0].message.content);`,
                   {model.display_name}
                 </h1>
                 <span className="rounded-full border border-success/30 bg-success-subtle px-3 py-1 font-mono text-xs font-medium tabular text-success">
-                  −{model.user_discount_pct.toFixed(0)}% vs OpenRouter
+                  −{model.user_discount_pct.toFixed(0)}% vs official
                 </span>
               </div>
               <div className="mb-1">
@@ -340,7 +340,7 @@ console.log(response.choices[0].message.content);`,
               <div className="space-y-3">
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">
-                    OpenRouter input
+                    Official input
                   </span>
                   <span className="font-mono text-sm tabular text-text-muted">
                     ${formatPrice(model.ref_input)}/1M
@@ -348,7 +348,7 @@ console.log(response.choices[0].message.content);`,
                 </div>
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">
-                    OpenRouter output
+                    Official output
                   </span>
                   <span className="font-mono text-sm tabular text-text-muted">
                     ${formatPrice(model.ref_output)}/1M
@@ -365,7 +365,9 @@ console.log(response.choices[0].message.content);`,
               </div>
               <p className="mt-4 text-xs leading-relaxed text-text-muted">
                 Live market pricing, refreshed every 2 minutes. No minimum
-                spend, no credit expiry.
+                spend, no credit expiry. Savings shown versus official
+                provider list prices. Savings shown versus official
+                provider list prices.
               </p>
             </div>
 

@@ -49,7 +49,7 @@ interface PlaygroundChatProps {
   apiKeys?: Array<{ id: string; label: string }>;
   statsPosition?: "left" | "right";
   showSignupCta?: boolean;
-  /** Public free playground shows Free/Unlimited badges; the dashboard does not. */
+  /** Public free playground shows a Free badge; the dashboard does not. */
   showFreeBadges?: boolean;
   hint?: string;
   hintSub?: string;
@@ -324,14 +324,9 @@ export function PlaygroundChat({
           stream: true
         </span>
         {showFreeBadges && (
-          <>
-            <Badge variant="outline" className="border-success/40 text-success">
-              Free
-            </Badge>
-            <Badge variant="outline" className="border-accent/40 text-accent-text">
-              Unlimited
-            </Badge>
-          </>
+          <Badge variant="outline" className="border-success/40 text-success">
+            Free
+          </Badge>
         )}
         {apiKeys && apiKeys.length > 0 && (
           <button

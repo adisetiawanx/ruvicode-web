@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   // the "- Ruvicode" template appended (that suffix is already at the front).
   title: { absolute: "Ruvicode - One API Key, Every AI Model, Transparent Pricing" },
   description:
-    "Access Claude, GPT, Gemini, GLM, DeepSeek, Kimi and more with one API key. Transparent per-request pricing, hard spend limits. Save up to 99% vs list price.",
+    "Access Claude, GPT, Gemini, GLM, DeepSeek, Kimi and more with one API key. Real per-request pricing, hard spend limits. Save up to 99% vs official provider pricing.",
   alternates: { canonical: "https://ruvicode.com" },
   openGraph: {
     title: "Ruvicode - One API Key, Every AI Model",

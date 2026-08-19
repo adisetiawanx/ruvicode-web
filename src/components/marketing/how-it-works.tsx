@@ -8,17 +8,17 @@ const steps = [
   {
     icon: UserPlus,
     title: "Create account & top up",
-    desc: "Register with email or OAuth. Add credit via card or USDC. No commitments.",
+    desc: "Register with email or OAuth. Add credit via card or USDC. No commitments, no subscription.",
   },
   {
     icon: KeyRound,
     title: "Get your API key",
-    desc: "Generate a key in seconds. Set spend and rate limits per key to protect your budget.",
+    desc: "Generate a key in seconds. Set spend and rate limits per key. Your budget, your control.",
   },
   {
     icon: Rocket,
     title: "Start building",
-    desc: "Point any OpenAI-compatible tool at our endpoint. Stream responses, see real costs.",
+    desc: "Point any OpenAI-compatible tool at our endpoint. Stream responses, see real costs in every header.",
   },
 ];
 
