@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { UserPlus, KeyRound, Rocket } from "lucide-react";
 import { Container } from "@/components/layout/container";
 
@@ -28,20 +31,27 @@ export function HowItWorks() {
         </h2>
         <div className="grid gap-12 md:grid-cols-3">
           {steps.map((step, i) => {
-                      const Icon = step.icon;
-                      return (
-                        <div key={step.title} className="relative text-center">
-                          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent-subtle">
-                            <Icon className="h-6 w-6 text-accent" />
-                          </div>
-                          <div className="mb-2 font-mono text-sm text-accent-text">
-                            Step {i + 1}
-                          </div>
-                          <h3 className="mb-2 font-semibold">{step.title}</h3>
-                          <p className="text-sm text-text-secondary">{step.desc}</p>
-                        </div>
-                      );
-                    })}
+            const Icon = step.icon;
+            return (
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="relative text-center"
+              >
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent-subtle">
+                  <Icon className="h-6 w-6 text-accent" />
+                </div>
+                <div className="mb-2 font-mono text-sm text-accent-text">
+                  Step {i + 1}
+                </div>
+                <h3 className="mb-2 font-semibold">{step.title}</h3>
+                <p className="text-sm text-text-secondary">{step.desc}</p>
+              </motion.div>
+            );
+          })}
         </div>
       </Container>
     </section>
