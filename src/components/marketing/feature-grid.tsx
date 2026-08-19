@@ -47,7 +47,7 @@ const features: Feature[] = [
   {
     icon: Gauge,
     title: "Rate limits that scale",
-    desc: "Per-key rate limiting with a sliding window, configurable up to 1,000,000 RPM. Built for agentic workloads that burst.",
+    desc: "Per-key rate limiting with a sliding window. Raise or lower limits per key anytime. Built for agentic workloads that burst.",
   },
 ];
 

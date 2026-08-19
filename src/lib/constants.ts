@@ -15,7 +15,7 @@ export const FAQS = [
   },
   {
     q: "Can I set spending limits per key?",
-    a: "Yes. Every API key can have daily and monthly spend caps. When a limit is hit, the key stops accepting requests until the next period. You can also set rate limits up to 1,000,000 RPM per key.",
+    a: "Yes. Every API key can have daily and monthly spend caps. When a limit is hit, the key stops accepting requests until the next period. You can also set per-key rate limits.",
   },
   {
     q: "What payment methods do you accept?",
@@ -31,7 +31,7 @@ export const STATS = [
   { value: "30+", label: "AI Models" },
   { value: "99%", label: "Up to vs official" },
   { value: "$0", label: "Hidden Fees" },
-  { value: "1M", label: "RPM per key" },
+  { value: "2 min", label: "Live price refresh" },
 ] as const;
 
 interface ShowcaseModel {
