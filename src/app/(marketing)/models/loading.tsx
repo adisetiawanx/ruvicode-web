@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 /**
  * Mirrors the actual /models structure so the swap-in feels seamless:
- * pricing hero -> how-it-works cards -> catalog grid.
+ * pricing hero → how-it-works cards → catalog header + sidebar + grid.
  */
 export default function ModelsLoading() {
   return (
@@ -24,8 +24,17 @@ export default function ModelsLoading() {
 
       {/* Catalog */}
       <Container size="wide" className="py-12">
-        <Skeleton className="mb-2 h-9 w-56" />
-        <Skeleton className="mb-8 h-5 w-[26rem]" />
+        {/* Catalog header with realtime badge + updated time */}
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="mb-2 flex flex-wrap items-center gap-3">
+              <Skeleton className="h-9 w-44" />
+              <Skeleton className="h-5 w-32 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-80" />
+          </div>
+          <Skeleton className="h-8 w-44 rounded-full" />
+        </div>
         <div className="flex flex-col gap-8 lg:flex-row">
           {/* Sidebar skeleton */}
           <div className="space-y-6 lg:w-64 lg:flex-shrink-0">

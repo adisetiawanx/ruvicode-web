@@ -1,5 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
+/**
+ * Mirrors /dashboard/topup exactly:
+ * h1 → grid 2-col (Paddle left, USDC right)
+ */
 export default function TopUpLoading() {
   return (
     <div className="space-y-6">
