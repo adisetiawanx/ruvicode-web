@@ -40,7 +40,7 @@ export function CreateKeyButton() {
 
   const resetForm = () => {
     setLabel("");
-    setRateLimitRpm("60");
+    setRateLimitRpm("700");
     setSpendLimitDaily("");
     setSpendLimitMonthly("");
     setErrors({});
@@ -146,17 +146,21 @@ export function CreateKeyButton() {
                   onChange={(e) => setRateLimitRpm(e.target.value)}
                   aria-invalid={!!errors.rateLimitRpm}
                   aria-describedby={
-                    errors.rateLimitRpm ? "key-rpm-error" : undefined
+                    errors.rateLimitRpm ? "key-rpm-error" : "key-rpm-hint"
                   }
                   className="font-mono tabular"
                 />
-                {errors.rateLimitRpm && (
+                {errors.rateLimitRpm ? (
                   <p
                     id="key-rpm-error"
                     className="text-xs text-error"
                     role="alert"
                   >
                     {errors.rateLimitRpm[0]}
+                  </p>
+                ) : (
+                  <p id="key-rpm-hint" className="text-xs text-text-muted">
+                    Default 700. Max 1,000,000 RPM.
                   </p>
                 )}
               </div>

@@ -221,13 +221,17 @@ export function KeyRow({ keyData }: KeyRowProps) {
                     }
                     className="font-mono tabular"
                   />
-                  {editErrors.rateLimitRpm && (
+                  {editErrors.rateLimitRpm ? (
                     <p
                       id="edit-key-rpm-error"
                       className="text-xs text-error"
                       role="alert"
                     >
                       {editErrors.rateLimitRpm[0]}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-text-muted">
+                      Max 1,000,000 RPM.
                     </p>
                   )}
                 </div>
