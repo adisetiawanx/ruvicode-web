@@ -34,26 +34,26 @@ export function CodeDemo({ tabs }: CodeDemoProps) {
       {/* Tab bar */}
       <div className="flex items-center justify-between border-b border-border-subtle bg-inset px-4 py-2">
         <div className="flex gap-1">
-                  {tabs.map((tab, i) => (
-                    <button
-                      key={tab.label}
-                      onClick={() => setActiveIndex(i)}
-                      className={cn(
-                        "flex min-h-11 items-center rounded-md px-4 text-xs transition-colors",
-                        i === activeIndex
-                          ? "bg-surface-3 text-text-primary"
-                          : "text-text-secondary hover:text-text-primary",
-                      )}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={handleCopy}
-                  className="flex min-h-11 min-w-11 items-center justify-center text-text-secondary transition-colors hover:text-text-primary"
-                  aria-label="Copy code"
-                >
+          {tabs.map((tab, i) => (
+            <button
+              key={tab.label}
+              onClick={() => setActiveIndex(i)}
+              className={cn(
+                "rounded-md px-3 py-1.5 text-xs transition-colors",
+                i === activeIndex
+                  ? "bg-surface-3 text-text-primary"
+                  : "text-text-muted hover:text-text-secondary",
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={handleCopy}
+          className="rounded-md p-1.5 text-text-muted transition-colors hover:text-text-primary"
+          aria-label="Copy code"
+        >
           {copied ? (
             <Check className="h-4 w-4 text-success" />
           ) : (
