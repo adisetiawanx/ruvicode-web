@@ -5,6 +5,10 @@ import { Container } from "@/components/layout/container";
 import Link from "next/link";
 import { CodeDemo, type CodeTab } from "@/components/marketing/code-demo";
 import { highlightCode } from "@/lib/shiki";
+import {
+  PageEntrance,
+  PageEntranceItem,
+} from "@/components/shared/page-entrance";
 
 export const metadata: Metadata = {
   title: "Integrations - Works with Your Tools",
@@ -259,7 +263,9 @@ export default async function IntegrationsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Container size="wide" className="py-16">
+        <PageEntrance>
         {/* Header */}
+        <PageEntranceItem>
         <div className="mb-12 max-w-2xl">
           <p className="mb-2 font-mono text-xs uppercase tracking-widest text-accent-text">
             Integrations
@@ -273,8 +279,10 @@ export default async function IntegrationsPage() {
             tool of choice.
           </p>
         </div>
+        </PageEntranceItem>
 
         {/* Universal config callout */}
+        <PageEntranceItem>
         <div className="mb-6 rounded-xl border border-accent/25 bg-accent-subtle p-6">
           <p className="mb-1 font-medium text-text-primary">
             The two values every tool needs
@@ -331,8 +339,10 @@ export default async function IntegrationsPage() {
             .
           </p>
         </div>
+        </PageEntranceItem>
 
         {/* Integration cards */}
+        <PageEntranceItem>
         <div className="space-y-6">
           {cards.map(({ integration, tabs }) => (
             <div
@@ -373,8 +383,10 @@ export default async function IntegrationsPage() {
             </div>
           ))}
         </div>
+        </PageEntranceItem>
 
         {/* Bottom CTA */}
+        <PageEntranceItem>
         <div className="mt-12 rounded-xl border border-border-default bg-surface p-8 text-center">
           <h2 className="mb-2 text-xl font-semibold text-text-primary">
             Get your key in under a minute
@@ -399,6 +411,8 @@ export default async function IntegrationsPage() {
             </Link>
           </div>
         </div>
+        </PageEntranceItem>
+        </PageEntrance>
       </Container>
     </>
   );

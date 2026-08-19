@@ -14,6 +14,10 @@ import {
   type CodeTab,
 } from "@/components/marketing/code-demo";
 import { ArrowLeft, ArrowRight, ArrowDownToLine, ArrowUpFromLine, PanelTop, Sparkles, TrendingDown } from "lucide-react";
+import {
+  PageEntrance,
+  PageEntranceItem,
+} from "@/components/shared/page-entrance";
 
 export const revalidate = 300; // on-demand ISR — never prerendered at build
 
@@ -177,7 +181,9 @@ console.log(response.choices[0].message.content);`,
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Container size="wide" className="py-10 md:py-14">
+        <PageEntrance>
         {/* Breadcrumb */}
+        <PageEntranceItem>
         <nav className="mb-8 flex items-center gap-2 text-sm text-text-muted">
           <Link href="/" className="transition-colors hover:text-text-secondary">
             Home
@@ -192,8 +198,10 @@ console.log(response.choices[0].message.content);`,
           <span>/</span>
           <span className="text-text-secondary">{model.display_name}</span>
         </nav>
+        </PageEntranceItem>
 
         {/* Header */}
+        <PageEntranceItem>
         <div className="mb-10">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
@@ -291,9 +299,11 @@ console.log(response.choices[0].message.content);`,
             </div>
           </div>
         </div>
+        </PageEntranceItem>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           {/* Left: Quickstart */}
+          <PageEntranceItem>
           <div>
             <h2 className="mb-1 text-xl font-semibold">Quickstart</h2>
             <p className="mb-4 text-sm text-text-secondary">
@@ -320,8 +330,10 @@ console.log(response.choices[0].message.content);`,
               </Link>
             </div>
           </div>
+          </PageEntranceItem>
 
           {/* Right: reference card */}
+          <PageEntranceItem>
           <div className="space-y-4">
             <div className="rounded-xl border border-border-default bg-surface p-6">
               <h3 className="mb-4 font-semibold">Reference pricing</h3>
@@ -396,7 +408,9 @@ console.log(response.choices[0].message.content);`,
               All models
             </Link>
           </div>
+          </PageEntranceItem>
         </div>
+        </PageEntrance>
       </Container>
     </>
   );
