@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { UserPlus, KeyRound, Rocket } from "lucide-react";
 import { Container } from "@/components/layout/container";
-import { useMounted } from "@/lib/hooks/use-mounted";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 
 const steps = [
   {
@@ -24,7 +24,7 @@ const steps = [
 ];
 
 export function HowItWorks() {
-  const mounted = useMounted();
+  const isMobile = useIsMobile();
   return (
     <section className="border-t border-border-subtle py-24">
       <Container size="wide">
@@ -37,7 +37,7 @@ export function HowItWorks() {
             return (
               <motion.div
                 key={step.title}
-                initial={mounted ? { opacity: 0, y: 20 } : false}
+                initial={isMobile ? false : { opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}

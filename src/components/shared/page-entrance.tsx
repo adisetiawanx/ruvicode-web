@@ -2,17 +2,13 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import { useMounted } from "@/lib/hooks/use-mounted";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 
 /**
  * Reusable page entrance animation (PAGES.md §5.3).
  *
  * Staggered fade-in + slide-up for page sections.
  * Usage: wrap page content sections in <PageEntrance>...</PageEntrance>
- *
- * SSR-safe: the server renders everything visible (no opacity:0 in the
- * HTML), and the entrance animation only plays after mount. Crawlers
- * and headless snapshot tools always see the full content.
  *
  * Respects prefers-reduced-motion (globals.css forces 0.01ms durations).
  */
@@ -35,11 +31,11 @@ const itemVariants = {
 };
 
 export function PageEntrance({ children }: { children: ReactNode }) {
-  const mounted = useMounted();
+  const isMobile = useIsMobile();
   return (
     <motion.div
       variants={containerVariants}
-      initial={mounted ? "hidden" : false}
+      initial={isMobile ? false : "hidden"}
       animate="show"
     >
       {children}
