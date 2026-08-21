@@ -89,7 +89,7 @@ function ResetPasswordForm() {
         </p>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div>
+          <div className="space-y-1.5">
             <Label htmlFor="password">New Password</Label>
             <Input
               id="password"
@@ -105,7 +105,7 @@ function ResetPasswordForm() {
             )}
           </div>
 
-          <div>
+          <div className="space-y-1.5">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <Input
               id="confirmPassword"

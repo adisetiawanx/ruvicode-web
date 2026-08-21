@@ -72,7 +72,7 @@ export default function LoginPage() {
 
         {/* Email/password form — for users who set a password */}
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div>
+          <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -88,7 +88,7 @@ export default function LoginPage() {
             )}
           </div>
 
-          <div>
+          <div className="space-y-1.5">
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
