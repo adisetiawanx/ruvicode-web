@@ -43,6 +43,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
             variants={container}
             initial="hidden"
             animate="show"
+            className="w-full min-w-0"
           >
             <motion.div variants={item}>
               <Badge
@@ -91,6 +92,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+            className="w-full min-w-0"
           >
             <CodeDemo tabs={codeTabs} />
           </motion.div>
