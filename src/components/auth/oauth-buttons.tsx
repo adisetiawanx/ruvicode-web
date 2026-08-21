@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { trackSignUp } from "@/lib/analytics";
 
 /**
  * OAuth sign-in buttons (ADR-008 revised).
@@ -49,6 +50,7 @@ export function OAuthButtons({ callbackURL = "/dashboard" }: OAuthButtonsProps) 
   async function handleSocialSignIn(provider: "google" | "github") {
     setLoadingProvider(provider);
     try {
+      trackSignUp(provider);
       await authClient.signIn.social({
         provider,
         callbackURL,
