@@ -11,7 +11,7 @@ export function TopUpTiers() {
           Top up what you need
         </h2>
         <p className="mb-12 text-center text-text-secondary">
-          Pay per request from a prepaid wallet. No subscription, no minimum.
+          Pay per request from a prepaid wallet. No subscription, minimum $0.01.
         </p>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {TIERS.map((amount) => (

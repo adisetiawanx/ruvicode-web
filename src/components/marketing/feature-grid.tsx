@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Container } from "@/components/layout/container";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 
 interface Feature {
   icon: LucideIcon;
@@ -37,7 +38,7 @@ const features: Feature[] = [
   {
     icon: CreditCard,
     title: "Card or crypto",
-    desc: "Top up with any major card or USDC on Base. No foreign card rejections, no minimum balance.",
+    desc: "Top up with any major card or USDC on Base. No foreign card rejections, minimum $0.01.",
   },
   {
     icon: Zap,
@@ -52,6 +53,7 @@ const features: Feature[] = [
 ];
 
 export function FeatureGrid() {
+  const isMobile = useIsMobile();
   return (
     <Container size="wide" className="py-24">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -60,7 +62,7 @@ export function FeatureGrid() {
           return (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={isMobile ? false : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.05 }}

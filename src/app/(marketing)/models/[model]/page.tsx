@@ -364,10 +364,8 @@ console.log(response.choices[0].message.content);`,
                 </div>
               </div>
               <p className="mt-4 text-xs leading-relaxed text-text-muted">
-                Live market pricing, refreshed every 2 minutes. No minimum
-                spend, no credit expiry. Savings shown versus official
-                provider list prices. Savings shown versus official
-                provider list prices.
+                Live market pricing, refreshed every 2 minutes.
+                No credit expiry. Savings versus official list prices.
               </p>
             </div>
 

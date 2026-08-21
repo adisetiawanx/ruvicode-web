@@ -394,7 +394,7 @@ export default async function IntegrationsPage() {
           </h2>
           <p className="mx-auto mb-5 max-w-md text-sm text-text-secondary">
             Register, top up, generate an rvcd_ key, and paste it into any tool
-            above. No subscription, no minimum spend.
+            above. No subscription, minimum $0.01.
           </p>
           <div className="flex items-center justify-center gap-3">
             <a

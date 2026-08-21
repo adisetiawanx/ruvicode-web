@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 
 /**
  * Reusable page entrance animation (PAGES.md §5.3).
@@ -30,10 +31,11 @@ const itemVariants = {
 };
 
 export function PageEntrance({ children }: { children: ReactNode }) {
+  const isMobile = useIsMobile();
   return (
     <motion.div
       variants={containerVariants}
-      initial="hidden"
+      initial={isMobile ? false : "hidden"}
       animate="show"
     >
       {children}

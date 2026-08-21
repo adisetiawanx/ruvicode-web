@@ -296,6 +296,20 @@
   overflow-x: auto;
 }
 
+/* Kill entrance animations on mobile (<=768px). framer-motion sets
+   inline opacity:0 and transform on SSR output; on slow mobile CPUs
+   the JS bundle takes seconds to hydrate and animate, which holds
+   the LCP element invisible. This media query forces the animated
+   elements visible immediately, before any JS runs. Desktop keeps
+   the animations. Uses !important to override inline styles. */
+@media (max-width: 768px) {
+  [style*="opacity: 0"],
+  [style*="opacity:0"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    GLOBAL BASE STYLES
    ═══════════════════════════════════════════════════════════════════ */

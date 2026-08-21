@@ -11,6 +11,7 @@ import {
   SheetContent,
   SheetTrigger,
   SheetClose,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Logo } from "@/components/shared/logo";
@@ -68,31 +69,45 @@ export function Navbar() {
               >
                 <Menu className="h-5 w-5" />
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] bg-canvas">
-                <div className="flex flex-col gap-6 pt-6">
-                  <div className="flex items-center justify-between pr-10">
-                    <Link href="/" className="flex items-center gap-2">
-                      <Logo />
-                      <span className="font-semibold">Ruvicode</span>
-                    </Link>
-                  </div>
-                  <nav className="flex flex-col gap-4">
-                    {navLinks.map((link) => (
-                      <SheetClose
-                        key={link.href}
-                        render={<Link href={link.href} />}
-                      >
-                        <span className="text-base text-text-secondary hover:text-text-primary">
-                          {link.label}
-                        </span>
-                      </SheetClose>
-                    ))}
-                  </nav>
-                  <div className="flex flex-col gap-3 border-t border-border-subtle pt-4">
-                    <LinkButton href="/register" variant="primary">
-                      Get Started
-                    </LinkButton>
-                  </div>
+              <SheetContent
+                side="right"
+                className="w-[300px] bg-canvas p-0"
+                showCloseButton={false}
+              >
+                {/* Drawer header */}
+                <div className="flex h-16 items-center justify-between border-b border-border-subtle px-5">
+                  <SheetTitle className="flex items-center gap-2 text-base font-semibold">
+                    <Logo />
+                    Ruvicode
+                  </SheetTitle>
+                  <SheetClose
+                    render={
+                      <Button variant="ghost" size="icon-sm" aria-label="Close menu" />
+                    }
+                  >
+                    <X className="h-5 w-5" />
+                  </SheetClose>
+                </div>
+
+                {/* Nav links */}
+                <nav className="flex flex-col gap-1 p-4">
+                  {navLinks.map((link) => (
+                    <SheetClose
+                      key={link.href}
+                      render={<Link href={link.href} />}
+                    >
+                      <span className="block rounded-md px-3 py-2.5 text-base text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary">
+                        {link.label}
+                      </span>
+                    </SheetClose>
+                  ))}
+                </nav>
+
+                {/* CTA */}
+                <div className="border-t border-border-subtle p-4">
+                  <LinkButton href="/register" variant="primary" className="w-full" onClick={() => setMobileOpen(false)}>
+                    Get Started
+                  </LinkButton>
                 </div>
               </SheetContent>
             </Sheet>
