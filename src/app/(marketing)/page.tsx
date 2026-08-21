@@ -7,6 +7,7 @@ import { ModelShowcase } from "@/components/marketing/model-showcase";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { CtaSection } from "@/components/marketing/cta-section";
 import { FaqSection } from "@/components/marketing/faq-section";
+import { OAuthErrorBanner } from "@/components/auth/oauth-error-banner";
 import { FAQS } from "@/lib/constants";
 import { CODE_SAMPLES } from "@/lib/code-samples";
 import { highlightCode } from "@/lib/shiki";
@@ -65,6 +66,9 @@ export default async function LandingPage() {
       <JsonLdScript data={organizationJsonLd()} />
       <JsonLdScript data={websiteJsonLd()} />
       <JsonLdScript data={faqJsonLd(FAQS as unknown as Array<{ q: string; a: string }>)} />
+      <Suspense>
+        <OAuthErrorBanner />
+      </Suspense>
       <HeroSection codeTabs={codeTabs} />
       <StatBar />
       <FeatureGrid />
