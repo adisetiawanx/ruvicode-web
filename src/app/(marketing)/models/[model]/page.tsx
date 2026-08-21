@@ -34,18 +34,18 @@ export async function generateMetadata({
   if (!model) return {};
 
   return {
-    title: `${model.display_name} API - Pricing & Docs`,
+    title: `${model.display_name}`,
     description: `${model.display_name} via Ruvicode. Input $${model.user_input.toFixed(2)}/1M, output $${model.user_output.toFixed(2)}/1M tokens. Save ${model.user_discount_pct.toFixed(0)}% vs official provider pricing. OpenAI-compatible endpoint.`,
     alternates: { canonical: `https://ruvicode.com/models/${model.model}` },
     openGraph: {
-      title: `${model.display_name} API`,
+      title: `${model.display_name}`,
       description: `Save ${model.user_discount_pct.toFixed(0)}% vs official provider pricing on ${model.display_name}.`,
       url: `https://ruvicode.com/models/${model.model}`,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `${model.display_name} API`,
+      title: `${model.display_name}`,
       description: `Save ${model.user_discount_pct.toFixed(0)}% vs official provider pricing on ${model.display_name}.`,
     },
   };
