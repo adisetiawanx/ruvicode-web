@@ -15,6 +15,12 @@ export const metadata: Metadata = {
   description:
     "Transparent AI API gateway. Access Claude, GPT, Gemini, GLM, DeepSeek and more with one key. Real per-request pricing, hard spend limits.",
   metadataBase: new URL("https://ruvicode.com"),
+  manifest: "/manifest.webmanifest",
+  applicationName: "Ruvicode",
+  appleWebApp: {
+    capable: true,
+    title: "Ruvicode",
+  },
   icons: {
     icon: [{ url: "/ruvicode-favicon.ico", sizes: "any" }],
   },

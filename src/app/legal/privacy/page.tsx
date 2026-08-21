@@ -100,27 +100,54 @@ export default function PrivacyPolicy() {
           third parties receive your data unless required by law.
         </p>
 
-        <h2>6. Cookies</h2>
+        <h2>6. Authentication Providers</h2>
+        <p>
+          We offer sign-in with Google and sign-in with GitHub. When you use
+          these options, the provider shares your basic profile (name, email
+          address, and profile photo) with Ruvicode so we can create and
+          secure your account. We use this information only for
+          authentication and account management. We never post on your
+          behalf, and you can revoke Ruvicode&apos;s access at any time from
+          your Google or GitHub account settings.
+        </p>
+
+        <h2>7. Cookies</h2>
         <p>
           The Service uses a single session cookie for authentication. We do
           not use tracking cookies, analytics cookies, or advertising
           cookies.
         </p>
 
-        <h2>7. Your Rights</h2>
+        <h2>8. Google Analytics</h2>
+        <p>
+          We use Google Analytics to understand aggregate site usage, such
+          as which pages are visited and for how long. It uses cookies to
+          distinguish visitors. You can learn more about how Google uses
+          data and how you can control it at{" "}
+          <a
+            href="https://www.google.com/policies/privacy/partners/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            google.com/policies/privacy/partners
+          </a>
+          .
+        </p>
+
+        <h2>9. Your Rights</h2>
         <p>
           You may access, export, or delete your data at any time through the
           dashboard settings. To request data deletion, use the Delete
           Account function or email support@ruvicode.com.
         </p>
 
-        <h2>8. Contact</h2>
+        <h2>10. Contact</h2>
         <p>
           For privacy questions or data requests, email{" "}
           <a href="mailto:support@ruvicode.com">support@ruvicode.com</a>.
         </p>
 
-        <h2>9. Entity</h2>
+        <h2>11. Entity</h2>
         <p>Ruvicode is operated by the Ruvicode team.</p>
       </div>
     </article>

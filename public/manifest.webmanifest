@@ -1,0 +1,16 @@
+{
+  "name": "Ruvicode",
+  "short_name": "Ruvicode",
+  "description": "AI API gateway. One API key, every frontier model, real per-request pricing.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F0F0E",
+  "theme_color": "#0F0F0E",
+  "icons": [
+    {
+      "src": "/ruvicode-logo.webp",
+      "type": "image/webp",
+      "sizes": "any"
+    }
+  ]
+}
