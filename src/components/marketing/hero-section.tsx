@@ -63,7 +63,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
             >
               Every frontier AI model.
               <br />
-              One API key.
+              One Ruvicode API key.
               <br />
               <span className="text-accent">Real per-request pricing.</span>
             </motion.h1>
