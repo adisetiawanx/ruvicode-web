@@ -1,12 +1,18 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Logo } from "@/components/shared/logo";
+import { getSession } from "@/lib/session";
 
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Redirect authenticated users away from auth pages
+  const session = await getSession();
+  if (session) redirect("/dashboard");
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
       <div className="absolute right-4 top-4">

@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
  * Proxy (Next.js 16 — formerly middleware) — handles route protection.
  *
  * - Protects /dashboard/* — redirects to /login if no session cookie
- * - Hard-404s /super for anonymous visitors
+ * - Redirects anonymous /super visitors to /login
  */
 
 // Paths that require authentication
@@ -30,14 +30,13 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // /super must not reveal that it exists. Anonymous scanners get a
-  // hard 404 before any render: Next streams the document head (with a
-  // 200 status) before the layout's async allowlist check can call
-  // notFound(). Cookie presence is the coarse gate only; the email
-  // allowlist still runs in the layout, the page, and /api/admin/sweep.
+  // /super must not reveal that it exists to anonymous visitors.
+  // Redirect to /login instead of returning a bare 404 (which browsers
+  // render as an ugly "HTTP ERROR 404" page). The email allowlist still
+  // runs in the layout, the page, and /api/admin/sweep.
   if (pathname === "/super" || pathname.startsWith("/super/")) {
     if (!sessionToken) {
-      return new NextResponse(null, { status: 404 });
+      return NextResponse.redirect(new URL("/login", request.url));
     }
     const res = NextResponse.next();
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
