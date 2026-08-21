@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDocsNav } from "@/lib/content/docs";
+import { MobileDocsNav } from "@/components/shared/mobile-docs-nav";
 
 export default function DocsLayout({
   children,
@@ -10,7 +11,7 @@ export default function DocsLayout({
 
   return (
     <div className="mx-auto flex max-w-[1440px] gap-0 px-6 md:px-8">
-      {/* Left sidebar — docs navigation */}
+      {/* Left sidebar — docs navigation (desktop only) */}
       <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 flex-shrink-0 overflow-y-auto border-r border-border-subtle p-4 lg:block">
         <nav className="space-y-6">
           {nav.map((group) => (
@@ -37,6 +38,8 @@ export default function DocsLayout({
 
       {/* Center content */}
       <main className="min-w-0 flex-1 py-12">
+        {/* Mobile docs navigation drawer */}
+        <MobileDocsNav nav={nav} />
         <div className="mx-auto max-w-[680px]">{children}</div>
       </main>
     </div>

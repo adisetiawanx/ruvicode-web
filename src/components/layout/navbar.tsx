@@ -70,16 +70,11 @@ export function Navbar() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] bg-canvas">
                 <div className="flex flex-col gap-6 pt-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between pr-10">
                     <Link href="/" className="flex items-center gap-2">
                       <Logo />
                       <span className="font-semibold">Ruvicode</span>
                     </Link>
-                    <SheetClose
-                      render={<Button variant="ghost" size="icon" />}
-                    >
-                      <X className="h-5 w-5" />
-                    </SheetClose>
                   </div>
                   <nav className="flex flex-col gap-4">
                     {navLinks.map((link) => (
