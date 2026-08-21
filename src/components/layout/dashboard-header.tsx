@@ -18,7 +18,7 @@ export function DashboardHeader() {
       {/* Left: mobile hamburger + wordmark */}
       <div className="flex items-center gap-2">
         <MobileSidebarTrigger />
-        <Link href="/dashboard" className="md:hidden">
+        <Link href="/" className="md:hidden">
           <span className="font-semibold">Ruvicode</span>
         </Link>
       </div>

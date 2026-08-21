@@ -207,7 +207,7 @@ console.log(response.choices[0].message.content);`,
             <div>
               <div className="mb-3 flex flex-wrap items-center gap-3">
                 <BrandLogo brand={model.provider} className="h-8 w-8" />
-                <h1 className="text-h1 font-bold tracking-tight">
+                <h1 className="text-2xl font-bold tracking-tight md:text-h1">
                   {model.display_name}
                 </h1>
                 <span className="rounded-full border border-success/30 bg-success-subtle px-3 py-1 font-mono text-xs font-medium tabular text-success">
@@ -234,6 +234,7 @@ console.log(response.choices[0].message.content);`,
             <LinkButton
               href={`/playground?model=${model.model}`}
               variant="primary"
+              className="w-full sm:w-auto"
             >
               <Sparkles className="mr-1.5 h-4 w-4" />
               Try in Playground
@@ -241,7 +242,7 @@ console.log(response.choices[0].message.content);`,
           </div>
 
           {/* Price strip */}
-          <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border-default bg-border-subtle sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border-default bg-border-subtle sm:grid-cols-2 lg:grid-cols-4 min-w-0">
             <div className="bg-surface p-5">
               <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
                 <PanelTop className="h-3.5 w-3.5" />
@@ -301,7 +302,7 @@ console.log(response.choices[0].message.content);`,
         </div>
         </PageEntranceItem>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+        <div className="grid gap-8 lg:grid-cols-[1fr_320px] min-w-0">
           {/* Left: Quickstart */}
           <PageEntranceItem>
           <div>
