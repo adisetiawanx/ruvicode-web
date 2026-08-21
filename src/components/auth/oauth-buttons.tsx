@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-import { trackSignUp } from "@/lib/analytics";
+import { trackSignUp, trackLogin } from "@/lib/analytics";
 
 /**
  * OAuth sign-in buttons (ADR-008 revised).
@@ -51,6 +51,7 @@ export function OAuthButtons({ callbackURL = "/dashboard" }: OAuthButtonsProps) 
     setLoadingProvider(provider);
     try {
       trackSignUp(provider);
+      trackLogin(provider);
       await authClient.signIn.social({
         provider,
         callbackURL,

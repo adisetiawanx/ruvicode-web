@@ -66,6 +66,7 @@ export default async function ModelDetailPage({
   const model = await getModelBySlug(slug);
   if (!model) notFound();
 
+
   const samples = [
     {
       label: "curl",
@@ -149,6 +150,7 @@ console.log(response.choices[0].message.content);`,
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];window.dataLayer.push(['event','view_item',{item_id:'${model.model}',item_category:'model'}]);` }} />
       <Container size="wide" className="py-10 md:py-14">
         <PageEntrance>
           {/* Breadcrumb */}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
+import { trackCalculatorUse } from "@/lib/analytics";
 import { motion } from "framer-motion";
 import {
   Select,
@@ -32,6 +33,15 @@ export function CostCalculator({
   const [inputTokens, setInputTokens] = useState(1_000_000);
   const [outputTokens, setOutputTokens] = useState(500_000);
   const [selectedModel, setSelectedModel] = useState(models[0]?.model ?? "");
+
+  const engaged = useRef(false);
+
+  // Fire the engagement event once, on the first interaction (not mount)
+  const onEngage = () => {
+    if (engaged.current) return;
+    engaged.current = true;
+    trackCalculatorUse();
+  };
 
   const selected = models.find((m) => m.model === selectedModel);
 
@@ -72,7 +82,7 @@ export function CostCalculator({
           <label className="mb-2 block text-sm font-medium">Model</label>
           <Select
             value={selectedModel}
-            onValueChange={(v) => setSelectedModel(v as string)}
+            onValueChange={(v) => { onEngage(); setSelectedModel(v as string); }}
           >
             <SelectTrigger className="w-full">
               <SelectValue />
@@ -125,9 +135,10 @@ export function CostCalculator({
           <Input
             type="number"
             value={inputTokens}
-            onChange={(e) =>
-              setInputTokens(Math.max(0, Number(e.target.value)))
-            }
+            onChange={(e) => {
+              onEngage();
+              setInputTokens(Math.max(0, Number(e.target.value)));
+            }}
             className="font-mono tabular"
           />
           <p className="mt-1 font-mono text-xs text-text-muted">
@@ -142,9 +153,10 @@ export function CostCalculator({
           <Input
             type="number"
             value={outputTokens}
-            onChange={(e) =>
-              setOutputTokens(Math.max(0, Number(e.target.value)))
-            }
+            onChange={(e) => {
+              onEngage();
+              setOutputTokens(Math.max(0, Number(e.target.value)));
+            }}
             className="font-mono tabular"
           />
           <p className="mt-1 font-mono text-xs text-text-muted">

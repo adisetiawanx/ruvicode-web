@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { authClient } from "@/lib/auth-client";
+import { trackLogin } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +41,7 @@ export default function LoginPage() {
       return;
     }
 
+    trackLogin("email");
     toast.success("Welcome back!");
     window.location.assign("/dashboard");
   }

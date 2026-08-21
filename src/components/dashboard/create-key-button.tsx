@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { KeyReveal } from "@/components/dashboard/key-reveal";
 import { createKeyAction } from "@/app/(dashboard)/dashboard/keys/actions";
+import { trackKeyCreated } from "@/lib/analytics";
 import type { CreateKeyResult } from "@/app/(dashboard)/dashboard/keys/actions";
 
 interface FormErrors {
@@ -79,6 +80,7 @@ export function CreateKeyButton() {
       return;
     }
 
+    trackKeyCreated();
     toast.success("API key created");
     setCreatedKey(result.key);
   };

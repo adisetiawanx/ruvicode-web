@@ -1,4 +1,5 @@
 "use client";
+import { trackPlaygroundMessage } from "@/lib/analytics";
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -257,6 +258,7 @@ export function PlaygroundChat({
     setInput("");
 
     try {
+      trackPlaygroundMessage(endpoint.includes("dashboard") ? "dashboard" : "public");
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
