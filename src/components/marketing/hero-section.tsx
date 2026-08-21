@@ -29,7 +29,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
 
   return (
     <section className="relative overflow-hidden">
-      {/* Subtle radial glow — Clay tint, NOT gradient slop */}
+      {/* Subtle radial glow, Clay tint, NOT gradient slop */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -39,9 +39,9 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
       />
 
       <Container size="wide" className="relative pb-24 pt-20 md:pb-32 md:pt-32">
-        {/* Desktop: text left, code demo right — side-by-side at lg+ */}
+        {/* Desktop: text left, code demo right, side-by-side at lg+ */}
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Left column — text content */}
+          {/* Left column, text content */}
           <motion.div
             variants={container}
             initial={isMobile ? false : "hidden"}
@@ -61,9 +61,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
               variants={item}
               className="mb-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl"
             >
-              Every frontier AI model.
-              <br />
-              One API key.
+              Ruvicode brings every frontier AI model behind one API key.
               <br />
               <span className="text-accent">Real per-request pricing.</span>
             </motion.h1>
@@ -72,9 +70,10 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
               variants={item}
               className="mb-8 max-w-xl text-lg text-text-secondary"
             >
-              Access Claude, GPT, Gemini, GLM, DeepSeek, Kimi, and more. Pay
-              only for what you use, see exact costs in every response header,
-              and set hard spend limits per key. No credit card to start.
+              Ruvicode is an AI API gateway. Access Claude, GPT, Gemini, GLM,
+              DeepSeek, Kimi, and more with one key. Pay only for what you use,
+              see exact costs in every response header, and set hard spend
+              limits per key. No credit card to start.
             </motion.p>
 
             <motion.div
@@ -90,7 +89,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
             </motion.div>
           </motion.div>
 
-          {/* Right column — code demo */}
+          {/* Right column, code demo */}
           <motion.div
             initial={isMobile ? false : { opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
