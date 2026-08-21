@@ -19,17 +19,9 @@ import {
   PageEntranceItem,
 } from "@/components/shared/page-entrance";
 
-export const revalidate = 300; // on-demand ISR — never prerendered at build
+export const revalidate = 300;
 
-/** SECURITY: validate slug format — only allow lowercase alphanumeric,
- * hyphens, dots, and colons (variant slugs like "kimi-k2.5:web" use them).
- * Prevents path traversal. */
 const SLUG_REGEX = /^[a-z0-9.:-]+$/;
-
-// No generateStaticParams: the build container cannot reach the database,
-// so build-time params would come from the static mock fallback and bake
-// mock prices into the prerendered pages. Pages are instead rendered on
-// demand and cached by ISR below.
 
 export async function generateMetadata({
   params,
@@ -74,14 +66,12 @@ export default async function ModelDetailPage({
   const model = await getModelBySlug(slug);
   if (!model) notFound();
 
-  // Quickstart snippets are static per model, so they are highlighted with
-  // Shiki on the server and shipped as HTML (zero client JS for coloring).
   const samples = [
     {
       label: "curl",
       lang: "bash" as const,
       code: `curl https://api.ruvicode.com/v1/chat/completions \\
-  -H "Authorization: Bearer rvcd_..." \\
+  -H "Authorization: Bearer ***" \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "${model.model}",
@@ -110,7 +100,7 @@ print(response.choices[0].message.content)`,
       code: `import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: "rvcd_...",
+  apiKey: "***"
   baseURL: "https://api.ruvicode.com/v1",
 });
 
@@ -149,268 +139,190 @@ console.log(response.choices[0].message.content);`,
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://ruvicode.com",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Models",
-        item: "https://ruvicode.com/models",
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: model.display_name,
-        item: `https://ruvicode.com/models/${model.model}`,
-      },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://ruvicode.com" },
+      { "@type": "ListItem", position: 2, name: "Models", item: "https://ruvicode.com/models" },
+      { "@type": "ListItem", position: 3, name: model.display_name, item: `https://ruvicode.com/models/${model.model}` },
     ],
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Container size="wide" className="py-10 md:py-14">
         <PageEntrance>
-        {/* Breadcrumb */}
-        <PageEntranceItem>
-        <nav className="mb-8 flex items-center gap-2 text-sm text-text-muted">
-          <Link href="/" className="transition-colors hover:text-text-secondary">
-            Home
-          </Link>
-          <span>/</span>
-          <Link
-            href="/models"
-            className="transition-colors hover:text-text-secondary"
-          >
-            Models
-          </Link>
-          <span>/</span>
-          <span className="text-text-secondary">{model.display_name}</span>
-        </nav>
-        </PageEntranceItem>
-
-        {/* Header */}
-        <PageEntranceItem>
-        <div className="mb-10">
-          <div className="flex flex-wrap items-start justify-between gap-6">
-            <div>
-              <div className="mb-3 flex flex-wrap items-center gap-3">
-                <BrandLogo brand={model.provider} className="h-8 w-8" />
-                <h1 className="text-2xl font-bold tracking-tight md:text-h1">
-                  {model.display_name}
-                </h1>
-                <span className="rounded-full border border-success/30 bg-success-subtle px-3 py-1 font-mono text-xs font-medium tabular text-success">
-                  −{model.user_discount_pct.toFixed(0)}% vs official
-                </span>
-              </div>
-              <div className="mb-1">
-                <ModelTag id={model.model} showName={false} />
-              </div>
-              {model.capabilities.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {model.capabilities.map((cap) => (
-                    <Badge
-                      key={cap}
-                      variant="secondary"
-                      className="capitalize"
-                    >
-                      {cap}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-            <LinkButton
-              href={`/playground?model=${model.model}`}
-              variant="primary"
-              className="w-full sm:w-auto"
-            >
-              <Sparkles className="mr-1.5 h-4 w-4" />
-              Try in Playground
-            </LinkButton>
-          </div>
-
-          {/* Price strip */}
-          <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border-default bg-border-subtle sm:grid-cols-2 lg:grid-cols-4 min-w-0">
-            <div className="bg-surface p-5">
-              <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
-                <PanelTop className="h-3.5 w-3.5" />
-                Context
-              </p>
-              <p className="font-mono text-2xl font-semibold tabular text-text-primary">
-                {model.context || "—"}
-                <span className="ml-1 text-sm font-normal text-text-muted">
-                  tokens
-                </span>
-              </p>
-            </div>
-            <div className="bg-surface p-5">
-              <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
-                <ArrowDownToLine className="h-3.5 w-3.5" />
-                Input
-              </p>
-              <p className="font-mono text-2xl font-semibold tabular text-text-primary">
-                {model.ref_input > model.user_input && (
-                  <span className="mr-1.5 text-sm font-normal text-text-muted line-through">
-                    ${formatPrice(model.ref_input)}
-                  </span>
-                )}{" "}
-                ${formatPrice(model.user_input)}
-                <span className="ml-1 text-sm font-normal text-text-muted">
-                  /1M
-                </span>
-              </p>
-            </div>
-            <div className="bg-surface p-5">
-              <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
-                <ArrowUpFromLine className="h-3.5 w-3.5" />
-                Output
-              </p>
-              <p className="font-mono text-2xl font-semibold tabular text-text-primary">
-                {model.ref_output > model.user_output && (
-                  <span className="mr-1.5 text-sm font-normal text-text-muted line-through">
-                    ${formatPrice(model.ref_output)}
-                  </span>
-                )}{" "}
-                ${formatPrice(model.user_output)}
-                <span className="ml-1 text-sm font-normal text-text-muted">
-                  /1M
-                </span>
-              </p>
-            </div>
-            <div className="bg-surface p-5">
-              <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
-                <TrendingDown className="h-3.5 w-3.5" />
-                You save
-              </p>
-              <p className="font-mono text-2xl font-semibold tabular text-success">
-                {model.user_discount_pct.toFixed(0)}%
-              </p>
-            </div>
-          </div>
-        </div>
-        </PageEntranceItem>
-
-        <div className="grid gap-8 lg:grid-cols-[1fr_320px] min-w-0">
-          {/* Left: Quickstart */}
+          {/* Breadcrumb */}
           <PageEntranceItem>
-          <div>
-            <h2 className="mb-1 text-xl font-semibold">Quickstart</h2>
-            <p className="mb-4 text-sm text-text-secondary">
-              Use the OpenAI SDK with your Ruvicode API key. Just change the
-              base URL and model name.
-            </p>
-            <CodeDemo tabs={quickstartTabs} />
-
-            <div className="mt-8 flex items-center justify-between rounded-xl border border-border-default bg-surface p-5">
-              <div>
-                <p className="font-medium text-text-primary">
-                  Need the full API reference?
-                </p>
-                <p className="mt-0.5 text-sm text-text-secondary">
-                  Authentication, streaming, error handling, and rate limits.
-                </p>
-              </div>
-              <Link
-                href="/docs"
-                className="flex shrink-0 items-center gap-1 text-sm font-medium text-accent-text transition-colors hover:text-accent-hover"
-              >
-                Read the docs
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
+            <nav className="mb-8 flex flex-wrap items-center gap-2 text-sm text-text-muted">
+              <Link href="/" className="transition-colors hover:text-text-secondary">Home</Link>
+              <span>/</span>
+              <Link href="/models" className="transition-colors hover:text-text-secondary">Models</Link>
+              <span>/</span>
+              <span className="text-text-secondary">{model.display_name}</span>
+            </nav>
           </PageEntranceItem>
 
-          {/* Right: reference card */}
+          {/* Header */}
           <PageEntranceItem>
-          <div className="space-y-4">
-            <div className="rounded-xl border border-border-default bg-surface p-6">
-              <h3 className="mb-4 font-semibold">Reference pricing</h3>
-              <div className="space-y-3">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-text-secondary">
-                    Official input
-                  </span>
-                  <span className="font-mono text-sm tabular text-text-muted">
-                    ${formatPrice(model.ref_input)}/1M
-                  </span>
-                </div>
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-text-secondary">
-                    Official output
-                  </span>
-                  <span className="font-mono text-sm tabular text-text-muted">
-                    ${formatPrice(model.ref_output)}/1M
-                  </span>
-                </div>
-                <div className="flex items-baseline justify-between border-t border-border-subtle pt-3">
-                  <span className="text-sm text-text-secondary">
-                    Ruvicode price
-                  </span>
-                  <span className="font-mono text-sm font-medium tabular text-success">
-                    −{model.user_discount_pct.toFixed(0)}%
-                  </span>
-                </div>
-              </div>
-              <p className="mt-4 text-xs leading-relaxed text-text-muted">
-                Live market pricing, refreshed every 2 minutes.
-                No credit expiry. Savings versus official list prices.
-              </p>
-            </div>
-
-            {model.context && (
-              <div className="rounded-xl border border-border-default bg-surface p-6">
-                <h3 className="mb-4 font-semibold">Specs</h3>
-                <div className="space-y-3">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-sm text-text-secondary">
-                      Context window
-                    </span>
-                    <span className="font-mono text-sm tabular text-text-primary">
-                      {model.context}
+            <div className="mb-10">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+                <div className="min-w-0">
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <BrandLogo brand={model.provider} className="h-8 w-8 shrink-0" />
+                    <h1 className="text-2xl font-bold tracking-tight md:text-h1">{model.display_name}</h1>
+                    <span className="rounded-full border border-success/30 bg-success-subtle px-3 py-1 font-mono text-xs font-medium tabular text-success">
+                      −{model.user_discount_pct.toFixed(0)}% vs official
                     </span>
                   </div>
-                  {model.max_output && (
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-sm text-text-secondary">
-                        Max output
-                      </span>
-                      <span className="font-mono text-sm tabular text-text-primary">
-                        {model.max_output}
-                      </span>
+                  <div className="mb-1">
+                    <ModelTag id={model.model} showName={false} />
+                  </div>
+                  {model.capabilities.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {model.capabilities.map((cap) => (
+                        <Badge key={cap} variant="secondary" className="capitalize">{cap}</Badge>
+                      ))}
                     </div>
                   )}
                 </div>
+                <LinkButton href={`/playground?model=${model.model}`} variant="primary" className="w-full sm:w-auto">
+                  <Sparkles className="mr-1.5 h-4 w-4" />
+                  Try in Playground
+                </LinkButton>
               </div>
-            )}
 
-            <LinkButton href="/register" variant="primary" className="w-full">
-              Get Started
-              <ArrowRight className="ml-1.5 h-4 w-4" />
-            </LinkButton>
-
-            <Link
-              href="/models"
-              className="flex items-center justify-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text-secondary"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              All models
-            </Link>
-          </div>
+              {/* Price strip */}
+              <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border-default bg-border-subtle lg:grid-cols-4 min-w-0">
+                <div className="bg-surface p-4 sm:p-5">
+                  <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                    <PanelTop className="h-3.5 w-3.5" />Context
+                  </p>
+                  <p className="font-mono text-xl font-semibold tabular text-text-primary sm:text-2xl">
+                    {model.context || "—"}
+                    <span className="ml-1 text-sm font-normal text-text-muted">tokens</span>
+                  </p>
+                </div>
+                <div className="bg-surface p-4 sm:p-5">
+                  <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                    <ArrowDownToLine className="h-3.5 w-3.5" />Input
+                  </p>
+                  <p className="font-mono text-xl font-semibold tabular text-text-primary sm:text-2xl">
+                    {model.ref_input > model.user_input && (
+                      <span className="mr-1.5 text-sm font-normal text-text-muted line-through">${formatPrice(model.ref_input)}</span>
+                    )}{" "}
+                    ${formatPrice(model.user_input)}
+                    <span className="ml-1 text-sm font-normal text-text-muted">/1M</span>
+                  </p>
+                </div>
+                <div className="bg-surface p-4 sm:p-5">
+                  <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                    <ArrowUpFromLine className="h-3.5 w-3.5" />Output
+                  </p>
+                  <p className="font-mono text-xl font-semibold tabular text-text-primary sm:text-2xl">
+                    {model.ref_output > model.user_output && (
+                      <span className="mr-1.5 text-sm font-normal text-text-muted line-through">${formatPrice(model.ref_output)}</span>
+                    )}{" "}
+                    ${formatPrice(model.user_output)}
+                    <span className="ml-1 text-sm font-normal text-text-muted">/1M</span>
+                  </p>
+                </div>
+                <div className="bg-surface p-4 sm:p-5">
+                  <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                    <TrendingDown className="h-3.5 w-3.5" />You save
+                  </p>
+                  <p className="font-mono text-xl font-semibold tabular text-success sm:text-2xl">
+                    {model.user_discount_pct.toFixed(0)}%
+                  </p>
+                </div>
+              </div>
+            </div>
           </PageEntranceItem>
-        </div>
+
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+            {/* Left: Quickstart */}
+            <PageEntranceItem>
+              <div className="min-w-0">
+                <h2 className="mb-1 text-xl font-semibold">Quickstart</h2>
+                <p className="mb-4 text-sm text-text-secondary">
+                  Use the OpenAI SDK with your Ruvicode API key. Just change the base URL and model name.
+                </p>
+                <CodeDemo tabs={quickstartTabs} />
+
+                <div className="mt-8 flex flex-col gap-4 rounded-xl border border-border-default bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-medium text-text-primary">Need the full API reference?</p>
+                    <p className="mt-0.5 text-sm text-text-secondary">
+                      Authentication, streaming, error handling, and rate limits.
+                    </p>
+                  </div>
+                  <Link
+                    href="/docs"
+                    className="flex shrink-0 items-center gap-1 text-sm font-medium text-accent-text transition-colors hover:text-accent-hover"
+                  >
+                    Read the docs
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            </PageEntranceItem>
+
+            {/* Right: reference card */}
+            <PageEntranceItem>
+              <div className="space-y-4">
+                <div className="rounded-xl border border-border-default bg-surface p-6">
+                  <h3 className="mb-4 font-semibold">Reference pricing</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-sm text-text-secondary">Official input</span>
+                      <span className="font-mono text-sm tabular text-text-muted">${formatPrice(model.ref_input)}/1M</span>
+                    </div>
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-sm text-text-secondary">Official output</span>
+                      <span className="font-mono text-sm tabular text-text-muted">${formatPrice(model.ref_output)}/1M</span>
+                    </div>
+                    <div className="flex items-baseline justify-between border-t border-border-subtle pt-3">
+                      <span className="text-sm text-text-secondary">Ruvicode price</span>
+                      <span className="font-mono text-sm font-medium tabular text-success">−{model.user_discount_pct.toFixed(0)}%</span>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-xs leading-relaxed text-text-muted">
+                    Live market pricing, refreshed every 2 minutes. No credit expiry. Savings versus official list prices.
+                  </p>
+                </div>
+
+                {model.context && (
+                  <div className="rounded-xl border border-border-default bg-surface p-6">
+                    <h3 className="mb-4 font-semibold">Specs</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-sm text-text-secondary">Context window</span>
+                        <span className="font-mono text-sm tabular text-text-primary">{model.context}</span>
+                      </div>
+                      {model.max_output && (
+                        <div className="flex items-baseline justify-between">
+                          <span className="text-sm text-text-secondary">Max output</span>
+                          <span className="font-mono text-sm tabular text-text-primary">{model.max_output}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <LinkButton href="/register" variant="primary" className="w-full">
+                  Get Started
+                  <ArrowRight className="ml-1.5 h-4 w-4" />
+                </LinkButton>
+
+                <Link
+                  href="/models"
+                  className="flex items-center justify-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text-secondary"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  All models
+                </Link>
+              </div>
+            </PageEntranceItem>
+          </div>
         </PageEntrance>
       </Container>
     </>

@@ -44,5 +44,12 @@ export function PageEntrance({ children }: { children: ReactNode }) {
 }
 
 export function PageEntranceItem({ children }: { children: ReactNode }) {
-  return <motion.div variants={itemVariants}>{children}</motion.div>;
+  // min-w-0: motion.div is often a CSS grid/flex child; grid items default to
+  // min-width auto which prevents shrinking below content width (ADR-031 bug
+  // class). Without this, long code lines blow out mobile layouts.
+  return (
+    <motion.div variants={itemVariants} className="min-w-0 w-full">
+      {children}
+    </motion.div>
+  );
 }

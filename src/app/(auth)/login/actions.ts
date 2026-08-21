@@ -24,12 +24,14 @@ export async function loginAction(input: unknown) {
       },
       headers: h,
     });
-
-    redirect("/dashboard");
   } catch {
     return {
       ok: false,
       message: "Invalid email or password.",
     } as const;
   }
+
+  // redirect() throws NEXT_REDIRECT internally, so it must stay OUTSIDE
+  // the try/catch above or the throw gets swallowed as a login failure.
+  redirect("/dashboard");
 }
