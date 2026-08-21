@@ -55,7 +55,7 @@ export const auth = betterAuth({
       await resend.emails.send({
         from: FROM_EMAIL,
         to: user.email,
-        subject: "Set your password — Ruvicode",
+        subject: "Set your password",
         html,
       });
     },

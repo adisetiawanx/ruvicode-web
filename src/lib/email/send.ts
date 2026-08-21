@@ -32,7 +32,7 @@ export async function sendLowBalanceEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: "Your balance is running low — Ruvicode",
+      subject: "Your balance is running low",
       html,
     });
   } catch (err) {
@@ -59,7 +59,7 @@ export async function sendTopupConfirmationEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: "Wallet credited — Ruvicode",
+      subject: "Wallet credited",
       html,
     });
   } catch (err) {
