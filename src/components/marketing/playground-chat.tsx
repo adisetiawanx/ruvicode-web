@@ -72,6 +72,14 @@ interface StreamChunk {
       reasoning_tokens?: number;
     };
   };
+  usage_from_consumer?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+  };
+  usage_from_provider?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+  };
 }
 
 const requestLimits = {
@@ -191,15 +199,18 @@ export function PlaygroundChat({
         );
       }
 
-      if (chunk.usage && (chunk.usage.prompt_tokens ?? 0) > 0) {
+      // Provider may send usage as "usage" (standard) or
+      // "usage_from_consumer" / "usage_from_provider" (vLLM).
+      const rawUsage = chunk.usage ?? chunk.usage_from_consumer ?? chunk.usage_from_provider;
+      if (rawUsage && (rawUsage.prompt_tokens ?? 0) > 0) {
         const usage = {
-          prompt: chunk.usage.prompt_tokens ?? 0,
-          completion: chunk.usage.completion_tokens ?? 0,
+          prompt: rawUsage.prompt_tokens ?? 0,
+          completion: rawUsage.completion_tokens ?? 0,
         };
         setLastUsage(usage);
         setLastCost(costOf(modelPricing, usage));
         setLastReasoningTokens(
-          chunk.usage.completion_tokens_details?.reasoning_tokens ?? 0,
+          chunk.usage?.completion_tokens_details?.reasoning_tokens ?? 0,
         );
       }
     },

@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${providerKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...parsed.data, stream: true }),
+      body: JSON.stringify({ ...parsed.data, stream: true, stream_options: { include_usage: true } }),
     });
   } catch {
     return Response.json(
