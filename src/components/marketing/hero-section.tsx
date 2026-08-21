@@ -29,7 +29,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
 
   return (
     <section className="relative overflow-hidden">
-      {/* Subtle radial glow, Clay tint, NOT gradient slop */}
+      {/* Subtle radial glow — Clay tint, NOT gradient slop */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -39,9 +39,9 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
       />
 
       <Container size="wide" className="relative pb-24 pt-20 md:pb-32 md:pt-32">
-        {/* Desktop: text left, code demo right, side-by-side at lg+ */}
+        {/* Desktop: text left, code demo right — side-by-side at lg+ */}
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Left column, text content */}
+          {/* Left column — text content */}
           <motion.div
             variants={container}
             initial={isMobile ? false : "hidden"}
@@ -61,7 +61,9 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
               variants={item}
               className="mb-6 text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl"
             >
-              Ruvicode brings every frontier AI model behind one API key.
+              Every frontier AI model.
+              <br />
+              One API key.
               <br />
               <span className="text-accent">Real per-request pricing.</span>
             </motion.h1>
@@ -89,7 +91,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
             </motion.div>
           </motion.div>
 
-          {/* Right column, code demo */}
+          {/* Right column — code demo */}
           <motion.div
             initial={isMobile ? false : { opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
