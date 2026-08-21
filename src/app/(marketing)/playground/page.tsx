@@ -12,13 +12,13 @@ import {
 } from "@/components/shared/page-entrance";
 
 export const metadata: Metadata = {
-  title: "AI Playground - Try DeepSeek V4 Flash Free",
+  title: "AI Playground - Try a Model Free",
   description:
-    "Try DeepSeek V4 Flash free in your browser. No account needed. Sign up for every model with real per-request pricing and hard spend limits.",
+    "Try AI models free in your browser. No account, no API key, no setup. Send a real request right now and see live token pricing per request.",
   alternates: { canonical: "https://ruvicode.com/playground" },
   openGraph: {
     title: "AI Playground",
-    description: "Try DeepSeek V4 Flash in your browser. Free, fair-use limits apply.",
+    description: "Try AI models free in your browser. No account needed. Fair-use limits apply.",
     url: "https://ruvicode.com/playground",
     siteName: "Ruvicode",
     type: "website",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "AI Playground",
-    description: "Try DeepSeek V4 Flash free. No account needed.",
+    description: "Try AI models free. No account needed.",
     images: ["https://ruvicode.com/og/ruvicode-default.png"],
   },
 };
@@ -81,7 +81,7 @@ export default async function PlaygroundPage({
           <PageEntranceItem>
             <h1 className="mb-2 text-h1 font-semibold">Try it free</h1>
             <p className="mb-8 text-text-secondary">
-              Send a real request to DeepSeek V4 Flash right now. No account,
+              Send a real request to a free AI model right now. No account,
               no key, no setup. Fair-use limits apply.
             </p>
           </PageEntranceItem>
@@ -97,48 +97,9 @@ export default async function PlaygroundPage({
                     The free playground runs on{" "}
                     {models.find((m) => m.model === publicPlaygroundFallbackModel)
                       ?.display_name ?? displayModelName(publicPlaygroundFallbackModel)}
-                    . Create a free account to try every model in the
+                    . Create a free account to try more models in the
                     catalog with your own API key and real per-request pricing.
                   </p>
-                  <div className="flex flex-wrap items-center justify-center gap-3">
-                    <LinkButton href="/register" variant="primary">
-                      Sign up free →
-                    </LinkButton>
-                    <LinkButton
-                      href="/playground"
-                      variant="outline"
-                    >
-                      Try the free model
-                    </LinkButton>
-                  </div>
-                </div>
-                <div className="space-y-4 rounded-lg border border-border-default bg-surface p-4">
-                  <div>
-                    <p className="mb-2 text-xs font-medium text-text-secondary">
-                      {lockedModel.display_name} pricing
-                    </p>
-                    <div className="space-y-2 font-mono text-xs tabular text-text-secondary">
-                      <p>
-                        ${lockedModel.user_input.toFixed(4)}/1M input tokens
-                      </p>
-                      <p>
-                        ${lockedModel.user_output.toFixed(4)}/1M output tokens
-                      </p>
-                      <p className="text-success">
-                        Save {lockedModel.user_discount_pct.toFixed(0)}% vs
-                        official
-                      </p>
-                    </div>
-                  </div>
-                  <div className="border-t border-border-subtle pt-3">
-                    <p className="text-xs text-text-muted">
-                      Free playground model, no account needed.
-                    </p>
-                    <p className="mt-1 flex items-center gap-1 text-[11px] text-text-muted">
-                      <Lock className="h-3 w-3" />
-                      Chats are not saved or stored.
-                    </p>
-                  </div>
                 </div>
               </div>
             ) : (
