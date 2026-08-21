@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
-import { loginAction } from "./actions";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,23 +23,25 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginInput) {
     setLoading(true);
-    const result = await loginAction(data);
+    // Client SDK POSTs directly to /api/auth/sign-in/email so the session
+    // cookie reaches the browser. A server action cannot forward the
+    // Set-Cookie header reliably in this setup.
+    const { error } = await authClient.signIn.email({
+      email: data.email,
+      password: data.password,
+      callbackURL: "/dashboard",
+    });
     setLoading(false);
 
-    if (!result.ok) {
-      if ("errors" in result && result.errors) {
-        Object.entries(result.errors).forEach(([field, messages]) => {
-          form.setError(field as keyof LoginInput, {
-            message: (messages as string[])[0],
-          });
-        });
-      }
-      toast.error(result.message);
+    if (error) {
+      toast.error(
+        error.message ?? "Invalid email or password. Please try again.",
+      );
       return;
     }
 
-    // Success — redirect happens in server action
     toast.success("Welcome back!");
+    window.location.assign("/dashboard");
   }
 
   return (

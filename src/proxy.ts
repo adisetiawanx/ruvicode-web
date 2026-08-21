@@ -5,14 +5,11 @@ import type { NextRequest } from "next/server";
  * Proxy (Next.js 16 — formerly middleware) — handles route protection.
  *
  * - Protects /dashboard/* — redirects to /login if no session cookie
- * - Redirects authenticated users away from /login and /register
+ * - Hard-404s /super for anonymous visitors
  */
 
 // Paths that require authentication
 const protectedPaths = ["/dashboard"];
-
-// Paths that should NOT be accessible when logged in
-const authPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -25,7 +22,6 @@ export function proxy(request: NextRequest) {
     request.cookies.get("__Secure-better-auth.session_token");
 
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
-  const isAuthPage = authPaths.some((p) => pathname.startsWith(p));
 
   // Protect dashboard — redirect to login if no session
   if (isProtected && !sessionToken) {
@@ -46,11 +42,6 @@ export function proxy(request: NextRequest) {
     const res = NextResponse.next();
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
     return res;
-  }
-
-  // Redirect authenticated users away from auth pages
-  if (isAuthPage && sessionToken) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
