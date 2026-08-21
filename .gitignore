@@ -37,3 +37,4 @@ next-env.d.ts
 # AI agent config, local only
 AGENTS.md
 CLAUDE.md
+gen-hash.mjs
