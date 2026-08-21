@@ -310,6 +310,19 @@
   }
 }
 
+/* Same idea for JS-less agents: the no-FOUC script in layout.tsx adds
+   a `js` class before first paint, so real browsers (and JS-rendering
+   crawlers) keep the entrance animations. Anything that parses the raw
+   HTML without executing JS (snapshot tools, strict security scanners,
+   plain curl pipes) gets no `js` class, and this rule forces every
+   framer-motion initial state fully visible. Raw server HTML always
+   reads as complete content. */
+html:not(.js) [style*="opacity: 0"],
+html:not(.js) [style*="opacity:0"] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    GLOBAL BASE STYLES
    ═══════════════════════════════════════════════════════════════════ */

@@ -37,11 +37,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
-        {/* No-FOUC theme script — must run BEFORE hydration */}
+        {/* No-FOUC theme script — must run BEFORE hydration.
+            Also tags the document with a `js` class so globals.css can
+            keep SSR content visible for crawlers that never run JS
+            (they see no `js` class, so the opacity overrides kick in). */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
+                document.documentElement.classList.add('js');
                 try {
                   var stored = localStorage.getItem('ruvicode-theme');
                   var theme = stored || 'dark';
