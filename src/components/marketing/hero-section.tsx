@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/layout/container";
 import { CodeDemo, type CodeTab } from "./code-demo";
 import { LinkButton } from "@/components/shared/link-button";
-import { useIsMobile } from "@/lib/hooks/use-is-mobile";
+import { useMounted } from "@/lib/hooks/use-mounted";
 
 const container = {
   hidden: { opacity: 0 },
@@ -25,7 +25,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ codeTabs }: HeroSectionProps) {
-  const isMobile = useIsMobile();
+  const mounted = useMounted();
 
   return (
     <section className="relative overflow-hidden">
@@ -44,7 +44,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
           {/* Left column — text content */}
           <motion.div
             variants={container}
-            initial={isMobile ? false : "hidden"}
+            initial={mounted ? "hidden" : false}
             animate="show"
             className="w-full min-w-0"
           >
@@ -93,7 +93,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
 
           {/* Right column — code demo */}
           <motion.div
-            initial={isMobile ? false : { opacity: 0, y: 30 }}
+            initial={mounted ? { opacity: 0, y: 30 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
             className="w-full min-w-0"

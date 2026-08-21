@@ -11,7 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Container } from "@/components/layout/container";
-import { useIsMobile } from "@/lib/hooks/use-is-mobile";
+import { useMounted } from "@/lib/hooks/use-mounted";
 
 interface Feature {
   icon: LucideIcon;
@@ -53,7 +53,7 @@ const features: Feature[] = [
 ];
 
 export function FeatureGrid() {
-  const isMobile = useIsMobile();
+  const mounted = useMounted();
   return (
     <Container size="wide" className="py-24">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -62,7 +62,7 @@ export function FeatureGrid() {
           return (
             <motion.div
               key={feature.title}
-              initial={isMobile ? false : { opacity: 0, y: 20 }}
+              initial={mounted ? { opacity: 0, y: 20 } : false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.05 }}

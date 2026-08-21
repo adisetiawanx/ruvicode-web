@@ -2,16 +2,16 @@
 
 import { motion } from "framer-motion";
 import { Container } from "@/components/layout/container";
-import { useIsMobile } from "@/lib/hooks/use-is-mobile";
+import { useMounted } from "@/lib/hooks/use-mounted";
 import { LinkButton } from "@/components/shared/link-button";
 
 export function CtaSection() {
-  const isMobile = useIsMobile();
+  const mounted = useMounted();
   return (
     <section className="border-t border-border-subtle py-24">
       <Container size="content">
         <motion.div
-          initial={isMobile ? false : { opacity: 0, y: 20 }}
+          initial={mounted ? { opacity: 0, y: 20 } : false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4 }}

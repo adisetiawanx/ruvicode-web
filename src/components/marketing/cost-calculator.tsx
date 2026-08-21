@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { LinkButton } from "@/components/shared/link-button";
+import { useMounted } from "@/lib/hooks/use-mounted";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 
 /** Common usage profiles for one-click fills. */
@@ -29,6 +30,7 @@ export function CostCalculator({
 }: {
   models: ModelWithPricing[];
 }) {
+  const mounted = useMounted();
   const [inputTokens, setInputTokens] = useState(1_000_000);
   const [outputTokens, setOutputTokens] = useState(500_000);
   const [selectedModel, setSelectedModel] = useState(models[0]?.model ?? "");
@@ -158,7 +160,7 @@ export function CostCalculator({
         {calculation && (
           <>
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={mounted ? { opacity: 0, y: 10 } : false}
               animate={{ opacity: 1, y: 0 }}
               className="rounded-lg border border-border-default bg-surface p-6"
             >
@@ -171,7 +173,7 @@ export function CostCalculator({
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={mounted ? { opacity: 0, y: 10 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="rounded-lg border-2 border-accent bg-accent-subtle p-6"
