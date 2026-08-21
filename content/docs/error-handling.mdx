@@ -1,76 +1,9 @@
 ---
 title: "Error Handling"
 slug: error-handling
-description: "Understand API error codes and how to handle them."
+description: "Ruvicode API error codes and error handling. Learn how to retry on rate limits, handle insufficient balance, and parse OpenAI-format error responses."
 section: "API Reference"
 order: 3
 ---
 
 Ruvicode returns standard HTTP status codes. Error responses follow the OpenAI format.
-
-## Error format
-
-```json
-{
-  "error": {
-    "message": "Human-readable error message",
-    "type": "error_type",
-    "code": null
-  }
-}
-```
-
-## Common errors
-
-| Status | Type | Meaning | Action |
-|--------|------|---------|--------|
-| 400 | `invalid_request_error` | Bad request parameters | Check your request body |
-| 413 | `invalid_request_error` | Request body too large | Keep the body under 10 MB |
-| 401 | `authentication_error` | Invalid or missing API key | Check your Authorization header |
-| 402 | `insufficient_balance` | Wallet balance too low | Top up your wallet |
-| 403 | `permission_error` | Key revoked or spend limit hit | Check key status in dashboard |
-| 429 | `rate_limit_error` | Rate limit exceeded | Wait and retry, or reduce frequency |
-| 500 | `api_error` | Server error | Retry with backoff |
-| 503 | `service_unavailable` | Model temporarily unavailable | Retry with different model |
-
-## Rate limiting
-
-Every key has a rate limit (default: 60 requests/minute). When exceeded:
-
-```json
-{
-  "error": {
-    "message": "Rate limit exceeded. Try again in 60 seconds.",
-    "type": "rate_limit_error"
-  }
-}
-```
-
-Response headers include rate limit info:
-
-```
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-Retry-After: 60
-```
-
-## Retry strategy
-
-For `429` and `503` errors, use exponential backoff:
-
-```python
-import time
-
-def retry_with_backoff(fn, max_retries=3):
-    for attempt in range(max_retries):
-        try:
-            return fn()
-        except Exception as e:
-            if attempt == max_retries - 1:
-                raise
-            time.sleep(2 ** attempt)  # 1s, 2s, 4s
-```
-
-## Insufficient balance
-
-If your wallet runs out mid-request, you'll receive a `402` error. Top up your wallet to resume. Your existing API keys remain valid, no need to regenerate them.

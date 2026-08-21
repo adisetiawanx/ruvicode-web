@@ -1,65 +1,9 @@
 ---
 title: "Authentication"
 slug: authentication
-description: "How to authenticate API requests with your Ruvicode API key."
+description: "How to authenticate Ruvicode API requests with Bearer API keys. Create keys, set rate limits and spend limits, rotate or revoke access anytime."
 section: "Getting Started"
 order: 2
 ---
 
 Every API request must include your Ruvicode API key in the `Authorization` header.
-
-## API key format
-
-Ruvicode API keys start with `rvcd_` followed by 32 random hex characters:
-
-```
-rvcd_a1b2c3d4e5f6...
-```
-
-## Making authenticated requests
-
-```bash
-curl https://api.ruvicode.com/v1/chat/completions \
-  -H "Authorization: Bearer rvcd_..." \
-  -H "Content-Type: application/json" \
-  -d '{...}'
-```
-
-## Key management
-
-- **Create keys** in Dashboard → API Keys
-- **Name keys** for identification (e.g., "production-app", "dev-testing")
-- **Set spend limits** per key (daily, monthly, or total)
-- **Set rate limits** per key (requests per minute)
-- **Rotate keys** anytime, old key stops working immediately
-- **Revoke keys** to permanently disable
-
-## Security
-
-- Keys are hashed (SHA-256) before storage, we cannot recover lost keys
-- Keys are shown **only once** at creation time
-- Never commit keys to version control
-- Use environment variables to manage keys in your application
-
-## Errors
-
-If authentication fails, you'll receive a `401` response:
-
-```json
-{
-  "error": {
-    "message": "Invalid API key",
-    "type": "authentication_error"
-  }
-}
-```
-
-If your key has been revoked or suspended (e.g., spend limit hit), you'll receive a `403` response.
-
-
-## Public endpoints
-
-`GET /v1/models` is public and needs no API key. Coding tools (OpenCode,
-OpenClaw, and other OpenAI-compatible clients) discover custom providers by
-fetching the model list without credentials, so it stays open. Everything
-else, including all chat completions, requires your `rvcd_` key.

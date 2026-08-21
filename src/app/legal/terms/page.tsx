@@ -3,12 +3,12 @@ import { legalProseStyles } from "@/lib/legal-styles";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms governing use of Ruvicode's AI API gateway service.",
+  description: "Terms governing use of the Ruvicode AI API gateway. API access, acceptable use, payment and billing, account suspension, and liability limitations.",
   alternates: { canonical: "https://ruvicode.com/legal/terms" },
   robots: { index: true, follow: true },
   openGraph: {
     title: "Terms of Service",
-    description: "Terms governing use of Ruvicode's AI API gateway service.",
+    description: "Terms governing use of the Ruvicode AI API gateway. API access, acceptable use, payment and billing, account suspension, and liability limitations.",
     url: "https://ruvicode.com/legal/terms",
     siteName: "Ruvicode",
     type: "website",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Terms of Service",
-    description: "Terms governing use of Ruvicode's AI API gateway service.",
+    description: "Terms governing use of the Ruvicode AI API gateway. API access, acceptable use, payment and billing, account suspension, and liability limitations.",
     images: ["https://ruvicode.com/og/ruvicode-default.png"],
   },
 };

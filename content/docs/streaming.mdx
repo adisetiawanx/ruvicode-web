@@ -1,75 +1,9 @@
 ---
 title: "Streaming"
 slug: streaming
-description: "Stream responses in real-time using Server-Sent Events."
+description: "Stream AI responses in real time with Server-Sent Events. Use stream:true with the OpenAI-compatible chat completions endpoint for token-by-token output."
 section: "API Reference"
 order: 2
 ---
 
 Streaming lets you receive tokens as they're generated, providing a better user experience for chat and long-form generation.
-
-## Enabling streaming
-
-Set `stream: true` in your request body:
-
-```bash
-curl https://api.ruvicode.com/v1/chat/completions \
-  -H "Authorization: Bearer rvcd_..." \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "glm-5.2",
-    "messages": [{"role": "user", "content": "Write a poem"}],
-    "stream": true
-  }'
-```
-
-## SSE format
-
-Streaming responses use Server-Sent Events. Each line starts with `data: `:
-
-```
-data: {"choices":[{"delta":{"content":"Hello"}}]}
-
-data: {"choices":[{"delta":{"content":" world"}}]}
-
-data: {"choices":[{"finish_reason":"stop"}]}
-
-data: [DONE]
-```
-
-## Python streaming
-
-```python
-stream = client.chat.completions.create(
-    model="glm-5.2",
-    messages=[{"role": "user", "content": "Hello!"}],
-    stream=True
-)
-for chunk in stream:
-    content = chunk.choices[0].delta.content
-    if content:
-        print(content, end="", flush=True)
-```
-
-## Node.js streaming
-
-```typescript
-const stream = await client.chat.completions.create({
-  model: "glm-5.2",
-  messages: [{ role: "user", content: "Hello!" }],
-  stream: true,
-});
-
-for await (const chunk of stream) {
-  const content = chunk.choices[0]?.delta?.content;
-  if (content) process.stdout.write(content);
-}
-```
-
-## Usage and cost
-
-When streaming, usage data (token counts) is included in the final chunk before `[DONE]`. HTTP headers cannot be appended after the stream starts, so streaming responses do not carry `X-Cost` — check your per-request cost in the dashboard usage history instead. Non-streaming responses include the `X-Cost` header as usual.
-
-## Strict SSE parsing
-
-Events are separated by blank lines, per the SSE specification. Each `data:` line is one JSON chunk, and the stream ends with `data: [DONE]`. Standard parsers (EventSource, OpenAI SDKs, Vercel AI SDK) work out of the box.

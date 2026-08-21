@@ -3,12 +3,12 @@ import { legalProseStyles } from "@/lib/legal-styles";
 
 export const metadata: Metadata = {
   title: "Refund Policy",
-  description: "Ruvicode's 30-day money-back guarantee on wallet top-ups.",
+  description: "Ruvicode refund policy. 30-day money-back guarantee on unused wallet top-ups, how to request a refund, and processing times.",
   alternates: { canonical: "https://ruvicode.com/legal/refund" },
   robots: { index: true, follow: true },
   openGraph: {
     title: "Refund Policy",
-    description: "Ruvicode's 30-day money-back guarantee on wallet top-ups.",
+    description: "Ruvicode refund policy. 30-day money-back guarantee on unused wallet top-ups, how to request a refund, and processing times.",
     url: "https://ruvicode.com/legal/refund",
     siteName: "Ruvicode",
     type: "website",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Refund Policy",
-    description: "Ruvicode's 30-day money-back guarantee on wallet top-ups.",
+    description: "Ruvicode refund policy. 30-day money-back guarantee on unused wallet top-ups, how to request a refund, and processing times.",
     images: ["https://ruvicode.com/og/ruvicode-default.png"],
   },
 };

@@ -3,12 +3,14 @@ import { legalProseStyles } from "@/lib/legal-styles";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How Ruvicode collects, uses, and protects your data.",
+  description:
+    "How Ruvicode collects, uses, and protects your data. Learn what usage metadata we store, how payments work, and your privacy rights.",
   alternates: { canonical: "https://ruvicode.com/legal/privacy" },
   robots: { index: true, follow: true },
   openGraph: {
     title: "Privacy Policy",
-    description: "How Ruvicode collects, uses, and protects your data.",
+    description:
+      "How Ruvicode collects, uses, and protects your data. Learn what usage metadata we store, how payments work, and your privacy rights.",
     url: "https://ruvicode.com/legal/privacy",
     siteName: "Ruvicode",
     type: "website",
@@ -24,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Privacy Policy",
-    description: "How Ruvicode collects, uses, and protects your data.",
+    description: "How Ruvicode collects, uses, and protects your data. Learn what usage metadata we store, how payments work, and your privacy rights.",
     images: ["https://ruvicode.com/og/ruvicode-default.png"],
   },
 };

@@ -11,7 +11,9 @@ import {
 
 // Don't index transient status page
 export const metadata: Metadata = {
-  title: "Status",
+  title: "API Status - Live Model Availability",
+  description:
+    "Real-time status of all AI models on Ruvicode. See which models are online, response times, and recent incidents.",
   alternates: { canonical: "https://ruvicode.com/status" },
   robots: { index: false, follow: false },
 };

@@ -11,13 +11,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { tag } = await params;
   const url = `https://ruvicode.com/blog/tag/${tag}`;
+  const tagLabel = tag.replace(/-/g, " ");
   return {
-    title: `Posts tagged "${tag}" - Blog`,
-    description: `Browse all blog posts tagged ${tag}.`,
+    title: `${tagLabel} - AI API Blog Posts`,
+    description: `All Ruvicode blog posts about ${tagLabel}. Guides, tutorials, and comparisons on AI APIs, pricing, and integrations.`,
     alternates: { canonical: url },
     openGraph: {
-      title: `Posts tagged "${tag}" - Blog`,
-      description: `Browse all blog posts tagged ${tag}.`,
+      title: `${tagLabel} - Ruvicode Blog`,
+      description: `All Ruvicode blog posts about ${tagLabel}.`,
       url,
       siteName: "Ruvicode",
       type: "website",
@@ -26,14 +27,14 @@ export async function generateMetadata({
           url: "https://ruvicode.com/og/ruvicode-default.png",
           width: 1200,
           height: 630,
-          alt: `Ruvicode blog posts tagged ${tag}`,
+          alt: `Ruvicode blog posts about ${tagLabel}`,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `Posts tagged "${tag}" - Blog`,
-      description: `Browse all blog posts tagged ${tag}.`,
+      title: `${tagLabel} - Ruvicode Blog`,
+      description: `All Ruvicode blog posts about ${tagLabel}.`,
       images: ["https://ruvicode.com/og/ruvicode-default.png"],
     },
   };
