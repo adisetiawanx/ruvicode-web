@@ -34,6 +34,8 @@ export interface DailyUsage {
   isoDate: string | null;
   cost: number;
   requests: number;
+  /** Total tokens (prompt + completion) for the day. */
+  tokens: number;
 }
 
 export interface ModelBreakdownEntry {
@@ -83,13 +85,13 @@ const MOCK_MONTHLY_REQUESTS = 1247;
 const MOCK_MONTHLY_SAVINGS = 8.91;
 
 const MOCK_WEEKLY_USAGE: DailyUsage[] = [
-  { date: "Mon", isoDate: null, cost: 0.42, requests: 180 },
-  { date: "Tue", isoDate: null, cost: 0.31, requests: 142 },
-  { date: "Wed", isoDate: null, cost: 0.88, requests: 321 },
-  { date: "Thu", isoDate: null, cost: 0.56, requests: 245 },
-  { date: "Fri", isoDate: null, cost: 0.72, requests: 298 },
-  { date: "Sat", isoDate: null, cost: 0.19, requests: 88 },
-  { date: "Sun", isoDate: null, cost: 0.16, requests: 73 },
+  { date: "Mon", isoDate: null, cost: 0.42, requests: 180 , tokens: 90000 },
+  { date: "Tue", isoDate: null, cost: 0.31, requests: 142 , tokens: 72000 },
+  { date: "Wed", isoDate: null, cost: 0.88, requests: 321 , tokens: 158000 },
+  { date: "Thu", isoDate: null, cost: 0.56, requests: 245 , tokens: 121000 },
+  { date: "Fri", isoDate: null, cost: 0.72, requests: 298 , tokens: 149000 },
+  { date: "Sat", isoDate: null, cost: 0.19, requests: 88 , tokens: 44000 },
+  { date: "Sun", isoDate: null, cost: 0.16, requests: 73 , tokens: 61000 },
 ];
 
 const MOCK_MODEL_BREAKDOWN: ModelBreakdownEntry[] = [
@@ -207,6 +209,7 @@ export async function getWeeklyUsage(userId: string): Promise<DailyUsage[]> {
       isoDate: sql<string>`TO_CHAR(DATE_TRUNC('day', ${usageRecords.createdAt}), 'YYYY-MM-DD')`,
       cost: sql<number>`COALESCE(SUM(${usageRecords.cost}),0)`,
       requests: sql<number>`COUNT(*)`,
+      tokens: sql<number>`COALESCE(SUM(${usageRecords.promptTokens} + ${usageRecords.completionTokens}),0)`,
     })
     .from(usageRecords)
     .where(
@@ -219,13 +222,14 @@ export async function getWeeklyUsage(userId: string): Promise<DailyUsage[]> {
     .orderBy(sql`DATE_TRUNC('day', ${usageRecords.createdAt})`);
 
   // Build a map of isoDate -> row for quick lookup.
-  const byDate = new Map<string, { cost: number; requests: number; date: string }>();
+  const byDate = new Map<string, { cost: number; requests: number; tokens: number; date: string }>();
   for (const r of rows) {
     const iso = r.isoDate?.trim() ?? "";
     byDate.set(iso, {
       date: r.date.trim(),
       cost: Number(r.cost),
       requests: Number(r.requests),
+      tokens: Number(r.tokens),
     });
   }
 
@@ -247,6 +251,7 @@ export async function getWeeklyUsage(userId: string): Promise<DailyUsage[]> {
       isoDate: iso,
       cost: existing?.cost ?? 0,
       requests: existing?.requests ?? 0,
+      tokens: existing?.tokens ?? 0,
     });
   }
 

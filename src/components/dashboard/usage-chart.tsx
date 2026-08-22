@@ -94,10 +94,12 @@ export function UsageChart({ data }: UsageChartProps) {
             <Tooltip
               contentStyle={tooltipStyle}
               labelStyle={{ color: "var(--text-secondary)" }}
-              formatter={(value) => [
-                `$${Number(value).toFixed(6)}`,
-                "Cost",
-              ]}
+              formatter={(value, name) => {
+                if (name === "cost") return [`$${Number(value).toFixed(6)}`, "Cost"];
+                if (name === "tokens")
+                  return [Number(value).toLocaleString(), "Tokens"];
+                return [String(value), name];
+              }}
               cursor={{
                 stroke: "var(--chart-1)",
                 strokeWidth: 1,
@@ -111,6 +113,14 @@ export function UsageChart({ data }: UsageChartProps) {
               strokeWidth={2}
               fill="url(#costGradient)"
               animationDuration={800}
+            />
+            <Area
+              type="monotone"
+              dataKey="tokens"
+              stroke="transparent"
+              fill="transparent"
+              activeDot={false}
+              animationDuration={0}
             />
           </AreaChart>
         </ResponsiveContainer>
