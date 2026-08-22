@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getSession } from "@/lib/session";
 import { TopUpPaddle } from "@/components/dashboard/topup-paddle";
 import { TopUpUSDC } from "@/components/dashboard/topup-usdc";
+import { PaddleCheckout } from "@/components/dashboard/paddle-checkout";
 import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
@@ -40,6 +42,10 @@ export default async function TopUpPage() {
 
   return (
     <div className="space-y-6">
+      {/* Opens the Paddle overlay when URL has ?_ptxn=txn_xxx */}
+      <Suspense fallback={null}>
+        <PaddleCheckout />
+      </Suspense>
       <h1 className="text-2xl font-semibold text-text-primary">
         Top Up Wallet
       </h1>

@@ -67,7 +67,9 @@ export async function createPaddleTransaction(input: {
               taxCategory: "saas",
             },
             unitPrice: {
-              amount: input.amount.toFixed(2),
+              // Paddle API expects amount in cents (integer string),
+              // not decimal major units. $5.00 -> "500".
+              amount: String(Math.round(input.amount * 100)),
               currencyCode: "USD",
             },
           },
