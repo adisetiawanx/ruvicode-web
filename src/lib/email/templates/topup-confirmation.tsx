@@ -72,7 +72,7 @@ export function TopupConfirmationTemplate({
             marginBottom: 16,
           }}
         >
-          {method}
+          {method === "usdc" ? "USDC" : method}
         </Text>
 
         <Text

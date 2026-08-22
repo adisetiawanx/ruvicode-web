@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { notFound } from "next/navigation";
 import { getAdminFinancial } from "@/lib/db/queries/admin-financial";
 import { displayModelName } from "@/lib/models/display";
+import { formatTopupMethod } from "@/lib/utils";
 import { ClientTime } from "@/components/shared/client-time";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
 
@@ -45,7 +46,7 @@ export default async function AdminFinancialPage({ searchParams }: { searchParam
                 {recent.map((row, i) => (
                   <tr key={`${row.createdAt}-${i}`} className="border-t border-border-subtle">
                     <td className="py-2 text-xs"><ClientTime utc={row.createdAt} /></td>
-                    <td className="py-2">{row.method}</td>
+                    <td className="py-2">{formatTopupMethod(row.method)}</td>
                     <td className="py-2 text-right font-mono">${row.amount.toFixed(2)}</td>
                     <td className="py-2">{row.status}</td>
                   </tr>

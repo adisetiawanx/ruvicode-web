@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { floorUsd } from "@/lib/models/display";
+import { formatTopupMethod } from "@/lib/utils";
 import { getSession } from "@/lib/session";
 import { getTopups } from "@/lib/db/queries/management";
 import { getWallet } from "@/lib/db/queries/dashboard";
@@ -90,8 +91,8 @@ export default async function BillingPage() {
                       })}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant="outline" className="capitalize">
-                        {t.method}
+                      <Badge variant="outline">
+                        {formatTopupMethod(t.method)}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-primary">
