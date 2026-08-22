@@ -7,6 +7,7 @@ const footerLinks = {
     { href: "/models", label: "Models" },
     { href: "/blog", label: "Blog" },
     { href: "/docs", label: "Documentation" },
+    { href: "/contact", label: "Contact" },
   ],
   Tools: [
     { href: "/playground", label: "Playground" },

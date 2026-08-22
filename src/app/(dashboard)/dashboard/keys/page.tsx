@@ -25,23 +25,13 @@ export default async function KeysPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-text-primary">API Keys</h1>
         <div className="flex items-center gap-2">
-          <LinkButton
-            href="/docs"
-            variant="outline"
-            size="icon-sm"
-            aria-label="Documentation"
-            title="Documentation"
-          >
+          <LinkButton href="/docs" variant="outline" size="sm">
             <BookOpen />
+            Docs
           </LinkButton>
-          <LinkButton
-            href="/integrations"
-            variant="outline"
-            size="icon-sm"
-            aria-label="Integrations"
-            title="Integrations"
-          >
+          <LinkButton href="/integrations" variant="outline" size="sm">
             <Plug />
+            Integrations
           </LinkButton>
           <CreateKeyButton />
         </div>

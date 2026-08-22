@@ -93,18 +93,24 @@ export default async function PlaygroundPage({
           </PageEntranceItem>
           <PageEntranceItem>
             {!isFree && lockedModel ? (
-              <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-                <div className="flex h-[400px] flex-col items-center justify-center rounded-lg border border-border-default bg-surface p-8 text-center">
-                  <Lock className="mb-4 h-10 w-10 text-accent" />
-                  <h2 className="mb-2 text-xl font-semibold">
-                    {lockedModel.display_name} is a paid model
-                  </h2>
-                  <p className="mb-6 max-w-md text-sm text-text-secondary">
-                    The free playground runs on{" "}
-                    {displayModelName(freeModel)}
-                    . Create a free account to try more models in the
-                    catalog with your own API key and real per-request pricing.
-                  </p>
+              <div className="flex h-[400px] flex-col items-center justify-center rounded-lg border border-border-default bg-surface p-8 text-center">
+                <Lock className="mb-4 h-10 w-10 text-accent" />
+                <h2 className="mb-2 text-xl font-semibold">
+                  {lockedModel.display_name} is a paid model
+                </h2>
+                <p className="mb-6 max-w-md text-sm text-text-secondary">
+                  The free playground runs on{" "}
+                  {displayModelName(freeModel)}
+                  . Create a free account to try more models in the
+                  catalog with your own API key and real per-request pricing.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <LinkButton href="/register" variant="primary" size="sm">
+                    Create free account
+                  </LinkButton>
+                  <LinkButton href="/login" variant="outline" size="sm">
+                    Sign in
+                  </LinkButton>
                 </div>
               </div>
             ) : (
