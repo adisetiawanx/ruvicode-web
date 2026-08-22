@@ -77,7 +77,7 @@ export default async function AdminFinancialPage({ searchParams }: { searchParam
         {revenue.perModel.length === 0 ? <p className="text-sm text-text-muted">No data to display.</p> : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-sm">
-              <thead className="bg-surface-2 text-xs text-text-muted"><tr><th className="px-3 py-2 text-left">Model</th><th className="px-3 py-2 text-right">Requests</th><th className="px-3 py-2 text-right">Charges</th><th className="px-3 py-2 text-right">Provider cost</th><th className="px-3 py-2 text-right">Margin</th><th className="px-3 py-2 text-right">%</th></tr></thead>
+              <thead className="bg-surface-2 text-xs text-text-muted"><tr><th className="px-3 py-2 text-left">Model</th><th className="px-3 py-2 text-right">Requests</th><th className="px-3 py-2 text-right">Charges</th><th className="px-3 py-2 text-right">Est. provider cost</th><th className="px-3 py-2 text-right">Margin</th><th className="px-3 py-2 text-right">%</th></tr></thead>
               <tbody>
                 {revenue.perModel.map((row) => (
                   <tr key={row.model} className="border-b border-border-subtle">

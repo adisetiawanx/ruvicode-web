@@ -221,7 +221,10 @@ export const usageRecords = pgTable(
     cost: decimal("cost", { precision: 12, scale: 8 }).notNull(), // amount charged to user
     upstreamCost: decimal("upstream_cost", { precision: 12, scale: 8 })
       .notNull()
-      .default("0"), // provider cost
+      .default("0"), // wholesale infra cost as reported (not the wallet charge)
+    marketCost: decimal("market_cost", { precision: 12, scale: 8 })
+      .notNull()
+      .default("0"), // estimated real wallet charge at marketplace best prices
     refCost: decimal("ref_cost", { precision: 12, scale: 8 })
       .notNull()
       .default("0"), // what the request would cost at the reference price
