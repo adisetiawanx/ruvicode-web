@@ -45,19 +45,6 @@ export interface PlaygroundErrorResponse {
   remaining?: number;
 }
 
-/**
- * Build the chat completions URL for the provider. The configured
- * PROVIDER_BASE_URL may or may not include the /v1 segment (the gateway's
- * copy does, the web's does not), so never append it twice.
- */
-export function playgroundProviderUrl(): string {
-  const base = (process.env.PROVIDER_BASE_URL ?? "").replace(/\/+$/, "");
-  if (!base) return "";
-  return base.endsWith("/v1")
-    ? `${base}/chat/completions`
-    : `${base}/v1/chat/completions`;
-}
-
 // The provider reports settlement internals (cost, cost_details, is_byok)
 // and its own identity (provider field, model echoed with an upstream
 // prefix). Every SSE line is scrubbed before it reaches the browser.

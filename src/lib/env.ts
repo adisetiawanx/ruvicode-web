@@ -22,12 +22,10 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     GITHUB_CLIENT_ID: z.string().optional(),
     GITHUB_CLIENT_SECRET: z.string().optional(),
-    PROVIDER_PLAYGROUND_KEY: z.string().optional(),
     // Public free playground: dedicated freedom endpoint + key so free
     // traffic is fully isolated from paid routing.
     FREEDOM_PLAYGROUND_BASE_URL: z.string().url().optional(),
     FREEDOM_PLAYGROUND_API_KEY: z.string().optional(),
-    PROVIDER_BASE_URL: z.string().url().optional(),
     // Shared Redis used for the API key cache. The Go gateway reads
     // `apikey:{hash}` from this Redis, so the dashboard deletes the same
     // entry on revoke/limit change to make the change effective immediately.
@@ -64,10 +62,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-    PROVIDER_PLAYGROUND_KEY: process.env.PROVIDER_PLAYGROUND_KEY,
     FREEDOM_PLAYGROUND_BASE_URL: process.env.FREEDOM_PLAYGROUND_BASE_URL,
     FREEDOM_PLAYGROUND_API_KEY: process.env.FREEDOM_PLAYGROUND_API_KEY,
-    PROVIDER_BASE_URL: process.env.PROVIDER_BASE_URL,
     REDIS_URL: process.env.REDIS_URL,
     INTERNAL_API_TOKEN: process.env.INTERNAL_API_TOKEN,
     BASE_RPC_URL: process.env.BASE_RPC_URL,
