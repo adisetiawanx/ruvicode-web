@@ -37,18 +37,29 @@ export default async function AdminFinancialPage({ searchParams }: { searchParam
             { name: "status", type: "select", label: "Status", options: [{ value: "completed", label: "Completed" }, { value: "pending", label: "Pending" }, { value: "failed", label: "Failed" }] },
           ]}
         />
-        <p className="mb-4 mt-4 text-sm text-text-secondary">USDC {deposits.totalUsdc.toFixed(2)} · Paddle {deposits.totalPaddle.toFixed(2)} · {deposits.pending} pending · {deposits.failed} failed</p>
+        <p className="mb-4 mt-4 text-sm text-text-secondary">
+          USDC {deposits.totalUsdc.toFixed(2)} · Paddle {deposits.totalPaddle.toFixed(2)} · {deposits.pending} pending · {deposits.failed} failed
+        </p>
         <div className="overflow-x-auto">
-          {recent.length === 0 ? <p className="text-sm text-text-muted">No data to display.</p> : (
+          {recent.length === 0 ? <p className="py-8 text-center text-sm text-text-muted">No data to display.</p> : (
             <table className="w-full min-w-[600px] text-sm">
-              <thead className="text-xs text-text-muted"><tr><th className="pb-2 text-left">Time</th><th className="pb-2 text-left">Method</th><th className="pb-2 text-right">Amount</th><th className="pb-2 text-left">Status</th></tr></thead>
+              <thead className="border-b border-border-default text-xs uppercase tracking-wider text-text-muted">
+                <tr>
+                  <th className="px-3 py-2.5 text-left font-medium">Time</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Method</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Amount</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Status</th>
+                </tr>
+              </thead>
               <tbody>
                 {recent.map((row, i) => (
-                  <tr key={`${row.createdAt}-${i}`} className="border-t border-border-subtle">
-                    <td className="py-2 text-xs"><ClientTime utc={row.createdAt} /></td>
-                    <td className="py-2">{formatTopupMethod(row.method)}</td>
-                    <td className="py-2 text-right font-mono">${row.amount.toFixed(2)}</td>
-                    <td className="py-2">{row.status}</td>
+                  <tr key={`${row.createdAt}-${i}`} className="border-b border-border-subtle last:border-0">
+                    <td className="whitespace-nowrap px-3 py-2.5 text-xs text-text-muted"><ClientTime utc={row.createdAt} /></td>
+                    <td className="px-3 py-2.5">{formatTopupMethod(row.method)}</td>
+                    <td className="px-3 py-2.5 text-right font-mono tabular">{row.amount.toFixed(2)}</td>
+                    <td className="px-3 py-2.5">
+                      <span className={row.status === "completed" ? "text-success" : row.status === "pending" ? "text-warning" : "text-error"}>{row.status}</span>
+                    </td>
                   </tr>
                 ))}
               </tbody>

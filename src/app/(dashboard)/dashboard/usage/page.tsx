@@ -105,13 +105,11 @@ export default async function UsagePage({ searchParams }: PageProps) {
         <StatCard
           label="Tokens"
           value={summary.totalTokens.toLocaleString()}
-          sublabel={`${summary.totalCachedTokens.toLocaleString()} cached (${
+          sublabel={`${summary.totalCachedTokens.toLocaleString()} (${
             summary.totalTokens > 0
-              ? Math.round(
-                  (summary.totalCachedTokens / summary.totalTokens) * 100,
-                )
+              ? (summary.totalCachedTokens / summary.totalTokens * 100).toFixed(1)
               : 0
-          }%)`}
+          }%) cached`}
         />
         <StatCard
           label="Cost"
@@ -175,12 +173,10 @@ export default async function UsagePage({ searchParams }: PageProps) {
                             ·{" "}
                             {Number(row.cacheReadTokens ?? 0).toLocaleString()} (
                             {row.promptTokens > 0
-                              ? Math.round(
-                                  (Number(row.cacheReadTokens ?? 0) /
-                                    Number(row.promptTokens)) *
-                                    100,
-                                )
-                              : 0}
+                              ? (Number(row.cacheReadTokens ?? 0) /
+                                  Number(row.promptTokens) *
+                                  100).toFixed(1)
+                              : "0"}
                             %) cached
                           </span>
                         </span>

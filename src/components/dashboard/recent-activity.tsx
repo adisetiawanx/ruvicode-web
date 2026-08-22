@@ -89,11 +89,7 @@ export function RecentActivity({ data }: RecentActivityProps) {
                         ·{" "}
                         {Number(row.cacheReadTokens ?? 0).toLocaleString()} (
                         {Number(row.promptTokens) > 0
-                          ? Math.round(
-                              (Number(row.cacheReadTokens ?? 0) /
-                                Number(row.promptTokens)) *
-                                100,
-                            )
+                          ? (Number(row.cacheReadTokens ?? 0) / Number(row.promptTokens) * 100).toFixed(1)
                           : 0}
                         %) cached
                       </span>

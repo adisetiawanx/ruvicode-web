@@ -32,8 +32,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                 <th className="px-3 py-2 text-right font-medium">Keys</th>
                 <th className="px-3 py-2 text-right font-medium">Requests</th>
                 <th className="px-3 py-2 text-right font-medium">Charges</th>
-                <th className="px-3 py-2 text-right font-medium">Balance</th>
-                <th className="whitespace-nowrap px-3 py-2 text-right font-medium">Held</th>
+                <th className="px-3 py-2 text-right font-medium">Wallet</th>
                 <th className="whitespace-nowrap px-3 py-2 text-left font-medium">Deposits</th>
                 <th className="px-3 py-2 text-left font-medium">Status</th>
               </tr>
@@ -48,8 +47,11 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                   <td className="px-3 py-3 text-right font-mono">{row.apiKeys}</td>
                   <td className="px-3 py-3 text-right font-mono">{row.requests.toLocaleString()}</td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.charges)}</td>
-                  <td className="px-3 py-3 text-right font-mono">${row.balance.toFixed(2)}</td>
-                  <td className="whitespace-nowrap px-3 py-3 text-right font-mono">${row.held.toFixed(2)}</td>
+                  <td className="whitespace-nowrap px-3 py-3 text-right font-mono tabular">
+                    <span className="text-text-primary">${row.balance.toFixed(2)}</span>
+                    {row.held > 0 && <span className="block text-xs text-text-muted">{row.held.toFixed(2)} held</span>}
+                    <span className="block text-xs text-text-muted">{row.totalLoaded.toFixed(2)} loaded · {row.totalSpent.toFixed(2)} spent</span>
+                  </td>
                   <td className="whitespace-nowrap px-3 py-3 text-xs"><span className="text-success">{row.completedDeposits} completed</span>{row.pendingDeposits > 0 && <span className="ml-1 text-warning">· {row.pendingDeposits} pending</span>}{row.failedDeposits > 0 && <span className="ml-1 text-error">· {row.failedDeposits} failed</span>}<span className="block text-text-muted">{row.depositAddresses} address</span></td>
                   <td className="px-3 py-3 text-xs text-success">{row.status}</td>
                 </tr>

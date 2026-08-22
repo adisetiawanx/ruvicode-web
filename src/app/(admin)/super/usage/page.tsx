@@ -18,7 +18,7 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
   const status = typeof params.status === "string" ? params.status : "";
   const data = await getAdminUsage();
   const filtered = data.rows.filter((row) =>
-    (!search || row.model.toLowerCase().includes(search) || (row.keyLabel ?? "").toLowerCase().includes(search) || (row.requestId ?? "").toLowerCase().includes(search))
+    (!search || row.model.toLowerCase().includes(search) || (row.userEmail ?? "").toLowerCase().includes(search) || (row.requestId ?? "").toLowerCase().includes(search))
     && (!model || row.model === model)
     && (!status || row.status === status),
   );
@@ -36,14 +36,14 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
     0,
   );
   const cachePct =
-    totalTokens > 0 ? Math.round((totalCached / totalTokens) * 100) : 0;
+    totalTokens > 0 ? (totalCached / totalTokens * 100).toFixed(1) : "0";
 
   return (
     <div className="space-y-6">
       <div><h1 className="text-2xl font-semibold text-text-primary">Usage</h1><p className="mt-1 text-sm text-text-secondary">Request traffic and metadata-only usage records</p></div>
       <AdminFilterBar
         fields={[
-          { name: "search", type: "search", label: "Model, key, request ID", placeholder: "Search model, key, request ID" },
+          { name: "search", type: "search", label: "Model, user, request ID", placeholder: "Search model, user, request ID" },
           { name: "model", type: "select", label: "Model", options: data.models.map((m) => ({ value: m.model, label: m.model })) },
           { name: "status", type: "select", label: "Status", options: [{ value: "completed", label: "Completed" }, { value: "failed", label: "Failed" }, { value: "partial", label: "Partial" }] },
         ]}
@@ -55,7 +55,7 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
               <tr>
                 <th className="px-3 py-2 text-left">Time</th>
                 <th className="px-3 py-2 text-left">Model</th>
-                <th className="px-3 py-2 text-left">Key</th>
+                <th className="px-3 py-2 text-left">User</th>
                 <th className="px-3 py-2 text-right">Tokens</th>
                 <th className="px-3 py-2 text-right">Cached</th>
                 <th className="px-3 py-2 text-right">Cost</th>
@@ -70,7 +70,7 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
                 <tr key={i} className="border-b border-border-subtle last:border-0">
                   <td className="whitespace-nowrap px-3 py-3 text-xs text-text-muted"><ClientTime utc={row.createdAt} /></td>
                   <td className="px-3 py-3">{row.model}</td>
-                  <td className="px-3 py-3 text-xs text-text-muted">{row.keyLabel ?? "Deleted key"}</td>
+                  <td className="max-w-[200px] truncate px-3 py-3 text-xs text-text-muted" title={row.userEmail}>{row.userEmail}</td>
                   <td className="px-3 py-3 text-right font-mono text-xs">{(row.promptTokens + row.completionTokens).toLocaleString()}</td>
                   <td className="px-3 py-3 text-right font-mono text-xs text-text-muted">{(row.cacheReadTokens ?? 0) > 0 ? row.cacheReadTokens.toLocaleString() : "-"}</td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.cost)}</td>

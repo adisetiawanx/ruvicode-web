@@ -221,9 +221,10 @@ console.log(response.choices[0].message.content);`,
                     <p className="mt-1.5 whitespace-nowrap font-mono text-xs tabular text-text-muted">
                       Cached{" "}
                       {model.ref_cache_read > model.user_cache_read && (
-                        <span className="mr-0.5 line-through">${formatRate(model.ref_cache_read)}</span>
+                        <span className="mr-1 line-through">${formatRate(model.ref_cache_read)}</span>
                       )}
-                      ${formatRate(model.user_cache_read)}/1M
+                      ${formatRate(model.user_cache_read)}
+                      <span> /1M</span>
                     </p>
                   )}
                 </div>
