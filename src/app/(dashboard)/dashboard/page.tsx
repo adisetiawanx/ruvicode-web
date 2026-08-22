@@ -50,8 +50,8 @@ export default async function DashboardPage() {
         <BalanceCard balance={wallet.balance} held={wallet.held} />
         <StatCard
           label="This Month"
-          value={`$${monthlySummary.spent.toFixed(2)}`}
-          sublabel={`${monthlySummary.requestCount.toLocaleString()} requests · $${monthlySummary.savings.toFixed(2)} saved`}
+          value={`$${floorUsd(monthlySummary.spent).toFixed(2)}`}
+          sublabel={`${monthlySummary.requestCount.toLocaleString()} requests · $${floorUsd(monthlySummary.savings).toFixed(2)} saved`}
         />
         <StatCard
           label="Total Loaded"
