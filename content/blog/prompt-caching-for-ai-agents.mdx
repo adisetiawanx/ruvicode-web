@@ -1,0 +1,85 @@
+---
+title: "Prompt Caching for AI Agents: How Cached Tokens Cut Your API Bill by 74%"
+slug: prompt-caching-for-ai-agents
+description: "Agentic workloads resend the same prompt prefix on every tool call. Learn how prompt caching bills those tokens up to 10x cheaper, with real numbers from a live gateway."
+date: 2026-08-22
+author: "Naran"
+tags: ["caching", "agentic", "cost-optimization", "guide"]
+category: "Guide"
+published: true
+featured: true
+---
+
+If you run AI coding agents like Claude Code, OpenCode, Cline, or Aider, your API bill has a dirty secret. The same tokens get processed over and over, and you pay full price every single time.
+
+A single agentic session resends its entire conversation history on every tool call. By turn 20, a request might carry 200,000 prompt tokens, and 95% of them are identical to the previous request. That is not a bug. It is how the chat completions API works. But paying full input price for tokens the model has already seen is money burned.
+
+Prompt caching fixes this. And if you are not using it, you are overpaying by a lot.
+
+## What prompt caching actually does
+
+When a request arrives, the provider checks whether the beginning of the prompt, the prefix, matches a recently processed one. If it does, that portion is served from a cache instead of being recomputed. Cached tokens are billed at a cache read rate, which is dramatically cheaper than the normal input rate.
+
+The numbers vary by model, but they are consistent in direction:
+
+- GLM-5.2: cache reads cost about 5x less than input tokens
+- DeepSeek V4 Flash: about 5x less
+- Claude Opus 4.6: about 10x less
+- GLM-5.3: about 5x less
+
+For an agent that resends a growing prefix on every turn, this is the single biggest cost lever available. Nothing else comes close.
+
+## Real numbers from live traffic
+
+We enabled cached token billing on Ruvicode this week. Here is what an actual agentic session looks like on our gateway, using GLM-5.2.
+
+A typical request mid-session:
+
+```
+prompt_tokens:      299,541
+cache_read_tokens:  298,624  (99.7% of the prompt)
+billable input:       917 tokens
+cost:                $0.0144
+```
+
+The same request without caching would bill all 299,541 tokens at the full input rate. With 99.7% served from cache, the input portion of the bill drops by roughly 74%. On a long session with hundreds of turns, the total savings compound into serious money.
+
+The interesting part: the person running this session did nothing special. No flags, no parameters, no code changes. Caching matched the repeated prefix automatically.
+
+## How it works on Ruvicode
+
+Three things, and then you can forget about it.
+
+**1. Caching is automatic.** We match prefixes for you on every request. There is no parameter to set and nothing to enable. If your request reuses a prompt prefix, the cached portion bills at the cache read rate. If it does not, every token bills at the normal input rate.
+
+**2. You can see it happening.** Every response's usage object reports the cache split. Your dashboard shows, per request, how many tokens were cached and what percentage of the prompt that covers. The weekly chart and usage totals include cached token counts.
+
+**3. Every model shows its cache rate.** The models catalog and each model page list the cached input rate next to the normal input rate. You can compare cache economics across models before you commit.
+
+## Which workloads benefit most
+
+Prompt caching pays off whenever the same prefix repeats.
+
+- **Coding agents** are the best case. Tool loops resend the whole conversation on every call, so cache hit rates of 95%+ are normal after the first few turns.
+- **Chat with long history** benefits the same way. Every follow-up message carries the entire prior conversation.
+- **Stable system prompts** over 1,024 tokens get partial benefit even in one-shot workloads, if the same system prompt is reused across requests.
+- **One-shot, unique prompts** get nothing. If every request is completely different, there is no prefix to reuse and every token bills at the input rate. That is fair, and it is how it should work.
+
+## Cache pricing is honest pricing
+
+Some gateways silently pocket the difference when the upstream serves your tokens from cache. The tokens get cheaper for them, but your bill stays the same. We think that is the wrong incentive.
+
+On Ruvicode, the cached input rate is a real rate, listed on every model page, and it applies automatically to the cached portion of every request. When your workload is cache-friendly, your bill drops. The savings from caching land in your wallet, not ours.
+
+## Try it
+
+Point your agent at the Ruvicode endpoint, run a real task, and watch the cached percentage climb in your usage dashboard.
+
+```bash
+export OPENAI_BASE_URL=https://api.ruvicode.com/v1
+export OPENAI_API_KEY=rvcd_...
+```
+
+Agents work out of the box because the API is OpenAI-compatible. No SDK changes, no config files, no cache toggles. Run a task, open the usage page, and see how much of your prompt was served from cache.
+
+Your wallet will notice the difference before your users notice anything at all.
