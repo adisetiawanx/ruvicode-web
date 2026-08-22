@@ -134,15 +134,23 @@ export async function POST(req: NextRequest) {
         completedAt: new Date(),
       });
 
-      // Credit wallet atomically
+      // Credit wallet atomically. Upsert: older accounts may not have a
+      // wallet row yet, and a plain UPDATE would silently no-op then.
       await tx
-        .update(wallets)
-        .set({
-          balance: sql`${wallets.balance} + ${amountInDollars}`,
-          totalLoaded: sql`${wallets.totalLoaded} + ${amountInDollars}`,
-          updatedAt: new Date(),
+        .insert(wallets)
+        .values({
+          userId,
+          balance: amountInDollars.toFixed(6),
+          totalLoaded: amountInDollars.toFixed(6),
         })
-        .where(eq(wallets.userId, userId));
+        .onConflictDoUpdate({
+          target: wallets.userId,
+          set: {
+            balance: sql`${wallets.balance} + ${amountInDollars}`,
+            totalLoaded: sql`${wallets.totalLoaded} + ${amountInDollars}`,
+            updatedAt: new Date(),
+          },
+        });
     });
   } catch (err: unknown) {
     // If it's a unique constraint violation on paddleTransactionId,
