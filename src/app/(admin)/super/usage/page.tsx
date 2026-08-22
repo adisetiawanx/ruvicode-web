@@ -32,7 +32,7 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
     0,
   );
   const totalCost = filtered.reduce((acc, r) => acc + r.cost, 0);
-  const totalUpstream = filtered.reduce((acc, r) => acc + r.upstreamCost, 0);
+  const totalUpstream = filtered.reduce((acc, r) => acc + r.providerCost, 0);
   const totalCached = filtered.reduce(
     (acc, r) => acc + (r.cacheReadTokens ?? 0),
     0,
@@ -78,10 +78,10 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
                   <td className="px-3 py-3 text-right font-mono text-xs">{(row.promptTokens + row.completionTokens).toLocaleString()}</td>
                   <td className="px-3 py-3 text-right font-mono text-xs text-text-muted">{(row.cacheReadTokens ?? 0) > 0 ? row.cacheReadTokens.toLocaleString() : "-"}</td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.cost)}</td>
-                  <td className="px-3 py-3 text-right font-mono text-text-muted">{usd(row.upstreamCost)}</td>
+                  <td className="px-3 py-3 text-right font-mono text-text-muted">{usd(row.providerCost)}</td>
                   <td className="px-3 py-3 text-right font-mono">
-                    <span className={(row.cost - row.upstreamCost) < 0 ? "text-error" : (row.cost - row.upstreamCost) === 0 ? "text-text-muted" : "text-success"}>
-                      {usd(row.cost - row.upstreamCost)}
+                    <span className={(row.cost - row.providerCost) < 0 ? "text-error" : (row.cost - row.providerCost) === 0 ? "text-text-muted" : "text-success"}>
+                      {usd(row.cost - row.providerCost)}
                     </span>
                   </td>
                   <td className="px-3 py-3 text-xs"><span className={row.status === "completed" ? "text-success" : row.status === "failed" ? "text-error" : "text-warning"}>{row.status}</span></td>
