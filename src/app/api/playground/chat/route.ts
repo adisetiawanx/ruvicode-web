@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import {
   playgroundSchema,
   sanitizeSSELine,
-  publicPlaygroundFallbackModel,
+  resolveFreeModel,
   displayModelName,
 } from "@/lib/playground";
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
   // The free model rotates on the freedom endpoint and its id is not
   // known to the browser ahead of time, so any requested model is
   // accepted and rewritten to the current free model server-side.
-  const freeModel = await resolveFreeModel(freedomBase, freedomKey);
+  const freeModel = await resolveFreeModel();
   parsed.data.model = freeModel;
 
   // Identity context (server-side only, never in browser payloads): models
@@ -137,38 +137,3 @@ export async function POST(req: NextRequest) {
   });
 }
 
-/**
- * Resolve the current free model id from the freedom endpoint, with a
- * short timeout and a small cache so every chat request does not pay a
- * models round trip. Falls back to the last known id when unavailable.
- */
-let cachedFreeModel: { id: string; at: number } | null = null;
-const FREE_MODEL_TTL_MS = 5 * 60 * 1000;
-
-async function resolveFreeModel(
-  base: string,
-  key: string,
-): Promise<string> {
-  if (cachedFreeModel && Date.now() - cachedFreeModel.at < FREE_MODEL_TTL_MS) {
-    return cachedFreeModel.id;
-  }
-  try {
-    const res = await fetch(`${base}/models`, {
-      headers: { Authorization: `Bearer ${key}` },
-      signal: AbortSignal.timeout(5000),
-    });
-    if (res.ok) {
-      const data = (await res.json()) as {
-        data?: Array<{ id?: string }>;
-      };
-      const id = data.data?.[0]?.id;
-      if (id) {
-        cachedFreeModel = { id, at: Date.now() };
-        return id;
-      }
-    }
-  } catch {
-    // fall through to cache or fallback
-  }
-  return cachedFreeModel?.id ?? publicPlaygroundFallbackModel;
-}

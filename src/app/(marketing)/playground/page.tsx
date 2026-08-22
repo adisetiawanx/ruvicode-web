@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { BreadcrumbList, WithContext } from "schema-dts";
 import { getAllActiveModels } from "@/lib/db/queries/models";
 import { PlaygroundChat } from "@/components/marketing/playground-chat";
-import { publicPlaygroundFallbackModel, displayModelName } from "@/lib/playground";
+import { resolveFreeModel, displayModelName } from "@/lib/playground";
 import { Container } from "@/components/layout/container";
 import { LinkButton } from "@/components/shared/link-button";
 import { Lock } from "lucide-react";
@@ -39,6 +39,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function PlaygroundPage({
   searchParams,
 }: {
@@ -48,7 +50,11 @@ export default async function PlaygroundPage({
   const params = await searchParams;
   const requested =
     typeof params.model === "string" ? params.model : undefined;
-  const isFree = !requested || requested === publicPlaygroundFallbackModel;
+  // The free model rotates on the freedom endpoint; resolve the current
+  // one server-side so the UI never shows a stale name. Falls back to
+  // the last known id when the endpoint is briefly unreachable.
+  const freeModel = await resolveFreeModel();
+  const isFree = !requested || requested === freeModel;
   const lockedModel = models.find((m) => m.model === requested);
 
   const breadcrumbJsonLd: WithContext<BreadcrumbList> = {
@@ -95,8 +101,7 @@ export default async function PlaygroundPage({
                   </h2>
                   <p className="mb-6 max-w-md text-sm text-text-secondary">
                     The free playground runs on{" "}
-                    {models.find((m) => m.model === publicPlaygroundFallbackModel)
-                      ?.display_name ?? displayModelName(publicPlaygroundFallbackModel)}
+                    {displayModelName(freeModel)}
                     . Create a free account to try more models in the
                     catalog with your own API key and real per-request pricing.
                   </p>
@@ -106,7 +111,7 @@ export default async function PlaygroundPage({
               <PlaygroundChat
                 models={models}
                 endpoint="/api/playground/chat"
-                lockModel={publicPlaygroundFallbackModel}
+                lockModel={freeModel}
                 showFreeBadges
               />
             )}

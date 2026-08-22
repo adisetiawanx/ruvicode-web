@@ -12,11 +12,52 @@ import { z } from "zod";
 
 /**
  * The public playground's free model is whatever the freedom endpoint
- * currently serves (it rotates day to day). The chat route resolves it
- * from GET /v1/models server-side and passes it down; this is only the
- * fallback used before the first resolution.
+ * currently serves (it rotates day to day). Resolved live from
+ * GET /v1/models with a short cache; this constant is only the fallback
+ * used when the endpoint is unreachable.
  */
 export const publicPlaygroundFallbackModel = "deepseek-v4-flash-0731";
+
+/**
+ * Resolve the current free model id from the freedom endpoint, with a
+ * short timeout and a small cache so every page render and chat request
+ * does not pay a models round trip. Falls back to the last known id,
+ * then to the fallback constant when never resolved successfully.
+ *
+ * Shared by the public playground page (display name) and the chat
+ * route (actual routing), so the UI never shows a stale model name.
+ */
+let cachedFreeModel: { id: string; at: number } | null = null;
+const FREE_MODEL_TTL_MS = 5 * 60 * 1000;
+
+export async function resolveFreeModel(): Promise<string> {
+  if (cachedFreeModel && Date.now() - cachedFreeModel.at < FREE_MODEL_TTL_MS) {
+    return cachedFreeModel.id;
+  }
+  // Env is read lazily so build-time page data collection, which runs
+  // without environment variables, never fails here.
+  const key = process.env.FREEDOM_PLAYGROUND_API_KEY;
+  const base = process.env.FREEDOM_PLAYGROUND_BASE_URL?.replace(/\/+$/, "");
+  if (key && base) {
+    try {
+      const res = await fetch(`${base}/models`, {
+        headers: { Authorization: `Bearer ${key}` },
+        signal: AbortSignal.timeout(5000),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { data?: Array<{ id?: string }> };
+        const id = data.data?.[0]?.id;
+        if (id) {
+          cachedFreeModel = { id, at: Date.now() };
+          return id;
+        }
+      }
+    } catch {
+      // fall through to cache or fallback
+    }
+  }
+  return cachedFreeModel?.id ?? publicPlaygroundFallbackModel;
+}
 
 export { displayModelName } from "@/lib/models/display";
 
