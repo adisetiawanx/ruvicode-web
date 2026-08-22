@@ -55,7 +55,7 @@ export function VerifyEmailTemplate({
         }}
       >
         Welcome to Ruvicode! Please verify your email address to activate your
-        account and start using 20+ AI models with a single API key.
+        account and start using 30+ AI models with a single API key.
       </Text>
 
       <Section style={{ textAlign: "center", marginBottom: 32 }}>

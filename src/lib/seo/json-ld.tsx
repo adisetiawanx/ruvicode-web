@@ -24,7 +24,7 @@ export function organizationJsonLd(): WithContext<Organization> {
     name: "Ruvicode",
     url: BASE_URL,
     description:
-      "Transparent AI API gateway with unified access to 20+ AI models.",
+      "Transparent AI API gateway with unified access to 30+ AI models.",
     logo: {
       "@type": "ImageObject",
       url: `${BASE_URL}/ruvicode-logo.webp`,

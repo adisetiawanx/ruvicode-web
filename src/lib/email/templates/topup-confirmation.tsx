@@ -130,7 +130,7 @@ export function TopupConfirmationTemplate({
         }}
       >
         Your balance is ready to use. Start making API requests with any of our
-        20+ AI models.
+        30+ AI models.
       </Text>
 
       <Hr style={{ borderColor: "#e8e6dc", margin: "32px 0" }} />

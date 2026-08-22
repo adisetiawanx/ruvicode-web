@@ -15,7 +15,7 @@ export default function RegisterPage() {
           Create your account
         </h1>
         <p className="mb-6 text-center text-sm text-text-secondary">
-          Start using 20+ AI models with one API key.
+          Start using 30+ AI models with one API key.
         </p>
 
         <OAuthButtons callbackURL="/dashboard" />
