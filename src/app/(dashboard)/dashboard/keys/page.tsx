@@ -4,7 +4,8 @@ import { getApiKeys } from "@/lib/db/queries/management";
 import { CreateKeyButton } from "@/components/dashboard/create-key-button";
 import { KeyRow } from "@/components/dashboard/key-row";
 import { EmptyState } from "@/components/shared/empty-state";
-import { KeyRound } from "lucide-react";
+import { LinkButton } from "@/components/shared/link-button";
+import { BookOpen, KeyRound, Plug } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,27 @@ export default async function KeysPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-text-primary">API Keys</h1>
-        <CreateKeyButton />
+        <div className="flex items-center gap-2">
+          <LinkButton
+            href="/docs"
+            variant="outline"
+            size="icon-sm"
+            aria-label="Documentation"
+            title="Documentation"
+          >
+            <BookOpen />
+          </LinkButton>
+          <LinkButton
+            href="/integrations"
+            variant="outline"
+            size="icon-sm"
+            aria-label="Integrations"
+            title="Integrations"
+          >
+            <Plug />
+          </LinkButton>
+          <CreateKeyButton />
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-lg border border-border-default bg-surface">
