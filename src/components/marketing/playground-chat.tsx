@@ -26,6 +26,7 @@ import {
 import { toast } from "sonner";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 import { publicPlaygroundFallbackModel, displayModelName } from "@/lib/playground";
+import { formatRate } from "@/lib/models/display";
 import {
   ChatCodeBlock,
   parseMessageContent,
@@ -416,6 +417,17 @@ export function PlaygroundChat({
                 ${modelPricing ? modelPricing.user_input.toFixed(3) : "?"}/1M
               </span>
             </div>
+            {modelPricing && modelPricing.user_cache_read > 0 && (
+              <div className="flex items-center justify-between font-mono text-xs">
+                <span className="text-text-muted">Cached</span>
+                <span className="whitespace-nowrap tabular text-text-secondary">
+                  <span className="mr-1 text-[10px] text-text-muted line-through">
+                    ${formatRate(modelPricing.ref_cache_read)}
+                  </span>
+                  ${formatRate(modelPricing.user_cache_read)}/1M
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Output</span>
               <span className="whitespace-nowrap tabular text-text-secondary">
@@ -442,6 +454,17 @@ export function PlaygroundChat({
                 ${modelPricing.user_input.toFixed(3)}/1M
               </span>
             </div>
+            {modelPricing.user_cache_read > 0 && (
+              <div className="flex items-center justify-between font-mono text-xs">
+                <span className="text-text-muted">Cached</span>
+                <span className="whitespace-nowrap tabular text-text-secondary">
+                  <span className="mr-1 text-[10px] text-text-muted line-through">
+                    ${formatRate(modelPricing.ref_cache_read)}
+                  </span>
+                  ${formatRate(modelPricing.user_cache_read)}/1M
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between font-mono text-xs">
               <span className="text-text-muted">Output</span>
               <span className="whitespace-nowrap tabular text-text-secondary">

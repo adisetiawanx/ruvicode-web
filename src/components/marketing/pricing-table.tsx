@@ -8,6 +8,7 @@ import { ModelTag } from "@/components/shared/model-tag";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
+import { formatRate } from "@/lib/models/display";
 import { ClientTime } from "@/components/shared/client-time";
 
 type SortKey = "model" | "user_input" | "user_output" | "savings";
@@ -173,10 +174,10 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                       <span className="font-mono tabular text-text-secondary">
                         {m.ref_cache_read > m.user_cache_read && (
                           <span className="mr-1 font-mono tabular text-[11px] text-text-muted line-through">
-                            ${formatPrice(m.ref_cache_read)}
+                            ${formatRate(m.ref_cache_read)}
                           </span>
                         )}{" "}
-                        ${formatPrice(m.user_cache_read)}
+                        ${formatRate(m.user_cache_read)}
                       </span>
                     ) : (
                       <span className="text-text-muted">-</span>

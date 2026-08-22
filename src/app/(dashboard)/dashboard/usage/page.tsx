@@ -105,13 +105,13 @@ export default async function UsagePage({ searchParams }: PageProps) {
         <StatCard
           label="Tokens"
           value={summary.totalTokens.toLocaleString()}
-          sublabel={
-            summary.totalCachedTokens > 0
-              ? `${summary.totalCachedTokens.toLocaleString()} cached (${Math.round(
+          sublabel={`${summary.totalCachedTokens.toLocaleString()} cached (${
+            summary.totalTokens > 0
+              ? Math.round(
                   (summary.totalCachedTokens / summary.totalTokens) * 100,
-                )}%)`
-              : undefined
-          }
+                )
+              : 0
+          }%)`}
         />
         <StatCard
           label="Cost"
@@ -169,18 +169,21 @@ export default async function UsagePage({ searchParams }: PageProps) {
                         {row.keyLabel ?? <span className="text-text-muted">Deleted key</span>}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
-                        {row.promptTokens.toLocaleString()}
-                        {(row.cacheReadTokens ?? 0) > 0 && (
+                        <span className="whitespace-nowrap">
+                          {row.promptTokens.toLocaleString()}
                           <span className="ml-1 font-sans text-xs text-text-muted">
                             ·{" "}
-                            {Math.round(
-                              (Number(row.cacheReadTokens) /
-                                Number(row.promptTokens)) *
-                                100,
-                            )}
-                            % cached
+                            {Number(row.cacheReadTokens ?? 0).toLocaleString()} (
+                            {row.promptTokens > 0
+                              ? Math.round(
+                                  (Number(row.cacheReadTokens ?? 0) /
+                                    Number(row.promptTokens)) *
+                                    100,
+                                )
+                              : 0}
+                            %) cached
                           </span>
-                        )}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
                         {row.completionTokens.toLocaleString()}

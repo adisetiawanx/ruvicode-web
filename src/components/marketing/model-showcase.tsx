@@ -1,5 +1,5 @@
 import { getTopModels } from "@/lib/db/queries/models";
-import { floorUsd } from "@/lib/models/display";
+import { formatRate } from "@/lib/models/display";
 import { Container } from "@/components/layout/container";
 import Link from "next/link";
 import { BrandLogo } from "@/components/shared/brand-logo";
@@ -79,20 +79,18 @@ export async function ModelShowcase() {
                     <span className="text-text-muted">/1M</span>
                   </span>
                 </div>
-                {m.user_cache_read > 0 && (
-                  <div className="flex items-baseline justify-between text-xs">
-                    <span className="text-text-muted">Cached input</span>
-                    <span className="whitespace-nowrap font-mono tabular text-text-muted">
-                      {m.ref_cache_read > m.user_cache_read && (
-                        <span className="mr-1 text-[11px] line-through">
-                          ${floorUsd(m.ref_cache_read).toFixed(2)}
-                        </span>
-                      )}{" "}
-                      ${floorUsd(m.user_cache_read).toFixed(2)}
-                      <span>/1M</span>
-                    </span>
-                  </div>
-                )}
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm text-text-secondary">Cached input</span>
+                  <span className="whitespace-nowrap font-mono tabular text-text-secondary">
+                    {m.ref_cache_read > m.user_cache_read && (
+                      <span className="mr-1 text-[11px] text-text-muted line-through">
+                        ${formatRate(m.ref_cache_read)}
+                      </span>
+                    )}{" "}
+                    ${formatRate(m.user_cache_read)}
+                    <span className="text-text-muted">/1M</span>
+                  </span>
+                </div>
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-text-secondary">Output</span>
                   <span className="font-mono tabular text-text-primary">

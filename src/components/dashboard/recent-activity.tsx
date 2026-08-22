@@ -81,21 +81,23 @@ export function RecentActivity({ data }: RecentActivityProps) {
                     {row.keyLabel ?? <span className="text-text-muted">Deleted key</span>}
                   </td>
                   <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
-                    {(
-                      Number(row.promptTokens) + Number(row.completionTokens)
-                    ).toLocaleString()}
-                    {(row.cacheReadTokens ?? 0) > 0 && (
+                    <span className="whitespace-nowrap">
+                      {(
+                        Number(row.promptTokens) + Number(row.completionTokens)
+                      ).toLocaleString()}
                       <span className="ml-1 font-sans text-xs text-text-muted">
                         ·{" "}
-                        {Math.round(
-                          (Number(row.cacheReadTokens) /
-                            (Number(row.promptTokens) +
-                              Number(row.completionTokens))) *
-                            100,
-                        )}
-                        % cached
+                        {Number(row.cacheReadTokens ?? 0).toLocaleString()} (
+                        {Number(row.promptTokens) > 0
+                          ? Math.round(
+                              (Number(row.cacheReadTokens ?? 0) /
+                                Number(row.promptTokens)) *
+                                100,
+                            )
+                          : 0}
+                        %) cached
                       </span>
-                    )}
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-primary">
                     ${Number(row.cost).toFixed(6)}

@@ -35,3 +35,16 @@ export function floorUsd(value: number | string, decimals = 2): number {
   const factor = 10 ** decimals;
   return Math.floor(n * factor) / factor;
 }
+
+/**
+ * Format a per-1M USD rate for display with enough precision for cheap
+ * cache read rates. Expands decimals when the value would otherwise round
+ * to $0.00, so a $0.0047 cache rate never renders as "$0.00".
+ */
+export function formatRate(value: number): string {
+  const v = Math.max(0, value);
+  if (v >= 0.01) return v.toFixed(2);
+  if (v >= 0.001) return v.toFixed(3);
+  if (v > 0) return v.toFixed(4);
+  return "0.00";
+}
