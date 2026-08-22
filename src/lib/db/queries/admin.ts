@@ -85,10 +85,11 @@ export async function getAdminUserStats() {
 }
 
 export async function getAdminRevenue() {
-  if (!isDbAvailable()) return { today: 0, week: 0, month: 0, chargesToday: 0, marginPct: 0, perModel: [] as AdminModelProfitability[] };
+  if (!isDbAvailable()) return { today: 0, week: 0, month: 0, chargesToday: 0, marginPct: 0, chargesTotal: 0, marginTotal: 0, perModel: [] as AdminModelProfitability[] };
   const periods = [utcStart(1), utcStart(7), new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1))];
   const rows = await Promise.all(periods.map((start) => db.select({ charges: sql<number>`COALESCE(SUM(${usageRecords.cost}), 0)`, margin: sql<number>`COALESCE(SUM(${usageRecords.cost} - ${usageRecords.upstreamCost}), 0)` }).from(usageRecords).where(gte(usageRecords.createdAt, start))));
   const [today = { charges: 0, margin: 0 }, week = { charges: 0, margin: 0 }, month = { charges: 0, margin: 0 }] = rows.map((row) => ({ charges: Number(row[0]?.charges ?? 0), margin: Number(row[0]?.margin ?? 0) }));
+  const [allTime = { charges: 0, margin: 0 }] = await Promise.all([db.select({ charges: sql<number>`COALESCE(SUM(${usageRecords.cost}), 0)`, margin: sql<number>`COALESCE(SUM(${usageRecords.cost} - ${usageRecords.upstreamCost}), 0)` }).from(usageRecords)]).then((r) => r.map((row) => ({ charges: Number(row[0]?.charges ?? 0), margin: Number(row[0]?.margin ?? 0) })));
   const modelRows = await db.select({ model: usageRecords.model, requests: sql<number>`COUNT(*)`, userCost: sql<number>`COALESCE(SUM(${usageRecords.cost}), 0)`, upstreamCost: sql<number>`COALESCE(SUM(${usageRecords.upstreamCost}), 0)`, margin: sql<number>`COALESCE(SUM(${usageRecords.cost} - ${usageRecords.upstreamCost}), 0)` }).from(usageRecords).groupBy(usageRecords.model).orderBy(sql`COALESCE(SUM(${usageRecords.cost} - ${usageRecords.upstreamCost}), 0) DESC`);
   const perModel = modelRows.map((row) => {
     const userCost = Number(row.userCost);
@@ -96,7 +97,7 @@ export async function getAdminRevenue() {
     const marginPct = userCost > 0 ? (margin / userCost) * 100 : 0;
     return { model: row.model, requests: Number(row.requests), userCost, upstreamCost: Number(row.upstreamCost), margin, marginPct, status: margin < 0 ? "negative" : marginPct < 10 ? "thin" : "healthy" };
   });
-  return { today: today.margin, week: week.margin, month: month.margin, chargesToday: today.charges, marginPct: today.charges > 0 ? (today.margin / today.charges) * 100 : 0, perModel };
+  return { today: today.margin, week: week.margin, month: month.margin, chargesToday: today.charges, marginPct: today.charges > 0 ? (today.margin / today.charges) * 100 : 0, chargesTotal: allTime.charges, marginTotal: allTime.margin, perModel };
 }
 
 export interface AdminModelProfitability { model: string; requests: number; userCost: number; upstreamCost: number; margin: number; marginPct: number; status: string }

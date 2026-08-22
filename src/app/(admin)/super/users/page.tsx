@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { listAdminUsers } from "@/lib/db/queries/admin-users";
 import { ClientTime } from "@/components/shared/client-time";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
+import { CopyAddress } from "@/components/admin/copy-address";
 
 export const dynamic = "force-dynamic";
 function ok(email: string | null | undefined) { return !!email && (process.env.ADMIN_EMAILS ?? "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).includes(email.toLowerCase()); }
@@ -49,6 +50,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                   <td className="px-3 py-3 text-right font-mono">{usd(row.charges)}</td>
                   <td className="whitespace-nowrap px-3 py-3 text-right font-mono tabular">
                     <span className="text-text-primary">${row.balance.toFixed(2)}</span>
+                    {row.depositAddress && <CopyAddress address={row.depositAddress} />}
                     {row.held > 0 && <span className="block text-xs text-text-muted">{row.held.toFixed(2)} held</span>}
                     <span className="block text-xs text-text-muted">{row.totalLoaded.toFixed(2)} loaded · {row.totalSpent.toFixed(2)} spent</span>
                   </td>

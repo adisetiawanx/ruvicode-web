@@ -26,20 +26,25 @@ export default async function AdminFinancialPage({ searchParams }: { searchParam
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Charges today</p><p className="mt-1 font-mono text-xl">{usd(revenue.chargesToday)}</p></div>
         <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Margin today</p><p className="mt-1 font-mono text-xl">{usd(revenue.today)}</p></div>
+        <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Charges all time</p><p className="mt-1 font-mono text-xl">{usd(revenue.chargesTotal)}</p></div>
+        <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Margin all time</p><p className="mt-1 font-mono text-xl">{usd(revenue.marginTotal)}</p></div>
+      </div>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Liability</p><p className="mt-1 font-mono text-xl">${chain.liability.toFixed(2)}</p></div>
         <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Reserve</p><p className="mt-1 font-mono text-xl">{reserveValue}</p><p className="mt-1 text-xs text-text-muted">{reserveSub}</p></div>
+        <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">USDC deposits</p><p className="mt-1 font-mono text-xl">${deposits.totalUsdc.toFixed(2)}</p></div>
+        <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Paddle deposits</p><p className="mt-1 font-mono text-xl">${deposits.totalPaddle.toFixed(2)}</p><p className="mt-1 text-xs text-text-muted">{deposits.pending} pending · {deposits.failed} failed</p></div>
       </div>
       <section className="rounded-lg border border-border-default bg-surface p-6">
-        <h2 className="mb-4 font-semibold text-text-primary">Deposits</h2>
-        <AdminFilterBar
-          fields={[
-            { name: "method", type: "select", label: "Method", options: [{ value: "usdc", label: "USDC" }, { value: "paddle", label: "Paddle" }] },
-            { name: "status", type: "select", label: "Status", options: [{ value: "completed", label: "Completed" }, { value: "pending", label: "Pending" }, { value: "failed", label: "Failed" }] },
-          ]}
-        />
-        <p className="mb-4 mt-4 text-sm text-text-secondary">
-          USDC {deposits.totalUsdc.toFixed(2)} · Paddle {deposits.totalPaddle.toFixed(2)} · {deposits.pending} pending · {deposits.failed} failed
-        </p>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold text-text-primary">Deposits</h2>
+          <AdminFilterBar
+            fields={[
+              { name: "method", type: "select", label: "Method", options: [{ value: "usdc", label: "USDC" }, { value: "paddle", label: "Paddle" }] },
+              { name: "status", type: "select", label: "Status", options: [{ value: "completed", label: "Completed" }, { value: "pending", label: "Pending" }, { value: "failed", label: "Failed" }] },
+            ]}
+          />
+        </div>
         <div className="overflow-x-auto">
           {recent.length === 0 ? <p className="py-8 text-center text-sm text-text-muted">No data to display.</p> : (
             <table className="w-full min-w-[600px] text-sm">
