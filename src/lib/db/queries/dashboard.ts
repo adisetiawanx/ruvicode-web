@@ -291,7 +291,7 @@ export async function getModelBreakdown(
   return rows.map((r) => ({
     model: r.model,
     cost: Number(r.cost),
-    pct: Math.round((Number(r.cost) / total) * 100),
+    pct: (Number(r.cost) / total) * 100,
   }));
 }
 
