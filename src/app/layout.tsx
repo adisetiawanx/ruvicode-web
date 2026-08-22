@@ -59,17 +59,23 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full bg-canvas font-sans text-text-primary">
-        {/* Google tag (gtag.js) — Google Ads conversion tracking */}
+        {/* Google Analytics. lazyOnload so it never blocks LCP.
+            allow_google_signals:false stops the doubleclick viewthrough
+            conversion ping that sets third-party cookies. */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="gtag-init" strategy="afterInteractive">
+        <Script id="gtag-init" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${GTAG_ID}');
+            gtag('config', '${GTAG_ID}', {
+              allow_google_signals: false,
+              allow_ad_personalization_signals: false,
+              anonymize_ip: true
+            });
           `}
         </Script>
         <a
