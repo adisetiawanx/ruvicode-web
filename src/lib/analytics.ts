@@ -1,19 +1,14 @@
 /**
- * Google Analytics event tracking utility.
+ * Analytics event tracking utility.
  *
- * The gtag snippet in layout.tsx handles automatic pageviews. This module
- * provides typed helpers for custom events that matter to a SaaS funnel:
+ * Provides typed helpers for custom events that matter to a SaaS funnel:
  * sign-ups, logins, top-ups, key creation, playground usage, model views.
  *
- * All helpers are silently no-op when gtag is not loaded (local dev, ad
- * blockers), so calling code never needs to guard. trackEvent pushes to
- * window.dataLayer only, no network calls and no extra bundle weight, so
- * page performance is unaffected.
- *
- * Events that fire before the gtag script finishes loading are queued in
- * the shared dataLayer and flushed once gtag initializes (gtag itself
- * consumes window.dataLayer, so entries pushed before init are picked up
- * automatically).
+ * trackEvent pushes to window.dataLayer. When no analytics script (gtag,
+ * Cloudflare Web Analytics, etc.) is loaded, these calls are silent no-ops
+ * with zero network calls and zero bundle weight, so page performance is
+ * unaffected. All call sites can remain as-is regardless of which analytics
+ * provider is active.
  */
 
 declare global {

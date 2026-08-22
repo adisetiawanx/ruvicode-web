@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
@@ -25,8 +24,6 @@ export const metadata: Metadata = {
     icon: [{ url: "/ruvicode-favicon.ico", sizes: "any" }],
   },
 };
-
-const GTAG_ID = "G-12NK6YS2K1";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -59,25 +56,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full bg-canvas font-sans text-text-primary">
-        {/* Google Analytics. lazyOnload so it never blocks LCP.
-            allow_google_signals:false stops the doubleclick viewthrough
-            conversion ping that sets third-party cookies. */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
-          strategy="lazyOnload"
-        />
-        <Script id="gtag-init" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GTAG_ID}', {
-              allow_google_signals: false,
-              allow_ad_personalization_signals: false,
-              anonymize_ip: true
-            });
-          `}
-        </Script>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-0 focus:top-0 focus:z-[100] focus:rounded-br-md focus:bg-accent focus:px-4 focus:py-2 focus:text-text-inverse focus:transition-all"
