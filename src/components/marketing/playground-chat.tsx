@@ -128,7 +128,12 @@ export function PlaygroundChat({
   const [showKeyPicker, setShowKeyPicker] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const model = locked ?? selectedModel ?? models[0]?.model ?? publicPlaygroundFallbackModel;
-  const modelPricing = models.find((m) => m.model === model);
+  // Freedom serves ids like "MiniMax-M2.5" while catalog slugs are
+  // lowercase ("minimax-m2.5"); compare case-insensitively so the
+  // price panel still finds the matching catalog entry.
+  const modelPricing = models.find(
+    (m) => m.model.toLowerCase() === model.toLowerCase(),
+  );
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   // Privacy notice rendered under the chat input on both playgrounds.
