@@ -18,11 +18,13 @@ export async function exportUsageCsvAction(
 
   const records = await getAllUsageForExport(session.user.id, filters);
 
-  const header = "Date,Model,Prompt Tokens,Completion Tokens,Cost (USD)\n";
+  const header =
+    "Date,Model,Prompt Tokens,Cached Tokens,Completion Tokens,Cost (USD)\n";
   const rows = records
     .map((r) => {
       const date = r.createdAt.toISOString();
-      return `${date},${r.model},${r.promptTokens},${r.completionTokens},${r.cost}`;
+      const cached = r.cacheReadTokens ?? "";
+      return `${date},${r.model},${r.promptTokens},${cached},${r.completionTokens},${r.cost}`;
     })
     .join("\n");
 

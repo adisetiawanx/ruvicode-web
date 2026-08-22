@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { ModelTag } from "@/components/shared/model-tag";
+import { floorUsd } from "@/lib/models/display";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 
 /** Format price — shows more decimals for very cheap models. */
@@ -44,6 +45,20 @@ export function ModelCard({ model }: { model: ModelWithPricing }) {
             <span className="text-text-muted">/1M</span>
           </span>
         </div>
+        {model.user_cache_read > 0 && (
+          <div className="flex items-baseline justify-between text-xs">
+            <span className="text-text-muted">Cached input</span>
+            <span className="whitespace-nowrap font-mono tabular text-text-muted">
+              {model.ref_cache_read > model.user_cache_read && (
+                <span className="mr-1 text-[11px] line-through">
+                  ${floorUsd(model.ref_cache_read).toFixed(2)}
+                </span>
+              )}{" "}
+              ${floorUsd(model.user_cache_read).toFixed(2)}
+              <span>/1M</span>
+            </span>
+          </div>
+        )}
         <div className="flex items-baseline justify-between">
           <span className="text-[13px] text-text-secondary">Output</span>
           <span className="font-mono tabular text-text-primary">

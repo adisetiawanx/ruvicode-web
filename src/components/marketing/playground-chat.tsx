@@ -68,8 +68,13 @@ interface StreamChunk {
   usage?: {
     prompt_tokens?: number;
     completion_tokens?: number;
+    prompt_cache_hit_tokens?: number;
+    cached_tokens?: number;
     completion_tokens_details?: {
       reasoning_tokens?: number;
+    };
+    prompt_tokens_details?: {
+      cached_tokens?: number;
     };
   };
   usage_from_consumer?: {
@@ -93,15 +98,25 @@ const requestLimits = {
 
 function costOf(
   model: ModelWithPricing | undefined,
-  usage: { prompt: number; completion: number },
+  usage: { prompt: number; completion: number; cached?: number },
 ) {
   if (!model) return null;
-  const input = (usage.prompt / 1_000_000) * model.user_input;
+  // Cached prompt tokens bill at the cache read rate (ADR-032); models
+  // without a cache price bill everything at the normal input rate.
+  const cached = Math.min(usage.cached ?? 0, usage.prompt);
+  const cacheRate =
+    model.user_cache_read > 0 ? model.user_cache_read : model.user_input;
+  const billable = usage.prompt - cached;
+  const input =
+    (billable / 1_000_000) * model.user_input + (cached / 1_000_000) * cacheRate;
   const output = (usage.completion / 1_000_000) * model.user_output;
   const total = input + output;
   // What the same tokens would cost at the reference price, so the UI can
   // show how much the user saved versus paying full list price.
-  const refInput = (usage.prompt / 1_000_000) * model.ref_input;
+  const refCacheRate =
+    model.ref_cache_read > 0 ? model.ref_cache_read : model.ref_input;
+  const refInput =
+    (billable / 1_000_000) * model.ref_input + (cached / 1_000_000) * refCacheRate;
   const refOutput = (usage.completion / 1_000_000) * model.ref_output;
   const refTotal = refInput + refOutput;
   const saved = Math.max(0, refTotal - total);
@@ -154,6 +169,7 @@ export function PlaygroundChat({
     completion: number;
   } | null>(null);
   const [lastReasoningTokens, setLastReasoningTokens] = useState(0);
+  const [lastCachedTokens, setLastCachedTokens] = useState(0);
 
   // Chat scroll container: auto-follow the latest message while streaming,
   // but stop the moment the user scrolls up to read.
@@ -206,11 +222,20 @@ export function PlaygroundChat({
         const usage = {
           prompt: rawUsage.prompt_tokens ?? 0,
           completion: rawUsage.completion_tokens ?? 0,
+          cached:
+            chunk.usage?.prompt_cache_hit_tokens ??
+            chunk.usage?.cached_tokens ??
+            chunk.usage?.prompt_tokens_details?.cached_tokens ??
+            0,
         };
         setLastUsage(usage);
+        setLastCachedTokens(usage.cached);
         setLastCost(costOf(modelPricing, usage));
         setLastReasoningTokens(
           chunk.usage?.completion_tokens_details?.reasoning_tokens ?? 0,
+        );
+        setLastCachedTokens(
+          chunk.usage?.prompt_tokens_details?.cached_tokens ?? 0,
         );
       }
     },
@@ -317,6 +342,7 @@ export function PlaygroundChat({
                 setMessages([]);
                 setLastCost(null);
                 setLastUsage(null);
+                setLastCachedTokens(0);
                 setInput("");
               }}
             />
@@ -507,6 +533,9 @@ export function PlaygroundChat({
           </p>
           <p className="font-mono text-[11px] tabular font-medium text-accent-text">
             {lastUsage?.prompt ?? 0} tokens
+          </p>
+          <p className="font-mono text-[11px] tabular text-text-muted">
+            {lastCachedTokens} cached
           </p>
         </div>
 

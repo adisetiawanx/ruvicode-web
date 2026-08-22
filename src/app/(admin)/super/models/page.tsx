@@ -38,30 +38,34 @@ export default async function AdminModelsPage({ searchParams }: { searchParams: 
       />
       <section className="overflow-hidden rounded-lg border border-border-default bg-surface">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1100px] text-sm">
+          <table className="w-full min-w-[1250px] text-sm">
             <thead className="bg-surface-2 text-xs text-text-muted">
               <tr>
                 <th className="px-3 py-2 text-left">Model</th>
                 <th className="px-3 py-2 text-left">State</th>
                 <th className="px-3 py-2 text-right">User input</th>
                 <th className="px-3 py-2 text-right">User output</th>
+                <th className="px-3 py-2 text-right">User cache</th>
                 <th className="px-3 py-2 text-right">Ref input</th>
                 <th className="px-3 py-2 text-right">Ref output</th>
+                <th className="px-3 py-2 text-right">Ref cache</th>
                 <th className="px-3 py-2 text-right">Discount</th>
                 <th className="px-3 py-2 text-left">Updated</th>
               </tr>
             </thead>
             <tbody>
               {rows.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-12 text-center text-sm text-text-muted">No data to display.</td></tr>
+                <tr><td colSpan={10} className="px-4 py-12 text-center text-sm text-text-muted">No data to display.</td></tr>
               ) : rows.map((row) => (
                 <tr key={row.model} className="border-b border-border-subtle last:border-0">
                   <td className="px-3 py-3"><Link href={`/models/${row.model}`} className="text-accent-text hover:text-accent-hover">{displayModelName(row.model)}</Link><p className="text-xs text-text-muted">{row.model}</p></td>
                   <td className="px-3 py-3 text-xs"><span className={row.active ? "text-success" : "text-text-muted"}>{row.active ? "Active" : "Inactive"}</span></td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.userInput)}</td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.userOutput)}</td>
+                  <td className="px-3 py-3 text-right font-mono">{row.userCacheRead > 0 ? usd(row.userCacheRead) : "-"}</td>
                   <td className="px-3 py-3 text-right font-mono text-text-muted">{usd(row.refInput)}</td>
                   <td className="px-3 py-3 text-right font-mono text-text-muted">{usd(row.refOutput)}</td>
+                  <td className="px-3 py-3 text-right font-mono text-text-muted">{row.refCacheRead > 0 ? usd(row.refCacheRead) : "-"}</td>
                   <td className="px-3 py-3 text-right font-mono">{row.refInput > 0 ? `${(((row.refInput - row.userInput) / row.refInput) * 100).toFixed(1)}%` : "-"}</td>
                   <td className="whitespace-nowrap px-3 py-3 text-xs text-text-muted"><ClientTime utc={row.updatedAt} format="date" /></td>
                 </tr>

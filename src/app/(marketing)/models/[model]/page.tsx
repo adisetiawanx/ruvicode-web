@@ -215,6 +215,15 @@ console.log(response.choices[0].message.content);`,
                     ${formatPrice(model.user_input)}
                     <span className="ml-1 text-sm font-normal text-text-muted">/1M</span>
                   </p>
+                  {model.user_cache_read > 0 && (
+                    <p className="mt-1.5 whitespace-nowrap font-mono text-xs tabular text-text-muted">
+                      Cached{" "}
+                      {model.ref_cache_read > model.user_cache_read && (
+                        <span className="mr-0.5 line-through">${formatPrice(model.ref_cache_read)}</span>
+                      )}
+                      ${formatPrice(model.user_cache_read)}/1M
+                    </p>
+                  )}
                 </div>
                 <div className="bg-surface p-4 sm:p-5">
                   <p className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-text-muted">

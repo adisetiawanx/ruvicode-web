@@ -32,6 +32,7 @@ export function CostCalculator({
 }) {
   const [inputTokens, setInputTokens] = useState(1_000_000);
   const [outputTokens, setOutputTokens] = useState(500_000);
+  const [cacheHitPct, setCacheHitPct] = useState(0);
   const [selectedModel, setSelectedModel] = useState(models[0]?.model ?? "");
 
   const engaged = useRef(false);
@@ -48,6 +49,14 @@ export function CostCalculator({
   const calculation = useMemo(() => {
     if (!selected) return null;
 
+    // Share of prompt tokens served from the cache at the cheaper cache
+    // read rate; the rest bills at the regular input rate. Models without
+    // a cache price ignore the slider.
+    const hitPct =
+      selected.user_cache_read > 0 ? Math.min(100, Math.max(0, cacheHitPct)) : 0;
+    const cachedTokens = (inputTokens * hitPct) / 100;
+    const freshTokens = inputTokens - cachedTokens;
+
     const officialInputCost =
       (inputTokens / 1_000_000) * selected.ref_input;
     const officialOutputCost =
@@ -55,7 +64,8 @@ export function CostCalculator({
     const officialTotal = officialInputCost + officialOutputCost;
 
     const ruvicodeInputCost =
-      (inputTokens / 1_000_000) * selected.user_input;
+      (freshTokens / 1_000_000) * selected.user_input +
+      (cachedTokens / 1_000_000) * selected.user_cache_read;
     const ruvicodeOutputCost =
       (outputTokens / 1_000_000) * selected.user_output;
     const ruvicodeTotal = ruvicodeInputCost + ruvicodeOutputCost;
@@ -69,10 +79,14 @@ export function CostCalculator({
       ruvicode: ruvicodeTotal,
       savings,
       savingsPct,
+      cacheSaving: cachedTokens > 0
+        ? (cachedTokens / 1_000_000) *
+          (selected.user_input - selected.user_cache_read)
+        : 0,
       monthlySavings: savings,
       yearlySavings: savings * 12,
     };
-  }, [selected, inputTokens, outputTokens]);
+  }, [selected, inputTokens, outputTokens, cacheHitPct]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
@@ -163,6 +177,46 @@ export function CostCalculator({
             {formatTokens(outputTokens)} tokens
           </p>
         </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium" htmlFor="cache-hit">
+            Cache hit % <span className="font-normal text-text-muted">(optional)</span>
+          </label>
+          <Input
+            id="cache-hit"
+            type="number"
+            min={0}
+            max={100}
+            value={cacheHitPct}
+            onChange={(e) => {
+              onEngage();
+              setCacheHitPct(Math.min(100, Math.max(0, Number(e.target.value))));
+            }}
+            className="font-mono tabular"
+          />
+          <p className="mt-1 text-xs text-text-muted">
+            {selected && selected.user_cache_read > 0 ? (
+              <>
+                {cacheHitPct > 0 ? (
+                  <>
+                    {formatTokens(
+                      Math.round((inputTokens * Math.min(100, Math.max(0, cacheHitPct))) / 100),
+                    )}{" "}
+                    of {formatTokens(inputTokens)} input tokens billed at the{" "}
+                    {selected.user_cache_read < 1
+                      ? selected.user_cache_read.toFixed(4)
+                      : selected.user_cache_read.toFixed(2)}{" "}
+                    cached rate
+                  </>
+                ) : (
+                  "Share of input tokens served from cache at the cheaper cached rate"
+                )}
+              </>
+            ) : (
+              "This model has no cached input rate"
+            )}
+          </p>
+        </div>
       </div>
 
       {/* Results panel */}
@@ -192,6 +246,11 @@ export function CostCalculator({
               <p className="font-mono tabular text-3xl text-text-primary">
                 ${calculation.ruvicode.toFixed(2)}/mo
               </p>
+              {calculation.cacheSaving > 0 && (
+                <p className="mt-2 font-mono text-xs tabular text-accent-text">
+                  incl. ${calculation.cacheSaving.toFixed(2)} prompt cache savings
+                </p>
+              )}
               <div className="mt-4 border-t border-accent/20 pt-4">
                 <p className="text-sm text-text-secondary">You save</p>
                 <p className="font-mono tabular text-xl text-success">

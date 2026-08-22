@@ -20,4 +20,8 @@ export const PRICING_FAQS = [
     q: "What happens if a model becomes unavailable?",
     a: "If a model is temporarily unavailable, requests will return an error and you will not be charged. You can switch to another model or retry later.",
   },
+  {
+    q: "Do cached tokens cost less?",
+    a: "Yes. When a request reuses a prompt prefix that was already processed, the cached portion is billed at a cache read rate, typically 5-10x cheaper than the input rate. Caching is automatic and there is nothing to enable. See the cached input rate on each model page.",
+  },
 ] as const;

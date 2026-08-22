@@ -105,6 +105,13 @@ export default async function UsagePage({ searchParams }: PageProps) {
         <StatCard
           label="Tokens"
           value={summary.totalTokens.toLocaleString()}
+          sublabel={
+            summary.totalCachedTokens > 0
+              ? `${summary.totalCachedTokens.toLocaleString()} cached (${Math.round(
+                  (summary.totalCachedTokens / summary.totalTokens) * 100,
+                )}%)`
+              : undefined
+          }
         />
         <StatCard
           label="Cost"
@@ -163,6 +170,17 @@ export default async function UsagePage({ searchParams }: PageProps) {
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
                         {row.promptTokens.toLocaleString()}
+                        {(row.cacheReadTokens ?? 0) > 0 && (
+                          <span className="ml-1 font-sans text-xs text-text-muted">
+                            ·{" "}
+                            {Math.round(
+                              (Number(row.cacheReadTokens) /
+                                Number(row.promptTokens)) *
+                                100,
+                            )}
+                            % cached
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm tabular text-text-secondary">
                         {row.completionTokens.toLocaleString()}

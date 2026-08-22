@@ -128,6 +128,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                   onToggle={toggleSort}
                   align="right"
                 />
+                <th className="px-4 py-3 text-right font-semibold">Cached in</th>
                 <SortHeader
                   label="Output $/1M"
                   sortKey="user_output"
@@ -166,6 +167,20 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
                       )}{" "}
                       ${formatPrice(m.user_input)}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {m.user_cache_read > 0 ? (
+                      <span className="font-mono tabular text-text-secondary">
+                        {m.ref_cache_read > m.user_cache_read && (
+                          <span className="mr-1 font-mono tabular text-[11px] text-text-muted line-through">
+                            ${formatPrice(m.ref_cache_read)}
+                          </span>
+                        )}{" "}
+                        ${formatPrice(m.user_cache_read)}
+                      </span>
+                    ) : (
+                      <span className="text-text-muted">-</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="font-mono tabular text-text-secondary">

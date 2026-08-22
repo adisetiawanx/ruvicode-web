@@ -108,6 +108,8 @@ async function seed() {
         providerOutput: (m.ref_output * (1 - m.discount_pct / 100)).toFixed(6),
         userInput: m.user_input.toString(),
         userOutput: m.user_output.toString(),
+        refCacheRead: m.ref_cache_read.toString(),
+        userCacheRead: m.user_cache_read.toString(),
         discountPct: m.discount_pct.toString(),
         userDiscountPct: m.user_discount_pct.toString(),
         isActive: m.is_active,

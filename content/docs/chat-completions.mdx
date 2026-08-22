@@ -147,10 +147,25 @@ for per-tool examples.
   "usage": {
     "prompt_tokens": 25,
     "completion_tokens": 7,
-    "total_tokens": 32
+    "total_tokens": 32,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
   }
 }
 ```
+
+### Cached tokens in usage
+
+When a request reuses a prompt prefix that was already processed, the cached portion is billed at a lower cache read rate instead of the full input rate. Caching is automatic, there is no parameter to set. The usage object reports the split, and clients can read it from these fields:
+
+| Field | Description |
+|-------|-------------|
+| `prompt_cache_hit_tokens` | Prompt tokens served from cache |
+| `cached_tokens` | Same count, nested in `prompt_tokens_details` |
+
+`prompt_tokens` is always the full prompt token count, including cached tokens. See [Pricing](/docs/pricing) for cache rates and billing rules.
 
 ## Cost header
 

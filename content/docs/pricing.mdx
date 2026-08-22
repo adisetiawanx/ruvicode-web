@@ -1,0 +1,55 @@
+---
+title: "Pricing"
+slug: pricing
+description: "How Ruvicode billing works. Live per-token rates, per-request charging, and automatic discounts for cached prompt tokens."
+section: "Getting Started"
+order: 3
+---
+
+How you are charged for requests, and how cached prompt tokens cost less.
+
+## How billing works
+
+You are billed per request, in USD, based on exact token counts. Every model lists its live $/1M token rates for input and output, and the amount for each request is deducted from your wallet balance. There is no credit conversion and no monthly fee.
+
+Every non-streaming response carries an `X-Cost` header with the exact charge for that request. Streaming requests show the same figure in your dashboard usage history.
+
+## Live rates
+
+Prices come from a pricing engine that refreshes every 2 minutes. The rate on each model page is the rate you pay on the next request. See the [models catalog](/models) for current input, output, and cached input rates per model.
+
+## Cached input tokens
+
+Workloads that resend the same prompt prefix on every turn (coding agents, chat with long history, repeated system prompts) get a lower price automatically. When a request reuses a prompt prefix that was already processed, the cached portion of the prompt is billed at a cache read rate instead of the full input rate. Cache reads are typically 5-10x cheaper than input tokens.
+
+Caching is automatic. Prefixes are matched for you, there is no parameter to set and nothing to enable. If a request has no repeated prefix, every prompt token is billed at the normal input rate, and models without a cached input price always bill at the normal input rate.
+
+Model pages show a "Cached input" rate when the model supports it. The [cost calculator](/calculator) lets you model the effect by setting the share of your prompt served from cache.
+
+Clients can read the cache split from the `usage` object in each response:
+
+| Field | Description |
+|-------|-------------|
+| `prompt_cache_hit_tokens` | Prompt tokens served from cache |
+| `cached_tokens` | Same count, nested in `prompt_tokens_details` |
+| `prompt_tokens` | Full prompt token count, including cached tokens |
+
+```json
+{
+  "usage": {
+    "prompt_tokens": 5075,
+    "completion_tokens": 120,
+    "total_tokens": 5195,
+    "prompt_cache_hit_tokens": 4900,
+    "prompt_tokens_details": {
+      "cached_tokens": 4900
+    }
+  }
+}
+```
+
+See [Chat Completions](/docs/chat-completions) for the full response shape.
+
+## Cost tracking
+
+Your dashboard shows per-request costs, token counts, and how much of each prompt was served from cache. Usage history is exportable, and each API key can carry a spend limit to cap runaway costs.
