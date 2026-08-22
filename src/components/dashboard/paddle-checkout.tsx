@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { initializePaddle, type Paddle } from "@paddle/paddle-js";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -32,6 +32,10 @@ export function PaddleCheckout() {
   const txnId = searchParams.get("_ptxn");
   const [status, setStatus] = useState<"loading" | "open" | "error">("loading");
   const [showFrame, setShowFrame] = useState(true);
+  // checkout.completed is always followed by checkout.closed (the overlay
+  // closes). Guard so the closed handler does not override the success
+  // redirect with a bounce back to the top-up page.
+  const completedRef = useRef(false);
 
   useEffect(() => {
     if (!txnId) return;
@@ -47,11 +51,15 @@ export function PaddleCheckout() {
             if (event.name === "checkout.completed") {
               // Payment done. The webhook credits the wallet; take the
               // user to billing and drop the ?_ptxn param entirely.
+              completedRef.current = true;
               router.replace("/dashboard/billing");
-            } else if (event.name === "checkout.closed") {
-              // User dismissed the overlay. Remove the param so this
-              // component unmounts the frame target and the page is
-              // clickable again.
+            } else if (
+              event.name === "checkout.closed" &&
+              !completedRef.current
+            ) {
+              // User dismissed the overlay without paying. Remove the
+              // param so this component unmounts the frame target and
+              // the page is clickable again.
               setShowFrame(false);
               router.replace("/dashboard/topup");
             }

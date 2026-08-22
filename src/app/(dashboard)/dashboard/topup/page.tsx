@@ -51,8 +51,9 @@ export default async function TopUpPage() {
       </h1>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <TopUpPaddle userId={session.user.id} />
+        {/* USDC first: zero fees and instant credit, the better deal */}
         <TopUpUSDC address={depositAddress} />
+        <TopUpPaddle userId={session.user.id} />
       </div>
     </div>
   );
