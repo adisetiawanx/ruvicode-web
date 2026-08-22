@@ -27,8 +27,10 @@ export async function POST(req: NextRequest) {
   // 1. Get raw body as text — MUST be before JSON.parse for signature verification
   const rawBody = await req.text();
 
-  // 2. Verify Paddle signature
-  const signatureHeader = req.headers.get("signature") ?? "";
+  // 2. Verify Paddle signature. Paddle Billing sends the signature in
+  // the `Paddle-Signature` header (not `Signature`).
+  const signatureHeader =
+    req.headers.get("paddle-signature") ?? req.headers.get("signature") ?? "";
 
   if (!env.PADDLE_WEBHOOK_SECRET) {
     console.error("[paddle-webhook] PADDLE_WEBHOOK_SECRET not configured");

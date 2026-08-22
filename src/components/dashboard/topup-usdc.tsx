@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Copy, Check, Coins, AlertTriangle, Wallet, ShieldCheck } from "lucide-react";
+import { Copy, Check, Coins, AlertTriangle, Wallet, ShieldCheck, Zap } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 
@@ -42,9 +42,6 @@ export function TopUpUSDC({ address }: TopUpUSDCProps) {
       <div className="mb-4 flex items-center gap-2">
         <Coins className="h-5 w-5 text-accent" />
         <h3 className="font-semibold text-text-primary">Pay by USDC</h3>
-        <span className="rounded-full bg-success-subtle px-2 py-0.5 text-[11px] font-semibold text-success">
-          0 fee
-        </span>
       </div>
 
       {/* QR Code */}
@@ -107,6 +104,16 @@ export function TopUpUSDC({ address }: TopUpUSDCProps) {
               Deposits are detected on-chain and credited to your wallet
               automatically after 3 block confirmations, usually within
               a minute. No need to contact support or click anything.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-start gap-2">
+          <Zap className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <div>
+            <p className="text-xs font-medium text-text-primary">Zero fees</p>
+            <p className="text-xs text-text-muted">
+              Every cent you send is credited in full. No processing fees,
+              no sales tax, no hidden charges.
             </p>
           </div>
         </div>
