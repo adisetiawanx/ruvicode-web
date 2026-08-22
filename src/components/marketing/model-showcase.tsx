@@ -16,7 +16,7 @@ const SHOWCASE_ORDER = [
   "claude-opus-5",
   "gpt-5.6-sol",
   "grok-4.5",
-  "glm-5.2",
+  "glm-5.3",
   "kimi-k3",
   "deepseek-v4-flash-0731",
 ];
