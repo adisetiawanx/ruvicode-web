@@ -94,11 +94,22 @@ export function UsageChart({ data }: UsageChartProps) {
             <Tooltip
               contentStyle={tooltipStyle}
               labelStyle={{ color: "var(--text-secondary)" }}
-              formatter={(value, name) => {
-                if (name === "cost") return [`$${Number(value).toFixed(6)}`, "Cost"];
-                if (name === "tokens")
-                  return [Number(value).toLocaleString(), "Tokens"];
-                return [String(value), name];
+              content={({ active, payload, label }) => {
+                if (!active || !payload?.length) return null;
+                const point = payload[0]?.payload as
+                  | { cost: number; tokens?: number; requests?: number }
+                  | undefined;
+                return (
+                  <div className="rounded-md border border-border-default bg-surface px-3 py-2 text-sm shadow-sm">
+                    <p className="mb-1 font-medium text-text-primary">{label}</p>
+                    <p className="font-mono tabular text-text-secondary">
+                      Cost ${Number(point?.cost ?? 0).toFixed(6)}
+                    </p>
+                    <p className="font-mono tabular text-text-secondary">
+                      Tokens {(point?.tokens ?? 0).toLocaleString()}
+                    </p>
+                  </div>
+                );
               }}
               cursor={{
                 stroke: "var(--chart-1)",
@@ -113,14 +124,6 @@ export function UsageChart({ data }: UsageChartProps) {
               strokeWidth={2}
               fill="url(#costGradient)"
               animationDuration={800}
-            />
-            <Area
-              type="monotone"
-              dataKey="tokens"
-              stroke="transparent"
-              fill="transparent"
-              activeDot={false}
-              animationDuration={0}
             />
           </AreaChart>
         </ResponsiveContainer>
