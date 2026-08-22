@@ -9,6 +9,8 @@ import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
 export const dynamic = "force-dynamic";
 function ok(email: string | null | undefined) { return !!email && (process.env.ADMIN_EMAILS ?? "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).includes(email.toLowerCase()); }
 function usd(n: number) { return `$${n.toFixed(4)}`; }
+function marginCls(n: number) { return n < 0 ? "text-error" : n > 0 ? "text-success" : "text-text-muted"; }
+function signedUsd(n: number) { return `${n < 0 ? "-" : "+"}$${Math.abs(n).toFixed(4)}`; }
 
 export default async function AdminFinancialPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const session = await getSession(); if (!session || !ok(session.user.email)) return notFound();
@@ -25,9 +27,9 @@ export default async function AdminFinancialPage({ searchParams }: { searchParam
       <div><h1 className="text-2xl font-semibold text-text-primary">Financial</h1><p className="mt-1 text-sm text-text-secondary">Charges, liability, deposits, and model economics</p></div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Charges today</p><p className="mt-1 font-mono text-xl">{usd(revenue.chargesToday)}</p></div>
-        <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Margin today</p><p className="mt-1 font-mono text-xl">{usd(revenue.today)}</p></div>
+        <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Margin today</p><p className={`mt-1 font-mono text-xl ${marginCls(revenue.today)}`}>{signedUsd(revenue.today)}</p></div>
         <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Charges all time</p><p className="mt-1 font-mono text-xl">{usd(revenue.chargesTotal)}</p></div>
-        <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Margin all time</p><p className="mt-1 font-mono text-xl">{usd(revenue.marginTotal)}</p></div>
+        <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Margin all time</p><p className={`mt-1 font-mono text-xl ${marginCls(revenue.marginTotal)}`}>{signedUsd(revenue.marginTotal)}</p></div>
       </div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Liability</p><p className="mt-1 font-mono text-xl">${chain.liability.toFixed(2)}</p></div>
@@ -85,8 +87,8 @@ export default async function AdminFinancialPage({ searchParams }: { searchParam
                     <td className="px-3 py-2 text-right font-mono">{row.requests}</td>
                     <td className="px-3 py-2 text-right font-mono">{usd(row.userCost)}</td>
                     <td className="px-3 py-2 text-right font-mono">{usd(row.upstreamCost)}</td>
-                    <td className={`px-3 py-2 text-right font-mono ${row.margin < 0 ? "text-error" : ""}`}>{usd(row.margin)}</td>
-                    <td className="px-3 py-2 text-right font-mono">{row.marginPct.toFixed(1)}%</td>
+                    <td className={`px-3 py-2 text-right font-mono ${marginCls(row.margin)}`}>{signedUsd(row.margin)}</td>
+                    <td className={`px-3 py-2 text-right font-mono ${marginCls(row.margin)}`}>{row.marginPct.toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>
