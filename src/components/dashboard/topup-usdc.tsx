@@ -42,6 +42,9 @@ export function TopUpUSDC({ address }: TopUpUSDCProps) {
       <div className="mb-4 flex items-center gap-2">
         <Coins className="h-5 w-5 text-accent" />
         <h3 className="font-semibold text-text-primary">Pay by USDC</h3>
+        <span className="rounded-full bg-success-subtle px-2 py-0.5 text-[11px] font-semibold text-success">
+          0 fee
+        </span>
       </div>
 
       {/* QR Code */}

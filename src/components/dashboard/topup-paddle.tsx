@@ -50,9 +50,6 @@ export function TopUpPaddle({ userId }: { userId: string }) {
     }
   };
 
-  const fee = finalAmount ? finalAmount * 0.05 + 0.5 : 0;
-  const received = finalAmount ? finalAmount - fee : 0;
-
   return (
     <div className="rounded-lg border border-border-default bg-surface p-6">
       <div className="mb-4 flex items-center gap-2">
@@ -100,20 +97,16 @@ export function TopUpPaddle({ userId }: { userId: string }) {
         </div>
       </div>
 
-      {/* Fee transparency */}
+      {/* Credits summary */}
       <div className="mb-4 space-y-1 font-mono text-xs tabular text-text-muted">
-        <div className="flex justify-between">
-          <span>Amount:</span>
+        <div className="flex justify-between font-semibold text-text-secondary">
+          <span>Credits you receive:</span>
           <span>${finalAmount?.toFixed(2) ?? "0.00"}</span>
         </div>
-        <div className="flex justify-between">
-          <span>Card processing fee:</span>
-          <span>−${fee.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between font-semibold text-text-secondary">
-          <span>You receive:</span>
-          <span>${received.toFixed(2)}</span>
-        </div>
+        <p className="pt-1 leading-relaxed">
+          Full amount is credited to your wallet. Sales tax, if applicable
+          for your country, is calculated at checkout.
+        </p>
       </div>
 
       <Button

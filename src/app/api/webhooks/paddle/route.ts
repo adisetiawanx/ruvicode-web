@@ -71,14 +71,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing transaction ID" }, { status: 400 });
   }
 
-  // Extract amount (Paddle sends cents as string, e.g., "2500" = $25.00)
+  // Extract amounts (Paddle sends cents as strings, e.g., "2500" = $25.00).
+  // credit = SUBTOTAL (the wallet credits the user bought); the checkout
+  // total also includes VAT which Paddle (as MoR) collects and remits, so
+  // crediting `total` would credit more than the credits are worth.
+  // fee = total - subtotal = VAT + Paddle processing, what we actually lose.
+  const subtotalCents = transaction.details?.totals?.subtotal;
   const totalCents = transaction.details?.totals?.total;
-  if (!totalCents) {
-    console.error("[paddle-webhook] No total in transaction", { transactionId });
-    return NextResponse.json({ error: "Missing total" }, { status: 400 });
+  if (!subtotalCents || !totalCents) {
+    console.error("[paddle-webhook] No totals in transaction", { transactionId });
+    return NextResponse.json({ error: "Missing totals" }, { status: 400 });
   }
 
-  const amountInDollars = Number(totalCents) / 100;
+  const amountInDollars = Number(subtotalCents) / 100;
+  const feeInDollars = (Number(totalCents) - Number(subtotalCents)) / 100;
 
   // Extract user_id from custom_data (set by our Server Action)
   const userId = transaction.custom_data?.user_id;
@@ -109,8 +115,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true, duplicate: true });
   }
 
-  // 7. Calculate fee (Paddle: 5% + $0.50)
-  const fee = amountInDollars * 0.05 + 0.5;
+  // 7. Fee = what Paddle adds on top (VAT + processing), already computed
 
   // 8. Atomic wallet credit + topup record in a Postgres transaction
   try {
@@ -123,7 +128,7 @@ export async function POST(req: NextRequest) {
         method: "paddle",
         paddleTransactionId: transactionId,
         status: "completed",
-        fee: fee.toFixed(4),
+        fee: feeInDollars.toFixed(4),
         completedAt: new Date(),
       });
 
@@ -226,7 +231,8 @@ interface PaddleEvent {
     status: string;
     details?: {
       totals?: {
-        total?: string; // cents as string, e.g., "2500"
+        subtotal?: string; // credits subtotal, cents, e.g., "2500"
+        total?: string; // grand total incl. VAT, cents
       };
     };
     custom_data?: {
