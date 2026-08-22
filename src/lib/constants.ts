@@ -10,12 +10,36 @@ export const FAQS = [
     a: "We buy inference capacity at market rates, well below what the official APIs charge, and pass most of the difference to you. The price you see on each model page is the price you pay per request.",
   },
   {
+    q: "Do cached tokens cost less?",
+    a: "Yes. When a request reuses a prompt prefix that was already processed, the cached portion is billed at a cache read rate, typically 5-10x cheaper than the input rate. Caching is automatic and there is nothing to enable.",
+  },
+  {
+    q: "Does prompt caching work with coding agents?",
+    a: "Yes, and agents benefit the most. Tools like Claude Code, OpenCode, Cline, and Aider resend the whole conversation on every tool call, so cache hit rates above 95% are normal after the first few turns. One real agent session on our gateway hit 99.7% cached mid-conversation.",
+  },
+  {
+    q: "How much can I save with caching?",
+    a: "It depends on how much of your prompt repeats. A mid-session agent request with 99% cache hits paid about 74% less than the same request at the full input rate. Short unique prompts see no benefit, repeated prefixes see the most.",
+  },
+  {
+    q: "Can I see how many of my tokens were cached?",
+    a: "Yes. Every response's usage object reports the cache split, and your dashboard shows cached tokens per request with the percentage of the prompt they cover. Usage totals and the weekly chart include cached counts too.",
+  },
+  {
     q: "Do you store my prompts or responses?",
     a: "No. We do not log or store the content of your prompts or AI responses. Only usage metadata (token counts, cost, model) is retained for billing.",
   },
   {
+    q: "Do you support streaming?",
+    a: "Yes. Streaming works out of the box with the OpenAI-compatible API, including usage reporting in the final chunk and cached token counts. Point any OpenAI SDK at our base URL and set stream to true.",
+  },
+  {
+    q: "What happens if my request fails mid-stream?",
+    a: "You are charged only for what the usage object reports. If a stream is canceled before usage arrives, the request settles at zero cost. Failed requests never consume your balance.",
+  },
+  {
     q: "Can I set spending limits per key?",
-    a: "Yes. Every API key can have daily and monthly spend caps. When a limit is hit, the key stops accepting requests until the next period. You can also set per-key rate limits.",
+    a: "Yes. Every API key can have daily and monthly spend caps. When a limit is hit, the key stops accepting requests until the next period. You can also set per-key rate limits up to 3,000 RPM.",
   },
   {
     q: "What payment methods do you accept?",
@@ -24,6 +48,10 @@ export const FAQS = [
   {
     q: "Is it OpenAI-compatible?",
     a: "Yes. Our API endpoint is fully OpenAI-compatible. Point any OpenAI SDK, Cursor, Aider, LangChain, or similar tool at our base URL with your Ruvicode API key.",
+  },
+  {
+    q: "Do my credits expire?",
+    a: "No. Your wallet balance never expires. Your balance is yours to use whenever you want. No inactivity timeout, no expiry.",
   },
 ] as const;
 
@@ -45,8 +73,8 @@ interface ShowcaseModel {
   savings_pct: number;
 }
 
-/** Static top models for the showcase (MVP — replaced by DB in later ADR).
- *  Pricing data from PROJECT.md §6 verified margin table. */
+/** Static top models for the showcase (MVP, replaced by DB in later ADR).
+ *  Pricing data from PROJECT.md verified margin table. */
 export const SHOWCASE_MODELS: readonly ShowcaseModel[] = [
   {
     model: "claude-opus-4.7",
@@ -130,7 +158,7 @@ export const SHOWCASE_MODELS: readonly ShowcaseModel[] = [
   },
 ] as const;
 
-// Common disposable email domains — blocked at registration
+// Common disposable email domains, blocked at registration
 export const DISPOSABLE_EMAIL_DOMAINS = [
   "10minutemail.com",
   "guerrillamail.com",
@@ -155,21 +183,21 @@ export function isDisposableEmail(email: string): boolean {
   return domain ? DISPOSABLE_EMAIL_DOMAINS.includes(domain) : false;
 }
 
-// ── Chart colors (PAGES.md §13.1) ──
+// Chart colors
 
 export const CHART_COLORS = {
-  primary: "#D97757", // Clay — primary cost series
-  secondary: "#6A9BCC", // Sky — comparison
-  tertiary: "#8FA876", // Olive — savings
-  quaternary: "#D4A27F", // Kraft
-  quinary: "#C46686", // Fig
-  sextary: "#B58AB8", // Mauve
-  septary: "#7FB8A4", // Sage
-  octonary: "#E0B050", // Amber
-  nonary: "#8B7FC7", // Iris
-  denary: "#C98B6B", // Rust
-  undenary: "#6BA3C9", // Steel
-  duodenary: "#A89070", // Tan
+  primary: "#D97757",
+  secondary: "#6A9BCC",
+  tertiary: "#8FA876",
+  quaternary: "#D4A27F",
+  quinary: "#C46686",
+  sextary: "#B58AB8",
+  septary: "#7FB8A4",
+  octonary: "#E0B050",
+  nonary: "#8B7FC7",
+  denary: "#C98B6B",
+  undenary: "#6BA3C9",
+  duodenary: "#A89070",
 } as const;
 
 export const CHART_COLOR_ARRAY = [
