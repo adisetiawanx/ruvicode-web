@@ -55,8 +55,8 @@ export default async function DashboardPage() {
         />
         <StatCard
           label="Total Loaded"
-          value={`$${Number(wallet.totalLoaded).toFixed(2)}`}
-          sublabel={`Total spent: $${Number(wallet.totalSpent).toFixed(2)}`}
+          value={`$${floorUsd(wallet.totalLoaded).toFixed(2)}`}
+          sublabel={`Total spent: $${floorUsd(wallet.totalSpent).toFixed(2)}`}
         />
       </div>
 
