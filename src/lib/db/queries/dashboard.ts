@@ -47,6 +47,8 @@ export interface RecentActivityEntry {
   model: string;
   promptTokens: number;
   completionTokens: number;
+  /** Cached prompt tokens (null = historical row before cache billing). */
+  cacheReadTokens: number | null;
   cost: string;
   createdAt: Date;
   keyLabel: string | null;
@@ -103,16 +105,16 @@ const MIN = 60_000;
 const HOUR = 60 * MIN;
 
 const MOCK_RECENT_ACTIVITY: RecentActivityEntry[] = [
-  { keyLabel: "Production", id: "rec-1", model: "glm-5.2", promptTokens: 320, completionTokens: 930, cost: "0.000231", createdAt: new Date(NOW - 2 * MIN) },
-  { keyLabel: "Test", id: "rec-2", model: "claude-sonnet-5", promptTokens: 1200, completionTokens: 2200, cost: "0.013400", createdAt: new Date(NOW - 5 * MIN) },
-  { keyLabel: "Production", id: "rec-3", model: "deepseek-v4-flash", promptTokens: 4100, completionTokens: 4800, cost: "0.000162", createdAt: new Date(NOW - 12 * MIN) },
-  { keyLabel: "Test", id: "rec-4", model: "gpt-5.4", promptTokens: 850, completionTokens: 1150, cost: "0.001575", createdAt: new Date(NOW - 25 * MIN) },
-  { keyLabel: "Production", id: "rec-5", model: "glm-5.2", promptTokens: 210, completionTokens: 540, cost: "0.000142", createdAt: new Date(NOW - 38 * MIN) },
-  { keyLabel: "Test", id: "rec-6", model: "claude-sonnet-5", promptTokens: 3400, completionTokens: 5600, cost: "0.034200", createdAt: new Date(NOW - 1 * HOUR) },
-  { keyLabel: "Production", id: "rec-7", model: "gpt-5.4", promptTokens: 720, completionTokens: 980, cost: "0.001364", createdAt: new Date(NOW - 1.5 * HOUR) },
-  { keyLabel: "Test", id: "rec-8", model: "deepseek-v4-flash", promptTokens: 2600, completionTokens: 3100, cost: "0.000097", createdAt: new Date(NOW - 2 * HOUR) },
-  { keyLabel: "Production", id: "rec-9", model: "glm-5.2", promptTokens: 180, completionTokens: 420, cost: "0.000108", createdAt: new Date(NOW - 3 * HOUR) },
-  { keyLabel: "Test", id: "rec-10", model: "claude-sonnet-5", promptTokens: 950, completionTokens: 1800, cost: "0.010850", createdAt: new Date(NOW - 4 * HOUR) },
+  { keyLabel: "Production", id: "rec-1", model: "glm-5.2", cacheReadTokens: 106, promptTokens: 320, completionTokens: 930, cost: "0.000231", createdAt: new Date(NOW - 2 * MIN) },
+  { keyLabel: "Test", id: "rec-2", model: "claude-sonnet-5", cacheReadTokens: 400, promptTokens: 1200, completionTokens: 2200, cost: "0.013400", createdAt: new Date(NOW - 5 * MIN) },
+  { keyLabel: "Production", id: "rec-3", model: "deepseek-v4-flash", cacheReadTokens: 1366, promptTokens: 4100, completionTokens: 4800, cost: "0.000162", createdAt: new Date(NOW - 12 * MIN) },
+  { keyLabel: "Test", id: "rec-4", model: "gpt-5.4", cacheReadTokens: 283, promptTokens: 850, completionTokens: 1150, cost: "0.001575", createdAt: new Date(NOW - 25 * MIN) },
+  { keyLabel: "Production", id: "rec-5", model: "glm-5.2", cacheReadTokens: 70, promptTokens: 210, completionTokens: 540, cost: "0.000142", createdAt: new Date(NOW - 38 * MIN) },
+  { keyLabel: "Test", id: "rec-6", model: "claude-sonnet-5", cacheReadTokens: 1133, promptTokens: 3400, completionTokens: 5600, cost: "0.034200", createdAt: new Date(NOW - 1 * HOUR) },
+  { keyLabel: "Production", id: "rec-7", model: "gpt-5.4", cacheReadTokens: 240, promptTokens: 720, completionTokens: 980, cost: "0.001364", createdAt: new Date(NOW - 1.5 * HOUR) },
+  { keyLabel: "Test", id: "rec-8", model: "deepseek-v4-flash", cacheReadTokens: 866, promptTokens: 2600, completionTokens: 3100, cost: "0.000097", createdAt: new Date(NOW - 2 * HOUR) },
+  { keyLabel: "Production", id: "rec-9", model: "glm-5.2", cacheReadTokens: 60, promptTokens: 180, completionTokens: 420, cost: "0.000108", createdAt: new Date(NOW - 3 * HOUR) },
+  { keyLabel: "Test", id: "rec-10", model: "claude-sonnet-5", cacheReadTokens: 316, promptTokens: 950, completionTokens: 1800, cost: "0.010850", createdAt: new Date(NOW - 4 * HOUR) },
 ];
 
 // ── Query functions ──
@@ -303,6 +305,7 @@ export async function getRecentActivity(
       model: usageRecords.model,
       promptTokens: usageRecords.promptTokens,
       completionTokens: usageRecords.completionTokens,
+      cacheReadTokens: usageRecords.cacheReadTokens,
       cost: usageRecords.cost,
       createdAt: usageRecords.createdAt,
       keyLabel: apiKeys.label,
@@ -318,6 +321,7 @@ export async function getRecentActivity(
     model: r.model,
     promptTokens: r.promptTokens,
     completionTokens: r.completionTokens,
+    cacheReadTokens: r.cacheReadTokens ?? null,
     cost: r.cost,
     createdAt: r.createdAt,
     keyLabel: r.keyLabel ?? null,

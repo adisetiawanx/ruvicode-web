@@ -39,6 +39,10 @@ export interface ModelWithPricing {
   ref_output: number;
   user_input: number;
   user_output: number;
+  /** Cached input $/1M (0 when the model has no cache price). */
+  user_cache_read: number;
+  /** Reference cached input $/1M (0 when unknown). */
+  ref_cache_read: number;
   discount_pct: number;
   user_discount_pct: number;
   context: string;       // formatted context window from the curated catalog
@@ -63,6 +67,8 @@ function rowToModelPricing(
     ref_output: Number(row.refOutput),
     user_input: Number(row.userInput),
     user_output: Number(row.userOutput),
+    user_cache_read: Number(row.userCacheRead ?? 0),
+    ref_cache_read: Number(row.refCacheRead ?? 0),
     discount_pct: Number(row.discountPct),
     user_discount_pct: Number(row.userDiscountPct),
     context: curated ? formatContext(curated.context) : "",

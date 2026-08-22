@@ -215,6 +215,9 @@ export const usageRecords = pgTable(
     promptTokens: integer("prompt_tokens").notNull(),
     completionTokens: integer("completion_tokens").notNull(),
     reasoningTokens: integer("reasoning_tokens").default(0),
+    // Tokens served from the prompt cache (ADR-032). Null on historical rows
+    // (unknown), 0 written by the gateway when measured no cache.
+    cacheReadTokens: integer("cache_read_tokens"),
     cost: decimal("cost", { precision: 12, scale: 8 }).notNull(), // amount charged to user
     upstreamCost: decimal("upstream_cost", { precision: 12, scale: 8 })
       .notNull()
@@ -306,6 +309,15 @@ export const modelPrices = pgTable(
     }).notNull(),
     userInput: decimal("user_input", { precision: 10, scale: 6 }).notNull(),
     userOutput: decimal("user_output", { precision: 10, scale: 6 }).notNull(),
+    // Cached input token prices (ADR-032), reconstructed at sync time.
+    refCacheRead: decimal("ref_cache_read_per_1m", {
+      precision: 10,
+      scale: 6,
+    }).notNull(),
+    userCacheRead: decimal("user_cache_read_per_1m", {
+      precision: 10,
+      scale: 6,
+    }).notNull(),
     discountPct: decimal("discount_pct", { precision: 5, scale: 2 }).notNull(),
     userDiscountPct: decimal("user_discount_pct", {
       precision: 5,

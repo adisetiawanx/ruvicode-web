@@ -37,6 +37,8 @@ export interface UsageRecord {
   model: string;
   promptTokens: number;
   completionTokens: number;
+  /** Cached prompt tokens (null = historical row before cache billing). */
+  cacheReadTokens: number | null;
   cost: string;
   createdAt: Date;
   keyLabel: string | null;
@@ -45,6 +47,8 @@ export interface UsageRecord {
 export interface UsageSummary {
   totalRequests: number;
   totalTokens: number;
+  /** Sum of cached prompt tokens across the window (0 when none measured). */
+  totalCachedTokens: number;
   totalCost: number;
 }
 
@@ -132,6 +136,7 @@ function generateUsageRecords(): UsageRecord[] {
       model,
       promptTokens,
       completionTokens,
+      cacheReadTokens: Math.floor(promptTokens * 0.6),
       cost,
       createdAt: new Date(NOW - i * 35 * 60 * 1000),
       keyLabel: i % 3 === 0 ? "Production" : i % 3 === 1 ? "Test" : null,
@@ -390,6 +395,7 @@ export async function getUsageRecords(
       model: usageRecords.model,
       promptTokens: usageRecords.promptTokens,
       completionTokens: usageRecords.completionTokens,
+      cacheReadTokens: usageRecords.cacheReadTokens,
       cost: usageRecords.cost,
       createdAt: usageRecords.createdAt,
       keyLabel: apiKeys.label,
@@ -406,6 +412,7 @@ export async function getUsageRecords(
     model: r.model,
     promptTokens: r.promptTokens,
     completionTokens: r.completionTokens,
+    cacheReadTokens: r.cacheReadTokens ?? null,
     cost: r.cost,
     createdAt: r.createdAt,
     keyLabel: r.keyLabel ?? null,
@@ -447,6 +454,10 @@ export async function getUsageSummary(
         (acc, r) => acc + r.promptTokens + r.completionTokens,
         0,
       ),
+      totalCachedTokens: records.reduce(
+        (acc, r) => acc + (r.cacheReadTokens ?? 0),
+        0,
+      ),
       totalCost: records.reduce((acc, r) => acc + Number(r.cost), 0),
     };
   }
@@ -457,6 +468,7 @@ export async function getUsageSummary(
     .select({
       totalRequests: sql<number>`COUNT(*)`,
       totalTokens: sql<number>`COALESCE(SUM(${usageRecords.promptTokens} + ${usageRecords.completionTokens}),0)`,
+      totalCachedTokens: sql<number>`COALESCE(SUM(${usageRecords.cacheReadTokens}),0)`,
       totalCost: sql<number>`COALESCE(SUM(${usageRecords.cost}),0)`,
     })
     .from(usageRecords)
@@ -466,6 +478,7 @@ export async function getUsageSummary(
   return {
     totalRequests: Number(row?.totalRequests ?? 0),
     totalTokens: Number(row?.totalTokens ?? 0),
+    totalCachedTokens: Number(row?.totalCachedTokens ?? 0),
     totalCost: Number(row?.totalCost ?? 0),
   };
 }
@@ -519,6 +532,7 @@ export async function getAllUsageForExport(
       model: usageRecords.model,
       promptTokens: usageRecords.promptTokens,
       completionTokens: usageRecords.completionTokens,
+      cacheReadTokens: usageRecords.cacheReadTokens,
       cost: usageRecords.cost,
       createdAt: usageRecords.createdAt,
       keyLabel: apiKeys.label,
@@ -533,6 +547,7 @@ export async function getAllUsageForExport(
     model: r.model,
     promptTokens: r.promptTokens,
     completionTokens: r.completionTokens,
+    cacheReadTokens: r.cacheReadTokens ?? null,
     cost: r.cost,
     createdAt: r.createdAt,
     keyLabel: r.keyLabel ?? null,
