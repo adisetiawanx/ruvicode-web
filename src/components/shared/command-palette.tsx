@@ -19,6 +19,7 @@ import {
   BookOpen,
   Newspaper,
   Plug,
+  Mail,
   Activity,
   KeyRound,
   LayoutDashboard,
@@ -33,6 +34,7 @@ const PAGES = [
   { href: "/docs", label: "Docs", icon: BookOpen, hint: "API reference" },
   { href: "/blog", label: "Blog", icon: Newspaper, hint: "Guides and comparisons" },
   { href: "/integrations", label: "Integrations", icon: Plug, hint: "Cursor, Aider, LangChain" },
+  { href: "/contact", label: "Contact", icon: Mail, hint: "Email support" },
   { href: "/status", label: "Status", icon: Activity, hint: "System health" },
 ];
 

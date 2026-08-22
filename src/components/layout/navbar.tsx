@@ -22,6 +22,7 @@ const navLinks = [
   { href: "/playground", label: "Playground" },
   { href: "/docs", label: "Docs" },
   { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function Navbar() {
