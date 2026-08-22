@@ -38,7 +38,7 @@ const features: Feature[] = [
   {
     icon: CreditCard,
     title: "Card or crypto",
-    desc: "Top up with any major card or USDC on Base. No foreign card rejections, minimum $0.01.",
+    desc: "Top up with any major card or USDC on Base. No foreign card rejections, deposits from $0.01.",
   },
   {
     icon: Zap,
