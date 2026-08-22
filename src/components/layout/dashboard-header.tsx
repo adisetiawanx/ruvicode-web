@@ -26,25 +26,15 @@ export function DashboardHeader({
           <span className="font-semibold">Ruvicode</span>
         </Link>
         {typeof totalTokensServed === "number" &&
-          totalTokensServed > 0 &&
-          (() => {
-            // Compact notation: 74.8M, 1.2B
-            const v = totalTokensServed;
-            const label =
-              v >= 1_000_000_000
-                ? `${(v / 1_000_000_000).toFixed(1)}B`
-                : v >= 1_000_000
-                  ? `${(v / 1_000_000).toFixed(1)}M`
-                  : v >= 1_000
-                    ? `${(v / 1_000).toFixed(0)}K`
-                    : v.toLocaleString();
-            return (
-              <span className="hidden items-center gap-1.5 font-mono text-xs text-text-muted md:flex" title={`${v.toLocaleString()} tokens served by Ruvicode`}>
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" />
-                {label} tokens served
-              </span>
-            );
-          })()}
+          totalTokensServed > 0 && (
+            <span
+              className="hidden items-center gap-1.5 font-mono text-xs text-text-muted md:flex"
+              title="Total tokens served by Ruvicode"
+            >
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" />
+              {totalTokensServed.toLocaleString("en-US")} tokens served
+            </span>
+          )}
       </div>
 
       {/* Right: theme toggle */}
