@@ -265,8 +265,9 @@ export function PlaygroundChat({
           model,
           ...(selectedKeyId ? { keyId: selectedKeyId } : {}),
           // Full conversation so the model remembers earlier turns. The
-          // identity context is added server-side in the route, so it is
-          // never visible in browser payloads.
+          // identity context is added server-side (in the public route for
+          // the free playground, at the gateway for the dashboard), so it
+          // is never visible in browser payloads.
           //
           // Empty assistant messages (a turn that stopped at the token
           // limit before any text arrived) are dropped: most upstreams
