@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, CreditCard } from "lucide-react";
+import { Loader2, CreditCard, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { trackTopUpInitiated } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { createPaddleTransaction } from "@/app/(dashboard)/dashboard/topup/actions";
 
 const PRESET_AMOUNTS = [5, 10, 25, 50, 100, 250];
 
@@ -31,22 +32,23 @@ export function TopUpPaddle({ userId }: { userId: string }) {
     setLoading(true);
 
     try {
-      // In production: create Paddle transaction via Server Action,
-      // then open Paddle checkout overlay.
-      // For now: show a placeholder message (Paddle SDK integration
-      // happens when PADDLE_API_KEY is configured).
-      toast.info(
-        "Card top-up is coming soon.",
-      );
+      const result = await createPaddleTransaction({
+        amount: finalAmount,
+        userId,
+      });
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+      // Hosted Paddle checkout. On completion Paddle returns to the
+      // dashboard; the webhook credits the wallet independently.
+      window.location.assign(result.checkoutUrl);
     } catch {
       toast.error("Checkout failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-
-  // Suppress unused warning — userId passed to Server Action in production
-  void userId;
 
   const fee = finalAmount ? finalAmount * 0.05 + 0.5 : 0;
   const received = finalAmount ? finalAmount - fee : 0;
@@ -127,6 +129,11 @@ export function TopUpPaddle({ userId }: { userId: string }) {
         )}
         Continue to Checkout
       </Button>
+
+      <p className="mt-3 flex items-center justify-center gap-1 text-center text-xs text-text-muted">
+        Secure checkout opens in a new step at Paddle
+        <ExternalLink className="h-3 w-3" />
+      </p>
     </div>
   );
 }

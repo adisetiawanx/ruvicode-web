@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { limitPlaygroundRequest } from "@/lib/upstash";
 import {
   playgroundSchema,
   sanitizeSSELine,
@@ -13,29 +12,13 @@ export const dynamic = "force-dynamic";
 /**
  * Public playground chat route.
  *
- * Anonymous visitors can try exactly one model (deepseek-v4-flash), 5
- * requests per day per IP. The response is streamed so tokens and reasoning
+ * Anonymous visitors can try exactly one model, the free model served by
+ * the freedom endpoint. The response is streamed so tokens and reasoning
  * appear live. The provider's identity stays masked: only our own headers
  * are set, and the upstream cost object is stripped from every SSE line.
  */
 export async function POST(req: NextRequest) {
-  // 1. Abuse control (not a hard quota): the playground is unlimited for
-  // humans, but scripted abuse via curl/IDEs gets throttled hard. A short
-  // sliding window of 10 requests per minute per IP stops bulk hammering
-  // while never touching a normal interactive session.
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
-  const { success, remaining } = await limitPlaygroundRequest(ip, 10, "1 m");
-  if (!success) {
-    return Response.json(
-      {
-        error: "Too many requests. Slow down or sign up for an API key.",
-        remaining: 0,
-      },
-      { status: 429 },
-    );
-  }
-
-  // 2. Validate input.
+  // 1. Validate input.
   let parsed;
   try {
     parsed = playgroundSchema.safeParse(await req.json());
@@ -93,7 +76,7 @@ export async function POST(req: NextRequest) {
     });
   } catch {
     return Response.json(
-      { error: "Something went wrong. Please try again.", remaining },
+      { error: "Something went wrong. Please try again." },
       { status: 500 },
     );
   }
@@ -101,7 +84,7 @@ export async function POST(req: NextRequest) {
   if (!upstream.ok || !upstream.body) {
     // Sanitized error: never leak the provider's status or body.
     return Response.json(
-      { error: "Model temporarily unavailable. Please try again.", remaining },
+      { error: "Model temporarily unavailable. Please try again." },
       { status: 503 },
     );
   }
@@ -113,10 +96,6 @@ export async function POST(req: NextRequest) {
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
-      // Announce the remaining quota first; the client badge reads this.
-      controller.enqueue(
-        new TextEncoder().encode(`data: ${JSON.stringify({ meta: { remaining } })}\n`),
-      );
       try {
         for (;;) {
           const { done, value } = await reader.read();

@@ -57,7 +57,6 @@ interface PlaygroundChatProps {
 }
 
 interface StreamChunk {
-  meta?: { remaining?: number };
   choices?: Array<{
     delta?: {
       content?: string;
@@ -135,7 +134,6 @@ export function PlaygroundChat({
   // Privacy notice rendered under the chat input on both playgrounds.
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [remaining, setRemaining] = useState<number | null>(null);
   const [needKey, setNeedKey] = useState(false);
   const [maxTokens, setMaxTokens] = useState(4096);
   const [temperature, setTemperature] = useState(0.7);
@@ -166,10 +164,6 @@ export function PlaygroundChat({
 
   const handleChunk = useCallback(
     (chunk: StreamChunk, activeIndex: number) => {
-      if (chunk.meta?.remaining !== undefined) {
-        setRemaining(chunk.meta.remaining);
-      }
-
       const finish = chunk.choices?.[0]?.finish_reason;
       if (finish && finish !== "stop") {
         const why =
@@ -363,11 +357,6 @@ export function PlaygroundChat({
       </div>
 
       <div className="flex items-center gap-2">
-        {remaining !== null && remaining <= 2 && (
-          <Badge variant="destructive" className="text-xs">
-            Slow down
-          </Badge>
-        )}
         {lastCost && (
           <span className="font-mono text-xs tabular text-text-muted">
             ${lastCost.total.toFixed(6)}

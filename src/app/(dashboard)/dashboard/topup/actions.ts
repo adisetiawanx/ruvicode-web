@@ -1,6 +1,6 @@
 "use server";
 
-import { Paddle } from "@paddle/paddle-node-sdk";
+import { Paddle, Environment } from "@paddle/paddle-node-sdk";
 import { getSession } from "@/lib/session";
 import { env } from "@/lib/env";
 import { revalidatePath } from "next/cache";
@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
  *
  * Called by the top-up UI when user clicks "Continue to Checkout".
  * Creates a Paddle transaction with inline pricing and returns the
- * transaction ID for the client to open the Paddle checkout overlay.
+ * transaction ID plus checkout URL for the client to redirect to.
  *
  * Security:
  * - Session validated (user must be logged in)
@@ -20,7 +20,7 @@ import { revalidatePath } from "next/cache";
  */
 
 export type CreatePaddleTransactionResult =
-  | { ok: true; transactionId: string }
+  | { ok: true; transactionId: string; checkoutUrl: string }
   | { ok: false; message: string };
 
 export async function createPaddleTransaction(input: {
@@ -46,8 +46,12 @@ export async function createPaddleTransaction(input: {
     return { ok: false, message: "Payment is not configured yet." };
   }
 
-  // 5. Create Paddle transaction
-  const paddle = new Paddle(env.PADDLE_API_KEY);
+  // 5. Create Paddle transaction on the right environment
+  // (SDK defaults to production; a sandbox key against production 401s)
+  const paddle =
+    env.PADDLE_ENV === "production"
+      ? new Paddle(env.PADDLE_API_KEY)
+      : new Paddle(env.PADDLE_API_KEY, { environment: Environment.sandbox });
 
   try {
     const transaction = await paddle.transactions.create({
@@ -55,13 +59,15 @@ export async function createPaddleTransaction(input: {
         {
           quantity: 1,
           price: {
-            description: `Ruvicode Wallet Top-Up — $${input.amount.toFixed(2)}`,
+            // Paddle amounts are decimal strings in major units ("5.00"),
+            // not cents.
+            description: `Ruvicode Wallet Top-Up $${input.amount.toFixed(2)}`,
             product: {
               name: "Ruvicode Wallet Credits",
               taxCategory: "saas",
             },
             unitPrice: {
-              amount: String(Math.round(input.amount * 100)), // Paddle uses cents
+              amount: input.amount.toFixed(2),
               currencyCode: "USD",
             },
           },
@@ -73,8 +79,16 @@ export async function createPaddleTransaction(input: {
       },
     });
 
+    const checkoutUrl = transaction.checkout?.url;
+    if (!checkoutUrl) {
+      return {
+        ok: false,
+        message: "Checkout is not ready yet. Please try again later.",
+      };
+    }
+
     revalidatePath("/dashboard/topup");
-    return { ok: true, transactionId: transaction.id };
+    return { ok: true, transactionId: transaction.id, checkoutUrl };
   } catch (err) {
     console.error("[paddle] Transaction creation failed", err);
     return {
