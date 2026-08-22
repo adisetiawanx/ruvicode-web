@@ -31,6 +31,8 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
     (acc, r) => acc + r.promptTokens + r.completionTokens,
     0,
   );
+  const totalCost = filtered.reduce((acc, r) => acc + r.cost, 0);
+  const totalUpstream = filtered.reduce((acc, r) => acc + r.upstreamCost, 0);
   const totalCached = filtered.reduce(
     (acc, r) => acc + (r.cacheReadTokens ?? 0),
     0,
@@ -59,13 +61,15 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
                 <th className="px-3 py-2 text-right">Tokens</th>
                 <th className="px-3 py-2 text-right">Cached</th>
                 <th className="px-3 py-2 text-right">Cost</th>
+                <th className="px-3 py-2 text-right">Provider</th>
+                <th className="px-3 py-2 text-right">Margin</th>
                 <th className="px-3 py-2 text-left">Status</th>
                 <th className="px-3 py-2 text-left">Request ID</th>
               </tr>
             </thead>
             <tbody>
               {rows.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-12 text-center text-sm text-text-muted">No data to display.</td></tr>
+                <tr><td colSpan={10} className="px-4 py-12 text-center text-sm text-text-muted">No data to display.</td></tr>
               ) : rows.map((row, i) => (
                 <tr key={i} className="border-b border-border-subtle last:border-0">
                   <td className="whitespace-nowrap px-3 py-3 text-xs text-text-muted"><ClientTime utc={row.createdAt} /></td>
@@ -74,6 +78,12 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
                   <td className="px-3 py-3 text-right font-mono text-xs">{(row.promptTokens + row.completionTokens).toLocaleString()}</td>
                   <td className="px-3 py-3 text-right font-mono text-xs text-text-muted">{(row.cacheReadTokens ?? 0) > 0 ? row.cacheReadTokens.toLocaleString() : "-"}</td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.cost)}</td>
+                  <td className="px-3 py-3 text-right font-mono text-text-muted">{usd(row.upstreamCost)}</td>
+                  <td className="px-3 py-3 text-right font-mono">
+                    <span className={(row.cost - row.upstreamCost) < 0 ? "text-error" : (row.cost - row.upstreamCost) === 0 ? "text-text-muted" : "text-success"}>
+                      {usd(row.cost - row.upstreamCost)}
+                    </span>
+                  </td>
                   <td className="px-3 py-3 text-xs"><span className={row.status === "completed" ? "text-success" : row.status === "failed" ? "text-error" : "text-warning"}>{row.status}</span></td>
                   <td className="px-3 py-3 text-xs text-text-muted">{row.requestId ?? "-"}</td>
                 </tr>
@@ -83,7 +93,7 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
         </div>
         <div className="flex items-center justify-between gap-4 border-t border-border-subtle px-4 py-3 text-sm text-text-muted">
           <span>
-            {filtered.length.toLocaleString()} records{filtered.length > 0 ? ` · ${start}–${end}` : ""}
+            {filtered.length.toLocaleString()} records{filtered.length > 0 ? ` · ${start}–${end}` : ""} · charges {usd(totalCost)} · provider {usd(totalUpstream)} · margin {usd(totalCost - totalUpstream)}
             {totalCached > 0 ? ` · ${totalTokens.toLocaleString()} tokens · ${totalCached.toLocaleString()} cached (${cachePct}%)` : ""}
           </span>
           <div className="flex gap-3">
