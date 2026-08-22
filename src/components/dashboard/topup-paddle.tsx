@@ -1,54 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, CreditCard, ExternalLink } from "lucide-react";
-import { toast } from "sonner";
-import { trackTopUpInitiated } from "@/lib/analytics";
+import { CreditCard, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createPaddleTransaction } from "@/app/(dashboard)/dashboard/topup/actions";
 
 const PRESET_AMOUNTS = [5, 10, 25, 50, 100, 250];
 
-export function TopUpPaddle({ userId }: { userId: string }) {
+export function TopUpPaddle() {
   const [amount, setAmount] = useState<number | null>(25);
   const [customAmount, setCustomAmount] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const finalAmount = customAmount ? Number(customAmount) : amount;
-
-  const handleCheckout = async () => {
-    if (!finalAmount || finalAmount < 5) {
-      toast.error("Minimum top-up is $5.00");
-      return;
-    }
-    if (finalAmount > 10000) {
-      toast.error("Maximum top-up is $10,000");
-      return;
-    }
-
-    trackTopUpInitiated(finalAmount, "card");
-    setLoading(true);
-
-    try {
-      const result = await createPaddleTransaction({
-        amount: finalAmount,
-        userId,
-      });
-      if (!result.ok) {
-        toast.error(result.message);
-        return;
-      }
-      // Hosted Paddle checkout. On completion Paddle returns to the
-      // dashboard; the webhook credits the wallet independently.
-      window.location.assign(result.checkoutUrl);
-    } catch {
-      toast.error("Checkout failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="rounded-lg border border-border-default bg-surface p-6">
@@ -112,15 +76,11 @@ export function TopUpPaddle({ userId }: { userId: string }) {
       <Button
         variant="primary"
         className="w-full"
-        onClick={handleCheckout}
-        disabled={loading || !finalAmount}
+        disabled
+        title="Card payments are coming soon. Top up with USDC in the meantime."
       >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <CreditCard className="h-4 w-4" />
-        )}
-        Continue to Checkout
+        <CreditCard className="h-4 w-4" />
+        Coming Soon
       </Button>
 
       <p className="mt-3 flex items-center justify-center gap-1 text-center text-xs text-text-muted">
