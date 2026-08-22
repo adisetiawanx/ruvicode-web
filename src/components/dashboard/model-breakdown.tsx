@@ -101,7 +101,7 @@ export function ModelBreakdown({ data }: ModelBreakdownProps) {
               </div>
               <div className="flex items-center gap-3">
                 <span className="font-mono tabular text-text-muted">
-                  {item.pct.toFixed(0)}%
+                  {item.pct.toFixed(1)}%
                 </span>
                 <span className="w-20 text-right font-mono tabular text-text-secondary">
                   ${item.cost.toFixed(4)}
