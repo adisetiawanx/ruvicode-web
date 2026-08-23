@@ -12,4 +12,33 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
       <p className="mb-4 text-sm text-text-secondary">Manual credit for IDR transfers, failed deposits, or corrections. Amount is always USD.</p>
       <AddTopupForm userId={data.id} />
     </section>
-    <section className="rounded-lg border border-border-default bg-surface p-6"><h2 className="mb-4 font-semibold">API keys</h2><div className="space-y-2">{data.keys.length === 0 ? <p className="text-sm text-text-muted">No API keys.</p> : data.keys.map((key) => <div key={key.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border-subtle pb-2 text-sm"><span>{key.label} <span className="font-mono text-xs text-text-muted">rvcd_{key.prefix}…</span></span><span className={key.active ? "text-success" : "text-text-muted"}>{key.active ? "Active" : "Revoked"}</span></div>)}</div></section><section className="rounded-lg border border-border-default bg-surface p-6"><h2 className="mb-4 font-semibold">Recent usage</h2><div className="overflow-x-auto"><table className="w-full min-w-[700px] text-sm"><thead className="text-xs text-text-muted"><tr><th className="pb-2 text-left">Time</th><th className="pb-2 text-left">Model</th><th className="pb-2 text-right">Tokens</th><th className="pb-2 text-right">Cost</th><th className="pb-2 text-left">Status</th></tr></thead><tbody>{data.usage.map((row) => <tr key={row.id} className="border-t border-border-subtle"><td className="py-2 text-xs text-text-muted"><ClientTime utc={row.createdAt} /></td><td className="py-2">{row.model}</td><td className="py-2 text-right font-mono">{(row.promptTokens + row.completionTokens).toLocaleString()}</td><td className="py-2 text-right font-mono">${row.cost.toFixed(6)}</td><td className="py-2">{row.status}</td></tr>)}</tbody></table></div></section></div>; }
+    <section className="rounded-lg border border-border-default bg-surface p-6"><h2 className="mb-4 font-semibold">API keys</h2>{data.keys.length === 0 ? <p className="text-sm text-text-muted">No API keys.</p> : (
+  <div className="overflow-x-auto">
+    <table className="w-full min-w-[640px] text-sm">
+      <thead className="border-b border-border-default text-xs uppercase tracking-wider text-text-muted">
+        <tr>
+          <th className="px-3 py-2.5 text-left font-medium">Label</th>
+          <th className="px-3 py-2.5 text-left font-medium">Key</th>
+          <th className="px-3 py-2.5 text-right font-medium">RPM</th>
+          <th className="px-3 py-2.5 text-right font-medium">Daily limit</th>
+          <th className="px-3 py-2.5 text-right font-medium">Monthly limit</th>
+          <th className="px-3 py-2.5 text-left font-medium">Last used</th>
+          <th className="px-3 py-2.5 text-left font-medium">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.keys.map((key) => (
+          <tr key={key.id} className="border-b border-border-subtle last:border-0">
+            <td className="px-3 py-2.5">{key.label}</td>
+            <td className="px-3 py-2.5 font-mono text-xs text-text-muted">rvcd_{key.prefix}…</td>
+            <td className="px-3 py-2.5 text-right font-mono text-xs">{key.rpm}</td>
+            <td className="px-3 py-2.5 text-right font-mono text-xs">{key.daily ? `$${key.daily}` : "-"}</td>
+            <td className="px-3 py-2.5 text-right font-mono text-xs">{key.monthly ? `$${key.monthly}` : "-"}</td>
+            <td className="whitespace-nowrap px-3 py-2.5 text-xs text-text-muted">{key.lastUsed ? <ClientTime utc={key.lastUsed} /> : "Never"}</td>
+            <td className="px-3 py-2.5 text-xs"><span className={key.active ? "text-success" : "text-text-muted"}>{key.active ? "Active" : "Revoked"}</span></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}</section><section className="rounded-lg border border-border-default bg-surface p-6"><h2 className="mb-4 font-semibold">Recent usage</h2><div className="overflow-x-auto"><table className="w-full min-w-[700px] text-sm"><thead className="text-xs text-text-muted"><tr><th className="pb-2 text-left">Time</th><th className="pb-2 text-left">Model</th><th className="pb-2 text-right">Tokens</th><th className="pb-2 text-right">Cost</th><th className="pb-2 text-left">Status</th></tr></thead><tbody>{data.usage.map((row) => <tr key={row.id} className="border-t border-border-subtle"><td className="py-2 text-xs text-text-muted"><ClientTime utc={row.createdAt} /></td><td className="py-2">{row.model}</td><td className="py-2 text-right font-mono">{(row.promptTokens + row.completionTokens).toLocaleString()}</td><td className="py-2 text-right font-mono">${row.cost.toFixed(6)}</td><td className="py-2">{row.status}</td></tr>)}</tbody></table></div></section></div>; }

@@ -20,7 +20,7 @@ export function CopyAddress({ address }: { address: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className="ml-1 inline-flex items-center text-text-muted transition-colors hover:text-accent-text"
+      className="relative z-10 ml-1 inline-flex items-center text-text-muted transition-colors hover:text-accent-text"
       title="Copy wallet address"
     >
       {copied ? (

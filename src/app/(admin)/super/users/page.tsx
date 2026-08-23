@@ -42,8 +42,8 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
               {data.rows.length === 0 ? (
                 <tr><td colSpan={9} className="px-4 py-12 text-center text-sm text-text-muted">No data to display.</td></tr>
               ) : data.rows.map((row) => (
-                <tr key={row.id} className="border-b border-border-subtle last:border-0">
-                  <td className="max-w-[220px] px-3 py-3"><Link href={`/super/users/${row.id}`} className="block truncate text-accent-text hover:text-accent-hover">{row.name || row.email}</Link><p className="truncate text-xs text-text-muted">{row.email}</p></td>
+                <tr key={row.id} className="relative border-b border-border-subtle last:border-0 hover:bg-surface-2/60">
+                  <td className="max-w-[220px] px-3 py-3"><Link href={`/super/users/${row.id}`} className="absolute inset-0" aria-label={`Open ${row.email}`} /><span className="relative truncate text-accent-text">{row.name || row.email}</span><p className="truncate text-xs text-text-muted">{row.email}</p></td>
                   <td className="whitespace-nowrap px-3 py-3 text-xs text-text-muted"><ClientTime utc={row.createdAt} format="date" /></td>
                   <td className="px-3 py-3 text-right font-mono">{row.apiKeys}</td>
                   <td className="px-3 py-3 text-right font-mono">{row.requests.toLocaleString()}</td>
