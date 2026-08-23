@@ -37,7 +37,7 @@ export function TopUpIDR({ rate }: { rate: number | null }) {
             {rateDisplay}
           </p>
           <p className="mt-0.5 text-xs text-text-muted">
-            Rate includes conversion spread. Final rate confirmed at payment.
+            Mid-market rate. Final rate confirmed at payment.
           </p>
         </div>
       )}
@@ -56,7 +56,7 @@ export function TopUpIDR({ rate }: { rate: number | null }) {
       <div className="mt-auto pt-5">
         <a
           href={`${TELEGRAM_URL}?text=${encodeURIComponent(
-            "Hi, I want to top up my Ruvicode wallet in IDR. My email: ",
+            "Halo, saya mau top up wallet Ruvicode pakai IDR (transfer bank/QRIS). Email akun saya: ",
           )}`}
           target="_blank"
           rel="noopener noreferrer"
