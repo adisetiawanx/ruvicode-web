@@ -57,7 +57,7 @@ export default async function TopUpPage() {
         <TopUpUSDC address={depositAddress} />
         <div className="space-y-6">
           <TopUpPaddle />
-          <TopUpIDR rate={await getUsdIdrRate()} />
+          <TopUpIDR rate={await getUsdIdrRate()} email={session.user.email} />
         </div>
       </div>
     </div>

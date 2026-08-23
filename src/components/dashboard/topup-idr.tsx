@@ -12,7 +12,7 @@ const TELEGRAM_URL = "https://t.me/asvmv";
  * Server component: the exchange rate is fetched by the parent page and
  * passed in, so the client never calls the rate API directly.
  */
-export function TopUpIDR({ rate }: { rate: number | null }) {
+export function TopUpIDR({ rate, email }: { rate: number | null; email: string }) {
   const rateDisplay = rate
     ? `1 USD = Rp${rate.toLocaleString("id-ID")}`
     : "Contact for current rate";
@@ -56,7 +56,7 @@ export function TopUpIDR({ rate }: { rate: number | null }) {
       <div className="mt-auto pt-5">
         <a
           href={`${TELEGRAM_URL}?text=${encodeURIComponent(
-            "Halo, saya mau top up wallet Ruvicode pakai IDR (transfer bank/QRIS). Email akun saya: ",
+            `Halo, saya mau top up wallet Ruvicode pakai IDR (transfer bank/QRIS). Email akun saya: ${email}`,
           )}`}
           target="_blank"
           rel="noopener noreferrer"
