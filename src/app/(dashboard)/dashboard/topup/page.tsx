@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getSession } from "@/lib/session";
 import { TopUpPaddle } from "@/components/dashboard/topup-paddle";
 import { TopUpUSDC } from "@/components/dashboard/topup-usdc";
+import { TopUpIDR } from "@/components/dashboard/topup-idr";
 import { PaddleCheckout } from "@/components/dashboard/paddle-checkout";
 import { env } from "@/lib/env";
 
@@ -50,11 +51,14 @@ export default async function TopUpPage() {
         Top Up Wallet
       </h1>
 
+      {/* Row 1: Card + USDC */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* USDC first: zero fees and instant credit, the better deal */}
-        <TopUpUSDC address={depositAddress} />
         <TopUpPaddle />
+        <TopUpUSDC address={depositAddress} />
       </div>
+
+      {/* Row 2: IDR manual channel */}
+      <TopUpIDR />
     </div>
   );
 }
