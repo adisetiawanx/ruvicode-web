@@ -60,7 +60,7 @@ export function TopUpIDR({ rate }: { rate: number | null }) {
           )}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex w-full items-center justify-center rounded-lg border border-border-default bg-transparent px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary"
+          className="inline-flex w-full items-center justify-center rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-text-inverse shadow-sm transition-colors hover:bg-accent-hover active:bg-accent-pressed"
         >
           <Send className="mr-1.5 h-4 w-4" />
           Continue on Telegram
