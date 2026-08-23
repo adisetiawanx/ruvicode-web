@@ -205,7 +205,7 @@ export function PlaygroundChat({
       // readable text (observed on grok 4.5). It is not meant for display
       // and is one giant unbroken token that breaks the layout.
       const stripEncrypted = (t: string) =>
-        t.replace(/__ENCRYPTED_REASONING__[A-Za-z0-9+/=]*/g, "").trim();
+        t.replace(/__ENCRYPTED_REASONING__[A-Za-z0-9+/=]*/g, "");
       const reasoning = stripEncrypted(
         delta?.reasoning ?? delta?.reasoning_content ?? "",
       );
@@ -672,7 +672,7 @@ export function PlaygroundChat({
                       <ChevronRight className="h-3 w-3" />
                       Reasoning
                     </summary>
-                    <p className="mt-1 whitespace-pre-wrap break-all text-text-muted">
+                    <p className="mt-1 whitespace-pre-wrap break-words text-text-muted">
                       {msg.reasoning}
                     </p>
                   </details>
