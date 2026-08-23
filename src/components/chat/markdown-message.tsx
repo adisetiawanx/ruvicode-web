@@ -212,7 +212,7 @@ export function MarkdownMessage({ text }: { text: string }) {
             );
           default:
             return (
-              <p key={bi} className="whitespace-pre-wrap">
+              <p key={bi} className="whitespace-pre-wrap break-all">
                 <Fragment>{renderInline(b.text ?? "", `p${bi}`)}</Fragment>
               </p>
             );

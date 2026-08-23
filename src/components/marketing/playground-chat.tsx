@@ -201,8 +201,14 @@ export function PlaygroundChat({
 
       const delta = chunk.choices?.[0]?.delta;
       const content = delta?.content ?? "";
-      const reasoning =
-        delta?.reasoning ?? delta?.reasoning_content ?? "";
+      // Some upstreams append an encrypted reasoning blob after the
+      // readable text (observed on grok 4.5). It is not meant for display
+      // and is one giant unbroken token that breaks the layout.
+      const stripEncrypted = (t: string) =>
+        t.replace(/__ENCRYPTED_REASONING__[A-Za-z0-9+/=]*/g, "").trim();
+      const reasoning = stripEncrypted(
+        delta?.reasoning ?? delta?.reasoning_content ?? "",
+      );
       if (content || reasoning) {
         setMessages((prev) =>
           prev.map((m, i) => {
@@ -657,7 +663,7 @@ export function PlaygroundChat({
                     : "bg-surface-2 text-text-primary rounded-bl-md"
                 }`}
               >
-                {msg.reasoning && (
+                {msg.reasoning?.trim() && (
                   <details
                     open={isStreamingSlot}
                     className="rounded-md bg-black/15 px-2 py-1 text-xs"
@@ -666,7 +672,7 @@ export function PlaygroundChat({
                       <ChevronRight className="h-3 w-3" />
                       Reasoning
                     </summary>
-                    <p className="mt-1 whitespace-pre-wrap text-text-muted">
+                    <p className="mt-1 whitespace-pre-wrap break-all text-text-muted">
                       {msg.reasoning}
                     </p>
                   </details>
