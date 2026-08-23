@@ -33,7 +33,7 @@ import { relations } from "drizzle-orm";
 // ENUMS
 // ════════════════════════════════════════════════════════
 
-export const topupMethodEnum = pgEnum("topup_method", ["paddle", "usdc"]);
+export const topupMethodEnum = pgEnum("topup_method", ["paddle", "usdc", "idr", "manual"]);
 export const topupStatusEnum = pgEnum("topup_status", [
   "pending",
   "completed",
@@ -269,6 +269,7 @@ export const topups = pgTable(
     method: topupMethodEnum("method").notNull(),
     paddleTransactionId: text("paddle_transaction_id"), // for idempotency
     usdcTxHash: text("usdc_tx_hash"), // for idempotency
+    noteAdmin: text("note_admin"), // admin note on manual credits
     status: topupStatusEnum("status").notNull().default("pending"),
     fee: decimal("fee", { precision: 10, scale: 4 }).notNull().default("0"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
