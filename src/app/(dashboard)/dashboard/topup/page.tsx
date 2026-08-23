@@ -51,14 +51,14 @@ export default async function TopUpPage() {
         Top Up Wallet
       </h1>
 
-      {/* Row 1: Card + USDC */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <TopUpPaddle />
+      {/* USDC fills the left column; Card and IDR stack on the right */}
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
         <TopUpUSDC address={depositAddress} />
+        <div className="space-y-6">
+          <TopUpPaddle />
+          <TopUpIDR />
+        </div>
       </div>
-
-      {/* Row 2: IDR manual channel */}
-      <TopUpIDR />
     </div>
   );
 }
