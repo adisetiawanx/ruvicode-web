@@ -55,9 +55,9 @@ export function TopUpIDR({ rate }: { rate: number | null }) {
 
       <div className="mt-auto pt-5">
         <a
-          href={TELEGRAM_URL}?text=${encodeURIComponent(
+          href={`${TELEGRAM_URL}?text=${encodeURIComponent(
             "Hi, I want to top up my Ruvicode wallet in IDR. My email: ",
-          )}
+          )}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex w-full items-center justify-center rounded-lg border border-border-default bg-transparent px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-2 hover:text-text-primary"
