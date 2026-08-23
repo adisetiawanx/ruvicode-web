@@ -8,6 +8,8 @@ import { twMerge } from "tailwind-merge";
  */
 export function formatTopupMethod(method: string): string {
   if (method.toLowerCase() === "usdc") return "USDC";
+  if (method.toLowerCase() === "manual") return "Adjustment";
+  if (method.toLowerCase() === "paddle") return "Card";
   return method.charAt(0).toUpperCase() + method.slice(1).toLowerCase();
 }
 
