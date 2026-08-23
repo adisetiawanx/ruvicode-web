@@ -5,6 +5,7 @@ import { TopUpPaddle } from "@/components/dashboard/topup-paddle";
 import { TopUpUSDC } from "@/components/dashboard/topup-usdc";
 import { TopUpIDR } from "@/components/dashboard/topup-idr";
 import { PaddleCheckout } from "@/components/dashboard/paddle-checkout";
+import { getUsdIdrRate } from "@/lib/exchange-rate";
 import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
@@ -56,7 +57,7 @@ export default async function TopUpPage() {
         <TopUpUSDC address={depositAddress} />
         <div className="space-y-6">
           <TopUpPaddle />
-          <TopUpIDR />
+          <TopUpIDR rate={await getUsdIdrRate()} />
         </div>
       </div>
     </div>
