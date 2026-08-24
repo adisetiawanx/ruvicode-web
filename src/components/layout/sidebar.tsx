@@ -14,13 +14,13 @@ interface NavItem { href: string; label: string; icon: LucideIcon }
 
 const customerItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+  { href: "/dashboard/playground", label: "Playground", icon: FlaskConical },
+  { href: "/dashboard/studio", label: "Studio", icon: ImagePlus },
   { href: "/dashboard/keys", label: "API Keys", icon: Key },
   { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/dashboard/topup", label: "Top Up", icon: Wallet },
   { href: "/dashboard/models", label: "Models & Pricing", icon: Tags },
-  { href: "/dashboard/playground", label: "Playground", icon: FlaskConical },
-  { href: "/dashboard/studio", label: "Studio", icon: ImagePlus },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 

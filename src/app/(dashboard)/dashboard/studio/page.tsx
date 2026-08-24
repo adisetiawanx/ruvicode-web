@@ -12,18 +12,18 @@ export const metadata: Metadata = {
 const PLANNED = [
   {
     icon: Wand2,
-    title: "Image generation",
-    desc: "Generate images from text prompts using the same pay-per-request wallet. No subscription, no per-seat license.",
+    title: "Generate images by prompt",
+    desc: "Describe the image you want and the model draws it. Iterate by refining the prompt.",
   },
   {
     icon: Brush,
-    title: "Image editor",
-    desc: "Inpaint, extend, and restyle images with brush-based edits and prompt control.",
+    title: "Edit images by prompt",
+    desc: "Upload an image and tell the model what to change. Add, remove, or restyle elements with plain language.",
   },
   {
     icon: Layers,
     title: "One wallet for everything",
-    desc: "Text and image workloads share a single balance, a single API key, and one usage history.",
+    desc: "Chat, image generation, and image edits share a single balance, a single API key, and one usage history.",
   },
 ];
 
@@ -33,7 +33,7 @@ export default function StudioPage() {
       <div>
         <h1 className="text-2xl font-semibold text-text-primary">Studio</h1>
         <p className="mt-1 text-sm text-text-secondary">
-          Image generation and editing, built on the Ruvicode wallet.
+          Prompt AI models to generate and edit images, on the Ruvicode wallet.
         </p>
       </div>
 
@@ -44,8 +44,8 @@ export default function StudioPage() {
           </span>
           <h2 className="text-lg font-semibold text-text-primary">Coming soon</h2>
           <p className="mt-2 max-w-md text-sm leading-relaxed text-text-secondary">
-            Studio is where image generation and the image editor will live.
-            It is not built yet. Everything below is the plan.
+            Studio is where you will prompt AI models to generate and edit
+            images. It is not built yet. Everything below is the plan.
           </p>
         </div>
 
