@@ -22,6 +22,7 @@ import {
   Mail,
   Activity,
   KeyRound,
+  ImagePlus,
   LayoutDashboard,
   LogIn,
 } from "lucide-react";
@@ -40,6 +41,7 @@ const PAGES = [
 
 const ACCOUNT = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, hint: "Overview and usage" },
+  { href: "/dashboard/studio", label: "Studio", icon: ImagePlus, hint: "Image tools (coming soon)" },
   { href: "/dashboard/keys", label: "API Keys", icon: KeyRound, hint: "Create and manage keys" },
   { href: "/login", label: "Sign in", icon: LogIn, hint: "Log into your account" },
 ];

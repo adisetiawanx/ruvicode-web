@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, ClipboardList, CreditCard, FlaskConical, Key, LayoutDashboard, LogOut, Menu, Settings, Tags, Users, Wallet, Wrench, X, type LucideIcon } from "lucide-react";
+import { BarChart3, ClipboardList, CreditCard, FlaskConical, ImagePlus, Key, LayoutDashboard, LogOut, Menu, Settings, Tags, Users, Wallet, Wrench, X, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
@@ -20,6 +20,7 @@ const customerItems: NavItem[] = [
   { href: "/dashboard/topup", label: "Top Up", icon: Wallet },
   { href: "/dashboard/models", label: "Models & Pricing", icon: Tags },
   { href: "/dashboard/playground", label: "Playground", icon: FlaskConical },
+  { href: "/dashboard/studio", label: "Studio", icon: ImagePlus },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
