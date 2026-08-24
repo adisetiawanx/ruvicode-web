@@ -299,7 +299,7 @@ export const modelPrices = pgTable(
   "model_prices",
   {
     model: text("model").primaryKey(), // e.g., "glm-5.2"
-    displayName: text("display_name"), // e.g., "GLM-5.2"
+    displayName: text("display_name"), // e.g., "GLM 5.2"
     provider: text("provider").notNull().default("provider"),
     refInput: decimal("ref_input", { precision: 10, scale: 6 }).notNull(),
     refOutput: decimal("ref_output", { precision: 10, scale: 6 }).notNull(),

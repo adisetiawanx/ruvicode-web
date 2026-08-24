@@ -2,7 +2,7 @@
  * Human-facing model names.
  *
  * Model ids arrive as slugs ("deepseek-v4-flash", "glm-5.2"); display
- * should read like the vendor's name ("DeepSeek V4 Flash", "GLM-5.2").
+ * should read like the vendor's name ("DeepSeek V4 Flash", "GLM 5.2").
  * Shared by the dashboard tables, the playground, and anywhere a raw
  * model id would otherwise leak to the UI.
  */

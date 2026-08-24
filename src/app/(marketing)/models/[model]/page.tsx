@@ -74,7 +74,7 @@ export default async function ModelDetailPage({
       label: "curl",
       lang: "bash" as const,
       code: `curl https://api.ruvicode.com/v1/chat/completions \\
-  -H "Authorization: Bearer ***" \\
+  -H "Authorization: Bearer rvcd_..." \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "${model.model}",

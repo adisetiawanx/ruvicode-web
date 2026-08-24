@@ -200,7 +200,7 @@ export const MODEL_PRICES: readonly ModelPricing[] = [
   },
   {
     model: "glm-5.2",
-    display_name: "GLM-5.2",
+    display_name: "GLM 5.2",
     provider: "Zhipu",
     ref_input: 0.95,
     ref_output: 3.8,

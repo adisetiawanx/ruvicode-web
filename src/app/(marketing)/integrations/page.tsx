@@ -328,7 +328,7 @@ export default async function IntegrationsPage() {
 {`"modalities": { "input": ["text", "image"], "output": ["text"] }`}
           </pre>
           <p className="mt-3 text-xs text-text-muted">
-            Text-only models (DeepSeek V4, GLM-5.x, MiniMax M2.x) do not
+            Text-only models (DeepSeek V4, GLM 5.x, MiniMax M2.x) do not
             need it. The API itself accepts image content blocks on any
             model marked vision in the{" "}
             <Link

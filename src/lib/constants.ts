@@ -128,7 +128,7 @@ export const SHOWCASE_MODELS: readonly ShowcaseModel[] = [
   },
   {
     model: "glm-5.2",
-    display_name: "GLM-5.2",
+    display_name: "GLM 5.2",
     provider: "Zhipu",
     user_input: 0.218,
     user_output: 0.872,
