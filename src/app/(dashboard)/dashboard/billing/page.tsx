@@ -91,7 +91,7 @@ export default async function BillingPage() {
                       })}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant="outline">
+                      <Badge variant="outline" className="uppercase tracking-wide">
                         {formatTopupMethod(t.method)}
                       </Badge>
                     </td>

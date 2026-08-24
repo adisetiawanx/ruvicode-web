@@ -44,8 +44,10 @@ export async function addManualTopupAction(
   if (!ALLOWED_METHODS.includes(method as (typeof ALLOWED_METHODS)[number])) {
     return { ok: false, message: "Invalid method" };
   }
-  if (!Number.isFinite(amountUsd) || amountUsd <= 0 || amountUsd > 10000) {
-    return { ok: false, message: "Amount must be between 0 and 10000 USD" };
+  // Negative amounts are debits (manual corrections). They are clamped at
+  // the database level so the balance can never go below zero.
+  if (!Number.isFinite(amountUsd) || amountUsd === 0 || Math.abs(amountUsd) > 10000) {
+    return { ok: false, message: "Amount must be between 0.01 and 10000 USD (or debit)" };
   }
   if (!isDbAvailable()) {
     return { ok: false, message: "Database unavailable" };
@@ -53,20 +55,36 @@ export async function addManualTopupAction(
 
   try {
     await db.transaction(async (tx) => {
-      // Credit the wallet (creates the row if missing).
-      await tx.execute(sql`
-        INSERT INTO wallets (user_id, balance, total_loaded)
-        VALUES (${userId}, ${amountUsd.toFixed(2)}, ${amountUsd.toFixed(2)})
-        ON CONFLICT (user_id) DO UPDATE SET
-          balance = wallets.balance + ${amountUsd.toFixed(2)},
-          total_loaded = wallets.total_loaded + ${amountUsd.toFixed(2)},
-          updated_at = NOW()
-      `);
+      // Credit or debit the wallet. Debits (negative) clamp at zero and do
+      // not touch total_loaded; credits also raise total_loaded.
+      if (amountUsd >= 0) {
+        await tx.execute(sql`
+          INSERT INTO wallets (user_id, balance, total_loaded)
+          VALUES (${userId}, ${amountUsd.toFixed(2)}, ${amountUsd.toFixed(2)})
+          ON CONFLICT (user_id) DO UPDATE SET
+            balance = wallets.balance + ${amountUsd.toFixed(2)},
+            total_loaded = wallets.total_loaded + ${amountUsd.toFixed(2)},
+            updated_at = NOW()
+        `);
+      } else {
+        const debit = (-amountUsd).toFixed(2);
+        // Clamp: never below zero. GREATEST(balance - debit, 0); total_spent
+        // records only what was actually removed.
+        await tx.execute(sql`
+          UPDATE wallets SET
+            balance = GREATEST(balance - ${debit}, 0),
+            total_spent = total_spent + LEAST(${debit}, GREATEST(balance, 0)),
+            updated_at = NOW()
+          WHERE user_id = ${userId}
+        `);
+      }
 
       // Record the topup as completed.
+      const signedAmount = amountUsd >= 0 ? amountUsd.toFixed(2) : (-amountUsd).toFixed(2);
       await tx.execute(sql`
         INSERT INTO topups (id, user_id, amount, method, status, fee, note_admin, created_at, completed_at)
-        VALUES (gen_random_uuid()::text, ${userId}, ${amountUsd.toFixed(2)}, ${method}::topup_method, 'completed', 0, ${note}, NOW(), NOW())
+        VALUES (gen_random_uuid()::text, ${userId}, ${signedAmount}, ${method}::topup_method,
+          'completed', 0, ${amountUsd < 0 ? `[debit] ${note}` : note}, NOW(), NOW())
       `);
 
       // Audit trail.
