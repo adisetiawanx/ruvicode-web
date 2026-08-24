@@ -75,8 +75,15 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
                   <td className="whitespace-nowrap px-3 py-3 text-xs text-text-muted"><ClientTime utc={row.createdAt} /></td>
                   <td className="px-3 py-3">{row.model}</td>
                   <td className="max-w-[200px] truncate px-3 py-3 text-xs text-text-muted" title={row.userEmail}>{row.userEmail}</td>
-                  <td className="px-3 py-3 text-right font-mono text-xs">{(row.promptTokens + row.completionTokens).toLocaleString()}</td>
-                  <td className="px-3 py-3 text-right font-mono text-xs text-text-muted">{(row.cacheReadTokens ?? 0) > 0 ? row.cacheReadTokens.toLocaleString() : "-"}</td>
+                  <td className="px-3 py-3 text-right font-mono text-xs">
+                    <span className="block">{row.promptTokens.toLocaleString()} in</span>
+                    <span className="block text-text-muted">{row.completionTokens.toLocaleString()} out</span>
+                  </td>
+                  <td className="px-3 py-3 text-right font-mono text-xs text-text-muted">
+                    {row.promptTokens > 0
+                      ? `${(row.cacheReadTokens ?? 0).toLocaleString()} (${((row.cacheReadTokens ?? 0) / row.promptTokens * 100).toFixed(1)}%)`
+                      : "-"}
+                  </td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.cost)}</td>
                   <td className="px-3 py-3 text-right font-mono text-text-muted">{usd(row.providerCost)}</td>
                   <td className="px-3 py-3 text-right font-mono">

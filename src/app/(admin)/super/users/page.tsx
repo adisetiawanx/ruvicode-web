@@ -32,7 +32,6 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                 <th className="whitespace-nowrap px-3 py-2 text-left font-medium">Created</th>
                 <th className="px-3 py-2 text-right font-medium">Keys</th>
                 <th className="px-3 py-2 text-right font-medium">Requests</th>
-                <th className="px-3 py-2 text-right font-medium">Tokens</th>
                 <th className="px-3 py-2 text-right font-medium">Charges</th>
                 <th className="px-3 py-2 text-right font-medium">Wallet</th>
                 <th className="whitespace-nowrap px-3 py-2 text-left font-medium">Deposits</th>
@@ -41,20 +40,13 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
             </thead>
             <tbody>
               {data.rows.length === 0 ? (
-                <tr><td colSpan={10} className="px-4 py-12 text-center text-sm text-text-muted">No data to display.</td></tr>
+                <tr><td colSpan={9} className="px-4 py-12 text-center text-sm text-text-muted">No data to display.</td></tr>
               ) : data.rows.map((row) => (
                 <tr key={row.id} className="relative border-b border-border-subtle last:border-0 hover:bg-surface-2/60">
                   <td className="max-w-[220px] px-3 py-3"><Link href={`/super/users/${row.id}`} className="absolute inset-0" aria-label={`Open ${row.email}`} /><span className="relative truncate text-accent-text">{row.name || row.email}</span><p className="truncate text-xs text-text-muted">{row.email}</p></td>
                   <td className="whitespace-nowrap px-3 py-3 text-xs text-text-muted"><ClientTime utc={row.createdAt} format="date" /></td>
                   <td className="px-3 py-3 text-right font-mono">{row.apiKeys}</td>
                   <td className="px-3 py-3 text-right font-mono">{row.requests.toLocaleString()}</td>
-                  <td className="px-3 py-3 text-right font-mono text-xs">
-                    <span className="block">{row.promptTokens.toLocaleString()} in</span>
-                    <span className="block text-text-muted">{row.completionTokens.toLocaleString()} out</span>
-                    {row.cachedTokens > 0 && row.promptTokens > 0 && (
-                      <span className="block text-text-muted">{row.cachedTokens.toLocaleString()} cached ({(row.cachedTokens / row.promptTokens * 100).toFixed(1)}%)</span>
-                    )}
-                  </td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.charges)}</td>
                   <td className="whitespace-nowrap px-3 py-3 text-right font-mono tabular">
                     <span className="text-text-primary">${row.balance.toFixed(2)}</span>
