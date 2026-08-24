@@ -62,8 +62,17 @@ export default async function AdminFinancialPage({ searchParams }: { searchParam
                 {recent.map((row, i) => (
                   <tr key={`${row.createdAt}-${i}`} className="border-b border-border-subtle last:border-0">
                     <td className="whitespace-nowrap px-3 py-2.5 text-xs text-text-muted"><ClientTime utc={row.createdAt} /></td>
-                    <td className="px-3 py-2.5">{formatTopupMethod(row.method)}</td>
-                    <td className="px-3 py-2.5 text-right font-mono tabular">{row.amount.toFixed(2)}</td>
+                    <td className="px-3 py-2.5">
+                      {formatTopupMethod(row.method)}
+                    </td>
+                    {(() => {
+                      const isDebit = !!row.note?.startsWith("[debit]");
+                      return (
+                        <td className={`px-3 py-2.5 text-right font-mono tabular ${isDebit ? "text-error" : "text-text-primary"}`}>
+                          {isDebit ? "−" : "+"}{row.amount.toFixed(2)}
+                        </td>
+                      );
+                    })()}
                     <td className="px-3 py-2.5">
                       <span className={row.status === "completed" ? "text-success" : row.status === "pending" ? "text-warning" : "text-error"}>{row.status}</span>
                     </td>

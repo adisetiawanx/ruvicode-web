@@ -58,6 +58,7 @@ export interface TopupRecord {
   method: string;
   fee: string;
   status: string;
+  note: string | null;
   createdAt: Date;
 }
 
@@ -149,7 +150,7 @@ const ALL_USAGE_RECORDS = generateUsageRecords();
 
 const MOCK_TOPUPS: TopupRecord[] = [
   {
-    id: "topup-1",
+    id: "topup-1", note: null,
     amount: "25.00",
     method: "card",
     fee: "1.75",
@@ -157,7 +158,7 @@ const MOCK_TOPUPS: TopupRecord[] = [
     createdAt: new Date(NOW - 2 * DAY),
   },
   {
-    id: "topup-2",
+    id: "topup-2", note: null,
     amount: "10.00",
     method: "usdc",
     fee: "0.00",
@@ -165,7 +166,7 @@ const MOCK_TOPUPS: TopupRecord[] = [
     createdAt: new Date(NOW - 6 * DAY),
   },
   {
-    id: "topup-3",
+    id: "topup-3", note: null,
     amount: "50.00",
     method: "card",
     fee: "3.00",
@@ -570,6 +571,7 @@ export async function getTopups(userId: string): Promise<TopupRecord[]> {
       method: topups.method,
       fee: topups.fee,
       status: topups.status,
+      note: topups.noteAdmin,
       createdAt: topups.createdAt,
     })
     .from(topups)
@@ -582,6 +584,7 @@ export async function getTopups(userId: string): Promise<TopupRecord[]> {
     method: r.method,
     fee: r.fee,
     status: r.status,
+    note: r.note ?? null,
     createdAt: r.createdAt,
   }));
 }

@@ -109,12 +109,12 @@ export async function getAdminDeposits() {
     db.select({ total: sql<number>`COALESCE(SUM(${topups.amount}), 0)` }).from(topups).where(eq(topups.method, "paddle")),
     db.select({ total: sql<number>`COUNT(*)` }).from(topups).where(eq(topups.status, "pending")),
     db.select({ total: sql<number>`COUNT(*)` }).from(topups).where(eq(topups.status, "failed")),
-    db.select({ userId: topups.userId, amount: topups.amount, method: topups.method, status: topups.status, createdAt: topups.createdAt }).from(topups).orderBy(desc(topups.createdAt)).limit(10),
+    db.select({ userId: topups.userId, amount: topups.amount, method: topups.method, status: topups.status, note: topups.noteAdmin, createdAt: topups.createdAt }).from(topups).orderBy(desc(topups.createdAt)).limit(10),
   ]);
-  return { totalUsdc: Number(usdc[0]?.total ?? 0), totalPaddle: Number(paddle[0]?.total ?? 0), pending: Number(pending[0]?.total ?? 0), failed: Number(failed[0]?.total ?? 0), recent: recent.map((row) => ({ userId: row.userId, amount: Number(row.amount), method: row.method, status: row.status, createdAt: new Date(row.createdAt).toISOString() })) };
+  return { totalUsdc: Number(usdc[0]?.total ?? 0), totalPaddle: Number(paddle[0]?.total ?? 0), pending: Number(pending[0]?.total ?? 0), failed: Number(failed[0]?.total ?? 0), recent: recent.map((row) => ({ userId: row.userId, amount: Number(row.amount), method: row.method, status: row.status, note: row.note ?? null, createdAt: new Date(row.createdAt).toISOString() })) };
 }
 
-export interface AdminDeposit { userId: string | null; amount: number; method: string; status: string; createdAt: string }
+export interface AdminDeposit { userId: string | null; amount: number; method: string; status: string; note: string | null; createdAt: string }
 
 export interface AdminChainData { available: boolean; error?: string; float: number; treasuryUsdc: number; liability: number; held: number; ratio: number | null; treasuryEth: number; treasury: string; addresses: AdminAddressBalance[] }
 
