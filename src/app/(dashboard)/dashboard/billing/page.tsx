@@ -3,7 +3,7 @@ import { floorUsd } from "@/lib/models/display";
 import { formatTopupMethod } from "@/lib/utils";
 import { getSession } from "@/lib/session";
 import { getTopups } from "@/lib/db/queries/management";
-import { getWallet } from "@/lib/db/queries/dashboard";
+import { getWallet, getLifetimeSavings } from "@/lib/db/queries/dashboard";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { BalanceCard } from "@/components/dashboard/balance-card";
@@ -21,9 +21,10 @@ export default async function BillingPage() {
   const session = await getSession();
   if (!session) return null;
 
-  const [topups, wallet] = await Promise.all([
+  const [topups, wallet, lifetimeSaved] = await Promise.all([
     getTopups(session.user.id),
     getWallet(session.user.id),
+    getLifetimeSavings(session.user.id),
   ]);
 
   return (
@@ -33,7 +34,7 @@ export default async function BillingPage() {
       </h1>
 
       {/* Summary cards — Balance first (same style as overview) */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <BalanceCard balance={wallet.balance} held={wallet.held} />
         <StatCard
           label="Total Loaded"
@@ -42,6 +43,11 @@ export default async function BillingPage() {
         <StatCard
           label="Total Spent"
           value={`$${floorUsd(wallet.totalSpent).toFixed(2)}`}
+        />
+        <StatCard
+          label="Total Saved"
+          value={`$${floorUsd(lifetimeSaved).toFixed(2)}`}
+          sublabel="vs official provider pricing"
         />
       </div>
 

@@ -97,7 +97,7 @@ export default async function UsagePage({ searchParams }: PageProps) {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Requests"
           value={summary.totalRequests.toLocaleString()}
@@ -114,6 +114,11 @@ export default async function UsagePage({ searchParams }: PageProps) {
         <StatCard
           label="Cost"
           value={`$${summary.totalCost.toFixed(6)}`}
+        />
+        <StatCard
+          label="Saved"
+          value={`$${summary.totalSaved.toFixed(6)}`}
+          sublabel="vs official provider pricing"
         />
       </div>
 

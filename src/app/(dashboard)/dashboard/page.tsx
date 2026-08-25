@@ -3,7 +3,7 @@ import { floorUsd } from "@/lib/models/display";
 import { getSession } from "@/lib/session";
 import {
   getWallet,
-  getMonthlySummary,
+  getWeeklySummary,
   getWeeklyUsage,
   getModelBreakdown,
   getRecentActivity,
@@ -28,10 +28,10 @@ export default async function DashboardPage() {
   const userId = session.user.id;
 
   // Parallel data fetch — all parameterized, scoped to userId
-  const [wallet, monthlySummary, weeklyUsage, modelBreakdown, recentActivity] =
+  const [wallet, weeklySummary, weeklyUsage, modelBreakdown, recentActivity] =
     await Promise.all([
       getWallet(userId),
-      getMonthlySummary(userId),
+      getWeeklySummary(userId),
       getWeeklyUsage(userId),
       getModelBreakdown(userId),
       getRecentActivity(userId, 10),
@@ -45,13 +45,18 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold text-text-primary">Overview</h1>
 
-      {/* Top row: 3 stat cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      {/* Top row: 4 stat cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <BalanceCard balance={wallet.balance} held={wallet.held} />
         <StatCard
-          label="This Month"
-          value={`$${floorUsd(monthlySummary.spent).toFixed(2)}`}
-          sublabel={`${monthlySummary.requestCount.toLocaleString()} requests · $${floorUsd(monthlySummary.savings).toFixed(2)} saved`}
+          label="This Week"
+          value={`$${floorUsd(weeklySummary.spent).toFixed(2)}`}
+          sublabel={`${weeklySummary.requestCount.toLocaleString()} requests · last 7 days`}
+        />
+        <StatCard
+          label="Saved"
+          value={`$${floorUsd(weeklySummary.savings).toFixed(2)}`}
+          sublabel="vs official pricing, last 7 days"
         />
         <StatCard
           label="Total Loaded"

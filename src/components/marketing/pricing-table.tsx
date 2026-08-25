@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useQueryStates, parseAsStringEnum, parseAsInteger } from "nuqs";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { ModelTag } from "@/components/shared/model-tag";
 import { Button } from "@/components/ui/button";
@@ -208,28 +208,38 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
         </div>
       </div>
       {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <button
-            type="button"
-            disabled={page <= 1}
-            onClick={() => setState({ tpage: page - 1 })}
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-default transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-40"
-            aria-label="Previous page"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <span className="font-mono text-sm tabular text-text-secondary">
-            {page} / {totalPages}
-          </span>
-          <button
-            type="button"
-            disabled={page >= totalPages}
-            onClick={() => setState({ tpage: page + 1 })}
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-border-default transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-40"
-            aria-label="Next page"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
+        <div className="mt-4 flex items-center justify-between border-t border-border-subtle px-4 py-3">
+          <p className="text-xs text-text-muted">
+            Page {page} of {totalPages}
+          </p>
+          <div className="flex gap-2">
+            {page > 1 ? (
+              <button
+                type="button"
+                onClick={() => setState({ tpage: page - 1 })}
+                className="inline-flex h-8 items-center rounded-md border border-border-default px-3 text-sm text-text-secondary transition-colors hover:bg-surface-2"
+              >
+                ← Prev
+              </button>
+            ) : (
+              <span className="inline-flex h-8 cursor-not-allowed items-center rounded-md border border-border-subtle px-3 text-sm text-text-muted opacity-50">
+                ← Prev
+              </span>
+            )}
+            {page < totalPages ? (
+              <button
+                type="button"
+                onClick={() => setState({ tpage: page + 1 })}
+                className="inline-flex h-8 items-center rounded-md border border-border-default px-3 text-sm text-text-secondary transition-colors hover:bg-surface-2"
+              >
+                Next →
+              </button>
+            ) : (
+              <span className="inline-flex h-8 cursor-not-allowed items-center rounded-md border border-border-subtle px-3 text-sm text-text-muted opacity-50">
+                Next →
+              </span>
+            )}
+          </div>
         </div>
       )}
       <p className="mt-4 text-xs text-text-muted">

@@ -50,6 +50,8 @@ export interface UsageSummary {
   /** Sum of cached prompt tokens across the window (0 when none measured). */
   totalCachedTokens: number;
   totalCost: number;
+  /** Savings vs official reference pricing (ref_cost - cost) for the window. */
+  totalSaved: number;
 }
 
 export interface TopupRecord {
@@ -460,6 +462,7 @@ export async function getUsageSummary(
         0,
       ),
       totalCost: records.reduce((acc, r) => acc + Number(r.cost), 0),
+      totalSaved: 0,
     };
   }
 
@@ -471,6 +474,7 @@ export async function getUsageSummary(
       totalTokens: sql<number>`COALESCE(SUM(${usageRecords.promptTokens} + ${usageRecords.completionTokens}),0)`,
       totalCachedTokens: sql<number>`COALESCE(SUM(${usageRecords.cacheReadTokens}),0)`,
       totalCost: sql<number>`COALESCE(SUM(${usageRecords.cost}),0)`,
+      totalSaved: sql<number>`COALESCE(SUM(${usageRecords.refCost} - ${usageRecords.cost}),0)`,
     })
     .from(usageRecords)
     .where(and(...conditions));
@@ -481,6 +485,7 @@ export async function getUsageSummary(
     totalTokens: Number(row?.totalTokens ?? 0),
     totalCachedTokens: Number(row?.totalCachedTokens ?? 0),
     totalCost: Number(row?.totalCost ?? 0),
+    totalSaved: Math.max(0, Number(row?.totalSaved ?? 0)),
   };
 }
 

@@ -332,3 +332,41 @@ export async function getRecentActivity(
     keyLabel: r.keyLabel ?? null,
   }));
 }
+
+/**
+ * Weekly summary for the overview card. spent and savings are scoped to the
+ * trailing 7 days (same window as the weekly chart).
+ */
+export async function getWeeklySummary(userId: string): Promise<MonthlySummary> {
+  if (!isDbAvailable()) {
+    return { spent: 1.12, requestCount: MOCK_MONTHLY_REQUESTS / 4, savings: MOCK_MONTHLY_SAVINGS / 4 };
+  }
+  const since = sevenDaysAgoUTC();
+  const [row] = await db
+    .select({
+      spent: sql<number>`COALESCE(SUM(${usageRecords.cost}),0)`,
+      requestCount: sql<number>`COUNT(*)`,
+      savings: sql<number>`COALESCE(SUM(${usageRecords.refCost} - ${usageRecords.cost}),0)`,
+    })
+    .from(usageRecords)
+    .where(and(eq(usageRecords.userId, userId), gte(usageRecords.createdAt, since)));
+  return {
+    spent: Number(row?.spent ?? 0),
+    requestCount: Number(row?.requestCount ?? 0),
+    savings: Math.max(0, Number(row?.savings ?? 0)),
+  };
+}
+
+/**
+ * Lifetime savings vs official reference pricing, for the billing page card.
+ */
+export async function getLifetimeSavings(userId: string): Promise<number> {
+  if (!isDbAvailable()) return 42.1;
+  const [row] = await db
+    .select({
+      saved: sql<number>`COALESCE(SUM(${usageRecords.refCost} - ${usageRecords.cost}),0)`,
+    })
+    .from(usageRecords)
+    .where(eq(usageRecords.userId, userId));
+  return Math.max(0, Number(row?.saved ?? 0));
+}
