@@ -54,9 +54,10 @@ export default async function DashboardPage() {
           sublabel={`${weeklySummary.requestCount.toLocaleString()} requests · last 7 days`}
         />
         <StatCard
-          label="Saved"
+          label="Saved This Week"
           value={`$${floorUsd(weeklySummary.savings).toFixed(2)}`}
-          sublabel="vs official pricing, last 7 days"
+          sublabel="vs official provider pricing"
+          success
         />
         <StatCard
           label="Total Loaded"

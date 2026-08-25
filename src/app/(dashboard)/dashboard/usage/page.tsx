@@ -119,6 +119,7 @@ export default async function UsagePage({ searchParams }: PageProps) {
           label="Saved"
           value={`$${summary.totalSaved.toFixed(6)}`}
           sublabel="vs official provider pricing"
+          success
         />
       </div>
 

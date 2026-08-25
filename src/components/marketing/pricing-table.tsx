@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { ModelWithPricing } from "@/lib/db/queries/models";
 import { formatRate } from "@/lib/models/display";
-import { ClientTime } from "@/components/shared/client-time";
 
 type SortKey = "model" | "user_input" | "user_output" | "savings";
 type SortDir = "asc" | "desc";
@@ -208,7 +207,7 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
         </div>
       </div>
       {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-between border-t border-border-subtle px-4 py-3">
+        <div className="mt-4 flex items-center justify-between px-0 py-2">
           <p className="text-xs text-text-muted">
             Page {page} of {totalPages}
           </p>
@@ -242,10 +241,6 @@ export function PricingTable({ models }: { models: ModelWithPricing[] }) {
           </div>
         </div>
       )}
-      <p className="mt-4 text-xs text-text-muted">
-        Live market pricing. Last updated:{" "}
-        <ClientTime utc={new Date().toISOString()} format="time" className="font-mono" />
-      </p>
     </div>
   );
 }

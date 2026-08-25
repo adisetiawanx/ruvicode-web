@@ -48,6 +48,7 @@ export default async function BillingPage() {
           label="Total Saved"
           value={`$${floorUsd(lifetimeSaved).toFixed(2)}`}
           sublabel="vs official provider pricing"
+          success
         />
       </div>
 

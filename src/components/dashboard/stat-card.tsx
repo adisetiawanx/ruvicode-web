@@ -5,6 +5,8 @@ interface StatCardProps {
   value: string;
   sublabel?: string;
   accent?: boolean;
+  /** Renders the value in success green (savings, profit-style numbers). */
+  success?: boolean;
 }
 
 /**
@@ -17,6 +19,7 @@ export function StatCard({
   value,
   sublabel,
   accent,
+  success,
 }: StatCardProps) {
   return (
     <div
@@ -28,7 +31,7 @@ export function StatCard({
       )}
     >
       <p className="mb-1 text-xs text-text-secondary">{label}</p>
-      <p className="font-mono text-2xl tabular text-text-primary">{value}</p>
+      <p className={`font-mono text-2xl tabular ${success ? "text-success" : "text-text-primary"}`}>{value}</p>
       {sublabel && <p className="mt-1 text-sm text-text-secondary">{sublabel}</p>}
     </div>
   );
