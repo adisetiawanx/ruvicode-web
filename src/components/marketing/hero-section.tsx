@@ -72,11 +72,13 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
               variants={item}
               className="mb-8 max-w-xl text-lg text-text-secondary"
             >
-              Ruvicode is an AI API gateway. Access Claude, GPT, Gemini, GLM,
-              DeepSeek, Kimi, and more with one key. Pay only for what you use,
-              see exact costs in every response header, and set hard spend
-              limits per key. Cached tokens bill up to 10x cheaper, agents
-              included. Top up with any major card or USDC.
+              Ruvicode is a software-as-a-service (SaaS) product that gives
+              developers a unified API to access AI language models. Access
+              Claude, GPT, Gemini, GLM, DeepSeek, Kimi, and more with one key.
+              Pay only for what you use, see exact costs in every response
+              header, and set hard spend limits per key. Cached tokens bill up
+              to 10x cheaper, agents included. Top up with any major card or
+              USDC.
             </motion.p>
 
             <motion.div
