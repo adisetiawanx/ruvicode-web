@@ -90,6 +90,7 @@ export const CURATED_MODELS: CuratedModel[] = [
   c("glm-5.1", "GLM 5.1", "Z.ai", ["text", "reasoning", "tools", "code"], 200_000, 128_000),
   c("glm-5.2", "GLM 5.2", "Z.ai", ["text", "reasoning", "tools", "code"], 1_000_000, 128_000),
   c("glm-5.3", "GLM 5.3", "Z.ai", ["text", "reasoning", "tools", "code"], 1_000_000, 128_000),
+  c("glm-5.3-flash", "GLM 5.3 Flash", "Z.ai", ["text", "vision", "reasoning", "tools", "code"], 1_000_000, 128_000),
 
   // ── xAI ──
   c("grok-4.5", "Grok 4.5", "xAI", ["text", "vision", "reasoning", "tools", "code"], 500_000, 128_000),
