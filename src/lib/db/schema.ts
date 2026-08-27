@@ -352,7 +352,7 @@ export const depositAddresses = pgTable(
       .references(() => user.id, { onDelete: "set null" }),
     chain: integer("chain").notNull().default(8453), // Base
     address: text("address").notNull(),
-    derivationIndex: integer("derivation_index").notNull(),
+    derivationIndex: integer("derivation_index").notNull().unique(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => ({
