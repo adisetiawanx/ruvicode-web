@@ -79,7 +79,7 @@ export default async function Image({
         </div>
 
         <div style={{ color: "#6B6A63", fontSize: 18 }}>
-          ruvicode.com/models/{model.model}
+          {`ruvicode.com/models/${model.model}`}
         </div>
       </div>
     ),
