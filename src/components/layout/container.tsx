@@ -8,7 +8,7 @@ const sizeMap = {
   default: "max-w-[1280px]", // Standard pages
   wide: "max-w-[1440px]", // Landing (extra breathing room)
   content: "max-w-[1024px]", // Content-focused pages
-  prose: "max-w-[680px]", // Blog, docs text
+  prose: "max-w-[768px]", // Blog articles (docs stays 680 for tighter reading)
 };
 
 /**

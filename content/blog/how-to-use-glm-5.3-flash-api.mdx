@@ -1,0 +1,142 @@
+---
+title: "How to Use the GLM 5.3 Flash API: Quickstart Guide"
+slug: how-to-use-glm-5.3-flash-api
+description: "Get started with the GLM 5.3 Flash API in under 2 minutes. Vision-native model with a 1M context window, OpenAI-compatible endpoint, code in curl, Python, and Node.js."
+date: 2026-08-28
+author: "Naran"
+tags: ["tutorial", "glm", "z.ai", "quickstart", "vision"]
+category: "Tutorial"
+published: true
+featured: false
+---
+
+GLM 5.3 Flash is the newest model in the GLM 5.3 family and the first Flash variant with native vision. It pairs a 1M token context window with some of the lowest pricing of any frontier model, at $0.0225/1M input and $0.075/1M output on [Ruvicode](https://ruvicode.com), 70% below the official API. If you run high-volume workloads or agentic pipelines that read a lot of context, this model deserves a spot on your shortlist.
+
+## What is GLM 5.3 Flash?
+
+GLM 5.3 Flash is Z.ai's fast, cost-efficient variant of GLM 5.3. It keeps the family's strong coding and reasoning abilities while cutting input and output prices dramatically. The headline specs:
+
+- **1M token context window** with 128K max output, enough for whole codebases, long documents, or full conversation histories
+- **Native vision**, the first multimodal Flash model in the GLM 5 series. Send screenshots, diagrams, and photos directly in the messages array
+- **Always-on thinking** with a tunable `reasoning_effort` parameter (low, high, or max) so you control how much reasoning the model spends before answering
+- **Tool calling and function use** for building agents
+- **Prompt caching** that bills repeated context at $0.0045/1M, 5x cheaper than the already cheap input rate
+
+You can see the full spec sheet and live pricing on the [GLM 5.3 Flash model page](/models/glm-5.3-flash).
+
+## Quickstart
+
+The API is OpenAI-compatible. If you have code that talks to any OpenAI-style endpoint, switching is a base URL and API key change.
+
+First, [create an API key](/register) from your Ruvicode dashboard. Then make your first request:
+
+```bash
+curl https://api.ruvicode.com/v1/chat/completions \
+  -H "Authorization: Bearer rvcd_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "glm-5.3-flash",
+    "messages": [
+      {"role": "user", "content": "Explain prompt caching in one paragraph."}
+    ]
+  }'
+```
+
+### Python
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.ruvicode.com/v1",
+    api_key="rvcd_...",
+)
+
+response = client.chat.completions.create(
+    model="glm-5.3-flash",
+    messages=[
+        {"role": "user", "content": "Explain prompt caching in one paragraph."}
+    ],
+)
+
+print(response.choices[0].message.content)
+```
+
+### Node.js
+
+```javascript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.ruvicode.com/v1",
+  apiKey: "rvcd_...",
+});
+
+const response = await client.chat.completions.create({
+  model: "glm-5.3-flash",
+  messages: [{ role: "user", content: "Explain prompt caching in one paragraph." }],
+});
+
+console.log(response.choices[0].message.content);
+```
+
+No SDK changes, no new abstractions. Streaming works the same way with `"stream": true`.
+
+## Sending images
+
+Because vision is native, multimodal requests use the standard OpenAI image_url format. This example asks the model to review a UI screenshot:
+
+```python
+response = client.chat.completions.create(
+    model="glm-5.3-flash",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "What is wrong with this signup form?"},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": "https://example.com/screenshot.png"},
+                },
+            ],
+        }
+    ],
+)
+```
+
+Base64 data URLs work too. At $0.0225/1M input, classifying a full-resolution screenshot costs a fraction of a cent, which makes image-heavy pipelines genuinely affordable.
+
+## Pricing
+
+Live rates on Ruvicode, billed per request with no monthly fee:
+
+| Token type | Official API | Ruvicode |
+| --- | --- | --- |
+| Input | $0.075/1M | **$0.0225/1M** |
+| Output | $0.25/1M | **$0.075/1M** |
+| Cached input | $0.015/1M | **$0.0045/1M** |
+
+Rates track the live market and are always visible on the [model page](/models/glm-5.3-flash), so you never have to guess what a request cost. Every response returns exact token counts and the [playground](/playground) shows the real cost of each turn as you experiment.
+
+## Agentic workloads love this model
+
+Two details make GLM 5.3 Flash a strong pick for agents:
+
+**Prompt caching is where the real savings are.** Agents resend the same system prompt, tool definitions, and conversation history on every turn. From the second turn onward, that repeated prefix bills at the cached rate. In real agent traces we see 95%+ of input tokens hit the cache, which pushes effective input cost toward a fraction of a cent per run. We wrote a [full guide to prompt caching for AI agents](/blog/prompt-caching-for-ai-agents) with the numbers.
+
+**Thinking is always on, so budget your tokens.** Unlike models where reasoning is optional, GLM 5.3 Flash always reasons before answering. Set `max_tokens` too low and the budget gets consumed by reasoning before any visible text is produced, and you get an empty answer. Give it room, and use `reasoning_effort: "low"` when you want short, direct replies on simple tasks.
+
+## Flash or full GLM 5.3?
+
+The full [GLM 5.3](/models/glm-5.3) model is the pick when you need maximum depth, it trades higher rates for stronger reasoning on hard problems. Flash is the everyday driver. A practical split many teams use:
+
+- **GLM 5.3 Flash** for chat, classification, extraction, code review, vision tasks, and the tool-loop of coding agents
+- **GLM 5.3** for final-pass reasoning, complex refactors, and problems where quality matters more than cost
+
+Because both share the same OpenAI-compatible endpoint, routing between them is a one-line model string change.
+
+## Start building
+
+[Create an account](/register), top up with any amount, and you are minutes away from your first request. Want to try the model before writing any code? It is live in the [playground](/playground) with real token counts and costs on every turn.
+
+Full API reference lives in the [documentation](/docs/quickstart), covering streaming, tool calling, error handling, and billing details.
