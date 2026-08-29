@@ -48,6 +48,10 @@ export function CreateKeyButton() {
   };
 
   const handleClose = (nextOpen: boolean) => {
+    // Block dismissals (backdrop tap, ESC, X, Cancel) while the create request
+    // is in flight: on mobile an accidental backdrop tap during loading used to
+    // close the dialog, and the one-time key reveal never showed.
+    if (!nextOpen && loading) return;
     setOpen(nextOpen);
     if (!nextOpen) {
       // Clear created key after modal closes — it's gone forever
@@ -86,7 +90,13 @@ export function CreateKeyButton() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog
+      open={open}
+      onOpenChange={handleClose}
+      // Once the key is created, the reveal is the only copy the user will
+      // ever see, so backdrop taps must not dismiss it. Done/X still work.
+      disablePointerDismissal={!!createdKey}
+    >
       <DialogTrigger
         render={
           <Button variant="primary" size="sm">
