@@ -39,6 +39,11 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+    // Sign-up is closed at the API level (ADR-008, OAuth-only registration).
+    // The register page dropped the form first, but the endpoint stayed open
+    // and scripted probes registered accounts directly. Existing password
+    // logins keep working; only creating NEW credential accounts is blocked.
+    disableSignUp: true,
     // No email verification required — all users register via trusted OAuth
     requireEmailVerification: false,
     minPasswordLength: 8,
