@@ -85,7 +85,12 @@ export default async function AdminUsagePage({ searchParams }: { searchParams: P
                       : "-"}
                   </td>
                   <td className="px-3 py-3 text-right font-mono">{usd(row.cost)}</td>
-                  <td className="px-3 py-3 text-right font-mono text-text-muted">{usd(row.providerCost)}</td>
+                  <td className="px-3 py-3 text-right font-mono text-text-muted">
+                    {usd(row.providerCost)}{" "}
+                    <span className={`ml-1 rounded px-1 py-0.5 text-[9px] uppercase tracking-wide ${row.costSource === "actual" ? "bg-success/10 text-success" : "bg-surface-2 text-text-muted"}`}>
+                      {row.costSource === "actual" ? "Actual" : "Est"}
+                    </span>
+                  </td>
                   <td className="px-3 py-3 text-right font-mono">
                     <span className={(row.cost - row.providerCost) < 0 ? "text-error" : (row.cost - row.providerCost) === 0 ? "text-text-muted" : "text-success"}>
                       {usd(row.cost - row.providerCost)}

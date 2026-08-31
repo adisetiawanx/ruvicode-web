@@ -225,6 +225,11 @@ export const usageRecords = pgTable(
     marketCost: decimal("market_cost", { precision: 12, scale: 8 })
       .notNull()
       .default("0"), // estimated real wallet charge at marketplace best prices
+    // Wallet-true provider charge from the usage webhook (ADR-037). Null
+    // means no webhook event joined yet; read paths coalesce to market_cost.
+    actualCost: decimal("actual_cost", { precision: 12, scale: 8 }),
+    actualCostAt: timestamp("actual_cost_at"),
+    upstreamRequestId: text("upstream_request_id"), // provider x-request-id header
     refCost: decimal("ref_cost", { precision: 12, scale: 8 })
       .notNull()
       .default("0"), // what the request would cost at the reference price

@@ -37,6 +37,7 @@ export default async function AdminFinancialPage({ searchParams }: { searchParam
         <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">USDC deposits</p><p className="mt-1 font-mono text-xl">${deposits.totalUsdc.toFixed(2)}</p></div>
         <div className="rounded-lg border border-border-default bg-surface p-4"><p className="text-xs text-text-muted">Paddle deposits</p><p className="mt-1 font-mono text-xl">${deposits.totalPaddle.toFixed(2)}</p><p className="mt-1 text-xs text-text-muted">{deposits.pending} pending · {deposits.failed} failed</p></div>
       </div>
+      <p className="text-xs text-text-muted">Provider cost uses the recorded wallet charge where a usage webhook matched, and the marketplace-best estimate otherwise. Rows before 31 Aug 2026 are estimates.</p>
       <section className="rounded-lg border border-border-default bg-surface p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-semibold text-text-primary">Deposits</h2>
