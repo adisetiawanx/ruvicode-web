@@ -37,6 +37,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
   const [amountUsd, setAmountUsd] = useState<number>(5);
   const [idrDisplay, setIdrDisplay] = useState<number | null>(50000);
   const [customValue, setCustomValue] = useState("");
+  const [customError, setCustomError] = useState<string | null>(null);
   // Focused (or filled) custom input deselects the presets, so the UI never
   // shows a highlighted preset while the user is typing their own amount.
   const [customActive, setCustomActive] = useState(false);
@@ -47,12 +48,14 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
 
   const selectUsd = (usd: number) => {
     setCustomActive(false);
+    setCustomError(null);
     setAmountUsd(usd);
     setIdrDisplay(rate ? Math.round(usd * rate) : null);
     setCustomValue("");
   };
   const selectIdr = (idr: number) => {
     setCustomActive(false);
+    setCustomError(null);
     setIdrDisplay(idr);
     if (rate) {
       setAmountUsd(Math.round((idr / rate) * 100) / 100);
@@ -60,17 +63,31 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
     }
   };
 
-  // Custom amount: parsed per the active perspective. The displayed IDR
-  // figure is the raw input when picking in IDR, or the rounded product
-  // when picking in USD, so both directions show clean numbers.
+  // Minimum top-up: Rp10.000 (the preset floor). In USD terms that is
+  // 10000 / rate, so the same floor guards both perspectives.
+  const MIN_IDR = 10000;
+  const minUsd = rate ? Math.ceil((MIN_IDR / rate) * 100) / 100 : null;
+
+  // Custom amount: parsed per the active perspective. Values below the
+  // minimum are rejected with an inline message and leave the last valid
+  // amount untouched.
   const applyCustom = (raw: string) => {
     setCustomValue(raw);
+    setCustomError(null);
     const n = Number(raw.replace(/[^\d.]/g, ""));
     if (!n || n <= 0) return;
     if (perspective === "usd") {
+      if (minUsd !== null && n < minUsd) {
+        setCustomError(`Minimum top-up is $${minUsd.toFixed(2)} (Rp${MIN_IDR.toLocaleString("id-ID")}).`);
+        return;
+      }
       setAmountUsd(Math.round(n * 100) / 100);
       if (rate) setIdrDisplay(Math.round(n * rate));
     } else {
+      if (n < MIN_IDR) {
+        setCustomError(`Minimum top-up is Rp${MIN_IDR.toLocaleString("id-ID")} (${fmtUsd(minUsd ?? 0)}).`);
+        return;
+      }
       if (rate) {
         setAmountUsd(Math.round((n / rate) * 100) / 100);
         setIdrDisplay(Math.round(n));
@@ -79,8 +96,8 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
   };
 
   const telegramHref = useMemo(() => {
-    const idrPart = idrDisplay ? ` (about Rp${idrDisplay.toLocaleString("id-ID")})` : "";
-    const ratePart = rate ? ` Rate at time of request: 1 USD = Rp${rate.toLocaleString("id-ID")}.` : "";
+    const idrPart = idrDisplay ? ` (sekitar Rp${idrDisplay.toLocaleString("id-ID")})` : "";
+    const ratePart = rate ? ` Kurs saat ini: 1 USD = Rp${rate.toLocaleString("id-ID")}.` : "";
     const usdPart = amountUsd % 1 === 0 ? String(amountUsd) : amountUsd.toFixed(2);
     const text =
       `Halo, saya mau top up wallet Ruvicode sebesar $${usdPart}${idrPart} ` +
@@ -220,6 +237,11 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
             />
           </div>
         </div>
+        {customError && (
+          <p className="mt-1.5 text-xs text-error" role="alert">
+            {customError}
+          </p>
+        )}
 
         {/* Rate + summary in one compact strip. */}
         <div className="mt-2 rounded-md border border-border-subtle bg-surface-2 px-3 py-2">
@@ -301,7 +323,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
         </a>
         <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-text-muted">
           <Clock className="h-3.5 w-3.5" />
-          Manual confirmation during business hours
+          Confirmed manually, usually within a few hours
         </p>
       </div>
     </div>
