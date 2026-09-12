@@ -80,10 +80,9 @@ export default function PrivacyPolicy() {
 
         <h2>3. Payment Processing</h2>
         <p>
-          Card payments are processed by Paddle, our payment processor and
-          Merchant of Record. Paddle collects and processes card information
-          in accordance with PCI-DSS standards. We do not store, process, or
-          transmit card details.
+          Wallet top-ups are made by USDC cryptocurrency transfer on the Base
+          network or by local bank transfer. Payments are detected on-chain or
+          confirmed manually; we never collect or store card details.
         </p>
 
         <h2>4. Data Retention</h2>

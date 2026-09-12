@@ -30,8 +30,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * Terms of Service — must include Acceptable Use section (critical for
- * Paddle approval + abuse prevention per PROJECT.md §5 feature #13).
+ * Terms of Service — must include Acceptable Use section (abuse
+ * prevention per PROJECT.md §5 feature #13).
  */
 export default function TermsOfService() {
   return (
@@ -90,9 +90,9 @@ export default function TermsOfService() {
         <h2>4. Payment &amp; Billing</h2>
         <p>
           The Service uses a prepaid wallet model. You top up your wallet via
-          card payment (processed by Paddle) or USDC cryptocurrency deposit.
-          Each API request deducts the actual cost from your wallet balance.
-          You are billed only for what you use.
+          USDC cryptocurrency deposit on the Base network or local bank
+          transfer. Each API request deducts the actual cost from your wallet
+          balance. You are billed only for what you use.
         </p>
 
         <h2>5. API Usage</h2>

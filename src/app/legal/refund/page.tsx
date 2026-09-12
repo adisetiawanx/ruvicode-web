@@ -30,11 +30,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * Refund Policy — CRITICAL for Paddle approval.
- *
- * Per PADDLE-REGISTRATION.md: unconditional 30-day money-back guarantee.
- * ZERO qualifiers ("except for...", "minus...", "if the user...").
- * Do NOT add conditions — Paddle will reject.
+ * Refund Policy — wallet balance refunds for prepaid usage.
+ * Top-ups are USDC on Base or local bank transfer (IDR).
  */
 export default function RefundPolicy() {
   return (
@@ -59,12 +56,10 @@ export default function RefundPolicy() {
           Are Calculated below).
         </p>
         <p>
-          Refunds are processed to the original payment method within 5-10
+          Refunds are issued in the same form as your payment. USDC deposits
+          are refunded in USDC to the original deposit address; local bank
+          transfers are refunded by bank transfer. Processing takes 5-10
           business days.
-        </p>
-        <p>
-          For USDC deposits, refunds are issued in USDC to the original
-          deposit address.
         </p>
 
         <h2>How Refunds Are Calculated</h2>

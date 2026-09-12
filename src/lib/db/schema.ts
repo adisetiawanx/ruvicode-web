@@ -12,7 +12,7 @@
  * Business tables (9): api_keys, wallets, usage_records, topups, model_prices,
  * deposit_addresses, usage_hourly, provider_keys.
  *
- * Security: keyHash is unique (prevents duplicate keys), paddleTransactionId
+ * Security: keyHash is unique (prevents duplicate keys), usdcTxHash
  * and usdcTxHash are unique (idempotency for webhooks/deposits).
  */
 
@@ -33,6 +33,8 @@ import { relations } from "drizzle-orm";
 // ENUMS
 // ════════════════════════════════════════════════════════
 
+// "paddle" is a legacy enum value from the removed card flow (kept to
+// avoid a Postgres enum type rebuild; no rows use it).
 export const topupMethodEnum = pgEnum("topup_method", ["paddle", "usdc", "idr", "manual"]);
 export const topupStatusEnum = pgEnum("topup_status", [
   "pending",
@@ -260,7 +262,7 @@ export const usageRecordsRelations = relations(usageRecords, ({ one }) => ({
 
 // ════════════════════════════════════════════════════════
 // TOPUPS (Billing)
-// Written by: Next.js webhook handler (on Paddle payment success)
+// Written by: deposit monitor (USDC), admin manual credit (IDR/adjustment)
 // Read by: Next.js dashboard (billing history)
 // ════════════════════════════════════════════════════════
 
@@ -272,7 +274,6 @@ export const topups = pgTable(
       .references(() => user.id, { onDelete: "set null" }),
     amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
     method: topupMethodEnum("method").notNull(),
-    paddleTransactionId: text("paddle_transaction_id"), // for idempotency
     usdcTxHash: text("usdc_tx_hash"), // for idempotency
     noteAdmin: text("note_admin"), // admin note on manual credits
     status: topupStatusEnum("status").notNull().default("pending"),
@@ -285,7 +286,6 @@ export const topups = pgTable(
       table.userId,
       table.createdAt,
     ),
-    paddleIdx: uniqueIndex("idx_topups_paddle").on(table.paddleTransactionId),
     usdcIdx: uniqueIndex("idx_topups_usdc").on(table.usdcTxHash),
   }),
 );

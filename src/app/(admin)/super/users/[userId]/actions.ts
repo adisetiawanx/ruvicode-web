@@ -5,7 +5,7 @@ import { sql } from "drizzle-orm";
 import { db, isDbAvailable } from "@/lib/db";
 import { getSession } from "@/lib/session";
 
-const ALLOWED_METHODS = ["idr", "manual", "usdc", "paddle"] as const;
+const ALLOWED_METHODS = ["idr", "manual", "usdc"] as const;
 
 function isAdmin(email: string | null | undefined): boolean {
   return (

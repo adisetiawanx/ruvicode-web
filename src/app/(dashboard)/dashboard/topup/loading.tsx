@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 /**
  * Mirrors /dashboard/topup exactly:
- * h1 → grid 2-col (Paddle left, USDC right)
+ * h1 → grid 2-col (USDC left, IDR right)
  */
 export default function TopUpLoading() {
   return (

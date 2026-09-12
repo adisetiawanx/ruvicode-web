@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { getSession } from "@/lib/session";
-import { TopUpPaddle } from "@/components/dashboard/topup-paddle";
 import { TopUpUSDC } from "@/components/dashboard/topup-usdc";
 import { TopUpIDR } from "@/components/dashboard/topup-idr";
-import { PaddleCheckout } from "@/components/dashboard/paddle-checkout";
 import { getUsdIdrRate } from "@/lib/exchange-rate";
 import { env } from "@/lib/env";
 
@@ -44,19 +41,14 @@ export default async function TopUpPage() {
 
   return (
     <div className="space-y-6">
-      {/* Opens the Paddle overlay when URL has ?_ptxn=txn_xxx */}
-      <Suspense fallback={null}>
-        <PaddleCheckout />
-      </Suspense>
       <h1 className="text-2xl font-semibold text-text-primary">
         Top Up Wallet
       </h1>
 
-      {/* USDC fills the left column; Card and IDR stack on the right */}
+      {/* USDC fills the left column; IDR stacks on the right */}
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
         <TopUpUSDC address={depositAddress} />
         <div className="space-y-6">
-          <TopUpPaddle />
           <TopUpIDR rate={await getUsdIdrRate()} email={session.user.email} />
         </div>
       </div>

@@ -3,8 +3,9 @@ import { twMerge } from "tailwind-merge";
 
 /**
  * Display label for a topup method. Stored values are lowercase enum
- * strings ("usdc", "paddle"); "usdc" is a currency ticker and must
- * render uppercase in customer-facing copy.
+ * strings ("usdc", "idr"); "usdc" is a currency ticker and must
+ * render uppercase in customer-facing copy. Legacy rows may still
+ * carry "paddle" from the removed card flow; render them as Card.
  */
 export function formatTopupMethod(method: string): string {
   if (method.toLowerCase() === "usdc") return "USDC";

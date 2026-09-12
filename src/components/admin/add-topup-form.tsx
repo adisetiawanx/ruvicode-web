@@ -9,7 +9,6 @@ const METHODS = [
   { value: "idr", label: "IDR (bank transfer / QRIS)" },
   { value: "manual", label: "Manual adjustment" },
   { value: "usdc", label: "USDC (on-chain fix)" },
-  { value: "paddle", label: "Card (processor fix)" },
   { value: "adjust-debit", label: "Debit balance (reduce)" },
 ];
 

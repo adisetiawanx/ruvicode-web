@@ -7,7 +7,7 @@ import {
 
 /**
  * Top-up confirmation template (ADR-014).
- * Sent after a successful Paddle payment or USDC deposit (ADR-015).
+ * Sent after a successful wallet top-up (USDC deposit or manual credit).
  */
 export function TopupConfirmationTemplate({
   amount,

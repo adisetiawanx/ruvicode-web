@@ -3,7 +3,7 @@
  *
  * These are used outside of the auth flow:
  * - sendLowBalanceEmail: triggered by cron when balance < $2.00
- * - sendTopupConfirmationEmail: triggered by Paddle webhook (ADR-015)
+ * - sendTopupConfirmationEmail: triggered after a wallet top-up is credited
  *
  * All functions are no-ops when Resend is not configured (local dev).
  * Errors are caught and logged — email failure should never break
@@ -42,7 +42,7 @@ export async function sendLowBalanceEmail(
 
 /**
  * Send a top-up confirmation email.
- * Called by Paddle webhook handler after wallet is credited (ADR-015).
+ * Called after a wallet top-up is credited.
  * Non-blocking: errors are logged but not thrown — wallet is already credited.
  */
 export async function sendTopupConfirmationEmail(

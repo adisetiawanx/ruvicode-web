@@ -103,15 +103,14 @@ export async function getAdminRevenue() {
 export interface AdminModelProfitability { model: string; requests: number; userCost: number; upstreamCost: number; margin: number; marginPct: number; status: string }
 
 export async function getAdminDeposits() {
-  if (!isDbAvailable()) return { totalUsdc: 0, totalPaddle: 0, pending: 0, failed: 0, recent: [] as AdminDeposit[] };
-  const [usdc, paddle, pending, failed, recent] = await Promise.all([
+  if (!isDbAvailable()) return { totalUsdc: 0, pending: 0, failed: 0, recent: [] as AdminDeposit[] };
+  const [usdc, pending, failed, recent] = await Promise.all([
     db.select({ total: sql<number>`COALESCE(SUM(${topups.amount}), 0)` }).from(topups).where(eq(topups.method, "usdc")),
-    db.select({ total: sql<number>`COALESCE(SUM(${topups.amount}), 0)` }).from(topups).where(eq(topups.method, "paddle")),
     db.select({ total: sql<number>`COUNT(*)` }).from(topups).where(eq(topups.status, "pending")),
     db.select({ total: sql<number>`COUNT(*)` }).from(topups).where(eq(topups.status, "failed")),
     db.select({ userId: topups.userId, amount: topups.amount, method: topups.method, status: topups.status, note: topups.noteAdmin, createdAt: topups.createdAt }).from(topups).orderBy(desc(topups.createdAt)).limit(10),
   ]);
-  return { totalUsdc: Number(usdc[0]?.total ?? 0), totalPaddle: Number(paddle[0]?.total ?? 0), pending: Number(pending[0]?.total ?? 0), failed: Number(failed[0]?.total ?? 0), recent: recent.map((row) => ({ userId: row.userId, amount: Number(row.amount), method: row.method, status: row.status, note: row.note ?? null, createdAt: new Date(row.createdAt).toISOString() })) };
+  return { totalUsdc: Number(usdc[0]?.total ?? 0), pending: Number(pending[0]?.total ?? 0), failed: Number(failed[0]?.total ?? 0), recent: recent.map((row) => ({ userId: row.userId, amount: Number(row.amount), method: row.method, status: row.status, note: row.note ?? null, createdAt: new Date(row.createdAt).toISOString() })) };
 }
 
 export interface AdminDeposit { userId: string | null; amount: number; method: string; status: string; note: string | null; createdAt: string }

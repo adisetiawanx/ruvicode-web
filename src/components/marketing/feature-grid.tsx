@@ -5,7 +5,7 @@ import {
   Key,
   DollarSign,
   Shield,
-  CreditCard,
+  Coins,
   Zap,
   Gauge,
   type LucideIcon,
@@ -36,9 +36,9 @@ const features: Feature[] = [
     desc: "Set daily and monthly spend caps per key. When a limit is hit, requests stop. No runaway agent loops, no surprise bills.",
   },
   {
-    icon: CreditCard,
-    title: "Card or crypto",
-    desc: "Top up with any major card or USDC on Base. No foreign card rejections, deposits from $0.01.",
+    icon: Coins,
+    title: "Crypto native",
+    desc: "Top up with USDC on Base. On-chain deposits from $0.01, credited automatically, no card rejections.",
   },
   {
     icon: Zap,

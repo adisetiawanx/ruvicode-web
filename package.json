@@ -19,8 +19,6 @@
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^16.3.0",
-    "@paddle/paddle-js": "^1.6.4",
-    "@paddle/paddle-node-sdk": "^3.8.0",
     "@react-email/components": "^1.0.12",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@types/qrcode": "^1.5.6",

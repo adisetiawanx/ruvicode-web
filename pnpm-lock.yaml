@@ -26,12 +26,6 @@ importers:
       '@next/mdx':
         specifier: ^16.3.0
         version: 16.3.0(@mdx-js/loader@3.1.1(supports-color@7.2.0))(@mdx-js/react@3.1.1(@types/react@19.2.18)(react@19.2.8))
-      '@paddle/paddle-js':
-        specifier: ^1.6.4
-        version: 1.6.4
-      '@paddle/paddle-node-sdk':
-        specifier: ^3.8.0
-        version: 3.8.0
       '@react-email/components':
         specifier: ^1.0.12
         version: 1.0.12(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1460,13 +1454,6 @@ packages:
   '@opentelemetry/semantic-conventions@1.43.0':
     resolution: {integrity: sha512-eSYWTm620tTk45EKSedaUL8MFYI8hW164hIXsgIHyxu3VobUB3fFCu5t0hQby6OoWRPsG1KkKUG2M5UadiLiVg==}
     engines: {node: '>=14'}
-
-  '@paddle/paddle-js@1.6.4':
-    resolution: {integrity: sha512-ncfnS6I8mCX6krZ3Sgz2iAYivGmhdI81yt9mT6prtPj4Ipd9J3M12LCJRUFL4FB7BYeeuV04c33RSEnbZUBCaA==}
-
-  '@paddle/paddle-node-sdk@3.8.0':
-    resolution: {integrity: sha512-4RS6AhZisloYaT2jiFgx9hwm22qwLRUx4EgIVb1gS3bS96lhDBQWq8BC1/Zow2i3CuxMkehXQUc3qKSBS77ozA==}
-    engines: {node: '>=20'}
 
   '@radix-ui/primitive@1.1.7':
     resolution: {integrity: sha512-rqWnm76nYT8HoNNqEjpgJ7Pw/DrBj5iBTrmEPo6HTX5+VJyBNOqTdv4g89G63HuR5g0AaENoAcH7Is5fF2kZ8Q==}
@@ -3851,6 +3838,7 @@ packages:
   isomorphic-dompurify@3.21.0:
     resolution: {integrity: sha512-Bg5mqtMnMdBBwz7MjvH3oAuLOA/j0xtawVkcAZsOpVhOsfaLYwnAvhEvz94f8585Q6LCnnNr2XNApbXlB0J3GQ==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
+    deprecated: Raised the minimum Node.js version (breaking) without a major bump. Use 4.x for the same code with correct semver, or pin 3.19.0 for Node < 22.22.2.
 
   iterator.prototype@1.1.5:
     resolution: {integrity: sha512-H0dkQoCa3b2VEeKQBOxFph+JAbcrQdE7KC0UkqwpLmv2EC4P41QXP+rqo9wYodACiG5/WM5s9oDApTU8utwj9g==}
@@ -6564,10 +6552,6 @@ snapshots:
   '@nolyfill/is-core-module@1.0.39': {}
 
   '@opentelemetry/semantic-conventions@1.43.0': {}
-
-  '@paddle/paddle-js@1.6.4': {}
-
-  '@paddle/paddle-node-sdk@3.8.0': {}
 
   '@radix-ui/primitive@1.1.7': {}
 

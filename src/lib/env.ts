@@ -40,10 +40,6 @@ export const env = createEnv({
     // api host is not resolvable, so the web container talks to the
     // gateway service directly. Falls back to the public API URL.
     GATEWAY_INTERNAL_URL: z.string().optional(),
-    // Paddle (ADR-015)
-    PADDLE_API_KEY: z.string().optional(),
-    PADDLE_WEBHOOK_SECRET: z.string().optional(),
-    PADDLE_ENV: z.enum(["sandbox", "production"]).optional().default("sandbox"),
     // Resend (ADR-014)
     RESEND_API_KEY: z.string().optional(),
   },
@@ -68,9 +64,6 @@ export const env = createEnv({
     USDC_CONTRACT: process.env.USDC_CONTRACT,
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     GATEWAY_INTERNAL_URL: process.env.GATEWAY_INTERNAL_URL,
-    PADDLE_API_KEY: process.env.PADDLE_API_KEY,
-    PADDLE_WEBHOOK_SECRET: process.env.PADDLE_WEBHOOK_SECRET,
-    PADDLE_ENV: process.env.PADDLE_ENV,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
