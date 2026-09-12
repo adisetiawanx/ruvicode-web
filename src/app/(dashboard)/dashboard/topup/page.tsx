@@ -45,11 +45,12 @@ export default async function TopUpPage() {
         Top Up Wallet
       </h1>
 
-      {/* USDC fills the left column; IDR stacks on the right */}
+      {/* IDR fills the left column (primary for the Indonesian market);
+          USDC stacks on the right */}
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-        <TopUpUSDC address={depositAddress} />
+        <TopUpIDR rate={await getUsdIdrRate()} email={session.user.email} />
         <div className="space-y-6">
-          <TopUpIDR rate={await getUsdIdrRate()} email={session.user.email} />
+          <TopUpUSDC address={depositAddress} />
         </div>
       </div>
     </div>

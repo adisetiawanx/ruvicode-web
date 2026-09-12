@@ -74,8 +74,8 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
             >
               One API key for Claude, GPT, Gemini, GLM, DeepSeek, Kimi, and
               more. Pay per request, see exact costs live, and cap spending
-              per key. Cached tokens bill up to 10x cheaper. Top up with USDC
-              on Base.
+              per key. Cached tokens bill up to 10x cheaper. Top up in IDR
+              with bank transfer or QRIS, or with USDC on Base.
             </motion.p>
 
             <motion.div

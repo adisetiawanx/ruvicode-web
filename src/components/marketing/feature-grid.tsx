@@ -37,8 +37,8 @@ const features: Feature[] = [
   },
   {
     icon: Coins,
-    title: "Crypto native",
-    desc: "Top up with USDC on Base. On-chain deposits from $0.01, credited automatically, no card rejections.",
+    title: "Easy top-ups",
+    desc: "Top up in IDR with bank transfer or QRIS, or with USDC on Base credited automatically on-chain. Deposits from $0.01.",
   },
   {
     icon: Zap,
