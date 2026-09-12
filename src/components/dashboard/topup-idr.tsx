@@ -1,15 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, Wallet, Clock } from "lucide-react";
 
 const TELEGRAM_URL = "https://t.me/asvmv";
 
-// Amount choices shown from both perspectives: the USD grid and the IDR
-// grid carry the same credit values, so switching tabs never loses the
-// selection. Rupiah picks are round local numbers.
-const TOPUP_CHOICES_USD = [1, 5, 10, 25, 50, 100];
-const TOPUP_CHOICES_IDR = [10000, 50000, 100000, 250000, 500000, 1000000];
+// Presets from both perspectives. IDR picks are round local numbers; the
+// USD grid carries the values people usually top up. Rp10k (~$0.64) is the
+// friendly starter, Rp2.5M (~$160) covers heavy agent users.
+const TOPUP_CHOICES_USD = [1, 3, 5, 10, 25, 50, 100, 250];
+const TOPUP_CHOICES_IDR = [10000, 25000, 50000, 100000, 250000, 500000, 1000000, 2500000];
 
 type Perspective = "usd" | "idr";
 
@@ -22,97 +22,87 @@ function fmtIdr(n: number) {
 
 /**
  * IDR top-up section. Manual channel for Indonesian users: pick an amount
- * from either perspective (how much credit in USD, or how much Rupiah to
- * pay), or type a custom one, then continue on Telegram where the choice,
- * the live rate, and the account email are pre-filled in the message.
+ * from either perspective (wallet credit in USD, or Rupiah to pay), or
+ * type a custom one, then continue on Telegram where the choice, the live
+ * rate, and the account email are pre-filled in the message.
  *
  * Client component: the picker needs interactivity; the exchange rate is
  * still fetched server-side by the parent page and passed in.
  */
 export function TopUpIDR({ rate, email }: { rate: number | null; email: string }) {
   const [perspective, setPerspective] = useState<Perspective>("idr");
-  // The selected amount is always stored in USD (the wallet currency),
-  // rounded to cents; IDR picks are converted through the live rate.
+  // Selection is stored in USD cents precision (the wallet currency);
+  // idrDisplay keeps the Rupiah figure the user actually picked so the
+  // summary shows round numbers instead of round-trip artifacts.
   const [amountUsd, setAmountUsd] = useState<number>(5);
+  const [idrDisplay, setIdrDisplay] = useState<number | null>(50000);
   const [customValue, setCustomValue] = useState("");
-
-  const idrEquivalent = useMemo(
-    () => (rate ? Math.round(amountUsd * rate) : null),
-    [rate, amountUsd],
-  );
 
   const rateDisplay = rate
     ? `1 USD = Rp${rate.toLocaleString("id-ID")}`
     : "Contact for current rate";
 
-  // Selecting a preset from either grid.
   const selectUsd = (usd: number) => {
     setAmountUsd(usd);
+    setIdrDisplay(rate ? Math.round(usd * rate) : null);
     setCustomValue("");
   };
   const selectIdr = (idr: number) => {
+    setIdrDisplay(idr);
     if (rate) {
       setAmountUsd(Math.round((idr / rate) * 100) / 100);
       setCustomValue("");
     }
   };
 
-  // Custom amount: parsed per the active perspective.
+  // Custom amount: parsed per the active perspective. The displayed IDR
+  // figure is the raw input when picking in IDR, or the rounded product
+  // when picking in USD, so both directions show clean numbers.
   const applyCustom = (raw: string) => {
     setCustomValue(raw);
     const n = Number(raw.replace(/[^\d.]/g, ""));
-    if (!n || n <= 0 || !rate) return;
+    if (!n || n <= 0) return;
     if (perspective === "usd") {
       setAmountUsd(Math.round(n * 100) / 100);
+      if (rate) setIdrDisplay(Math.round(n * rate));
     } else {
-      setAmountUsd(Math.round((n / rate) * 100) / 100);
+      if (rate) {
+        setAmountUsd(Math.round((n / rate) * 100) / 100);
+        setIdrDisplay(Math.round(n));
+      }
     }
   };
 
   const telegramHref = useMemo(() => {
-    const idrPart = idrEquivalent ? ` (sekitar Rp${idrEquivalent.toLocaleString("id-ID")})` : "";
-    const ratePart = rate ? ` Kurs saat ini: 1 USD = Rp${rate.toLocaleString("id-ID")}.` : "";
+    const idrPart = idrDisplay ? ` (about Rp${idrDisplay.toLocaleString("id-ID")})` : "";
+    const ratePart = rate ? ` Rate at time of request: 1 USD = Rp${rate.toLocaleString("id-ID")}.` : "";
+    const usdPart = amountUsd % 1 === 0 ? String(amountUsd) : amountUsd.toFixed(2);
     const text =
-      `Halo, saya mau top up wallet Ruvicode sebesar $${amountUsd % 1 === 0 ? amountUsd : amountUsd.toFixed(2)}${idrPart} ` +
+      `Halo, saya mau top up wallet Ruvicode sebesar $${usdPart}${idrPart} ` +
       `pakai transfer bank/QRIS.${ratePart} Email akun saya: ${email}`;
     return `${TELEGRAM_URL}?text=${encodeURIComponent(text)}`;
-  }, [amountUsd, idrEquivalent, rate, email]);
+  }, [amountUsd, idrDisplay, rate, email]);
 
-  const isCustomMatch = (usd: number) => {
-    if (!customValue) return false;
-    return Math.abs(usd - amountUsd) < 0.005;
-  };
+  const presetMatches = (usd: number) =>
+    !customValue && Math.abs(usd - amountUsd) < 0.005;
 
   return (
     <div className="flex flex-col rounded-lg border border-border-default bg-surface p-6">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="font-mono text-sm font-semibold text-accent">Rp</span>
-        <h3 className="font-semibold text-text-primary">
-          Top Up in IDR
-        </h3>
+      <div className="mb-2 flex items-center gap-2">
+        <Wallet className="h-5 w-5 text-accent" />
+        <h3 className="font-semibold text-text-primary">Top Up in IDR</h3>
       </div>
 
       <p className="text-sm leading-relaxed text-text-secondary">
-        Pay with local bank transfer, QRIS, or e-wallet in Rupiah. Credit is
-        added to your wallet at the current exchange rate, no crypto needed.
+        Pay with local bank transfer, QRIS, or e-wallet in Rupiah. Credit lands
+        in your wallet at the current exchange rate, no crypto needed.
       </p>
 
-      {rate && (
-        <div className="mt-3 rounded-md border border-border-subtle bg-surface-2 px-3 py-2">
-          <p className="font-mono text-sm font-medium tabular text-accent-text">
-            {rateDisplay}
-          </p>
-          <p className="mt-0.5 text-xs text-text-muted">
-            Mid-market rate. Final rate confirmed at payment.
-          </p>
-        </div>
-      )}
-
-      {/* Perspective tabs: pick by USD credit or by Rupiah to pay. */}
+      {/* Amount picker with perspective tabs. */}
       <fieldset className="mt-4">
         <div className="mb-2 flex items-center justify-between gap-2">
           <legend className="text-sm font-medium text-text-primary">
-            Choose amount
+            Amount
           </legend>
           <div className="inline-flex rounded-lg border border-border-default bg-surface-2 p-0.5" role="tablist" aria-label="Amount perspective">
             <button
@@ -120,7 +110,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
               role="tab"
               aria-selected={perspective === "usd"}
               onClick={() => setPerspective("usd")}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+              className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                 perspective === "usd"
                   ? "bg-accent text-text-inverse"
                   : "text-text-muted hover:text-text-primary"
@@ -133,7 +123,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
               role="tab"
               aria-selected={perspective === "idr"}
               onClick={() => setPerspective("idr")}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+              className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                 perspective === "idr"
                   ? "bg-accent text-text-inverse"
                   : "text-text-muted hover:text-text-primary"
@@ -145,17 +135,17 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
         </div>
 
         {perspective === "usd" ? (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {TOPUP_CHOICES_USD.map((usd) => {
               const idr = rate ? Math.round(usd * rate) : null;
-              const selected = !customValue && amountUsd === usd;
+              const selected = presetMatches(usd);
               return (
                 <button
                   key={usd}
                   type="button"
                   onClick={() => selectUsd(usd)}
                   aria-pressed={selected}
-                  className={`rounded-lg border px-2 py-2.5 text-center transition-all hover:-translate-y-px hover:border-accent/60 hover:bg-accent/5 ${
+                  className={`rounded-lg border px-1.5 py-2 text-center transition-all hover:-translate-y-px hover:border-accent/60 hover:bg-accent/5 ${
                     selected
                       ? "border-accent bg-accent/10"
                       : "border-border-default bg-surface-2"
@@ -164,7 +154,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
                   <span className="block font-mono text-sm font-semibold text-text-primary">
                     {fmtUsd(usd)}
                   </span>
-                  <span className="mt-0.5 block font-mono text-[11px] tabular text-text-muted">
+                  <span className="mt-0.5 block font-mono text-[10px] tabular text-text-muted">
                     {idr ? fmtIdr(idr) : "-"}
                   </span>
                 </button>
@@ -172,7 +162,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
             })}
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {TOPUP_CHOICES_IDR.map((idr) => {
               const usd = rate ? Math.round((idr / rate) * 100) / 100 : null;
               const selected =
@@ -184,16 +174,16 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
                   onClick={() => selectIdr(idr)}
                   disabled={!rate}
                   aria-pressed={selected}
-                  className={`rounded-lg border px-2 py-2.5 text-center transition-all hover:-translate-y-px hover:border-accent/60 hover:bg-accent/5 ${
+                  className={`rounded-lg border px-1.5 py-2 text-center transition-all hover:-translate-y-px hover:border-accent/60 hover:bg-accent/5 ${
                     selected
                       ? "border-accent bg-accent/10"
                       : "border-border-default bg-surface-2"
                   } ${!rate ? "opacity-50" : ""}`}
                 >
-                  <span className="block font-mono text-sm font-semibold text-text-primary">
+                  <span className="block font-mono text-[13px] font-semibold text-text-primary">
                     {fmtIdr(idr)}
                   </span>
-                  <span className="mt-0.5 block font-mono text-[11px] tabular text-text-muted">
+                  <span className="mt-0.5 block font-mono text-[10px] tabular text-text-muted">
                     {usd !== null ? fmtUsd(usd) : "-"}
                   </span>
                 </button>
@@ -213,39 +203,35 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
               inputMode="decimal"
               value={customValue}
               onChange={(e) => applyCustom(e.target.value)}
-              placeholder={
-                perspective === "usd" ? "Custom amount" : "Jumlah custom"
-              }
+              placeholder={perspective === "usd" ? "Custom amount" : "Custom amount"}
               aria-label="Custom amount"
               className="h-9 w-full rounded-lg border border-border-default bg-surface-2 pl-8 pr-3 font-mono text-sm tabular text-text-primary outline-none transition-colors placeholder:font-sans placeholder:text-text-muted focus:border-accent hover:border-border-strong"
             />
           </div>
         </div>
 
-        {idrEquivalent && (
-          <p className="mt-2 text-xs text-text-muted">
-            You get <span className="font-medium text-text-secondary">{fmtUsd(amountUsd)}</span>{" "}
-            wallet credit for about{" "}
-            <span className="font-medium text-text-secondary">
-              {fmtIdr(idrEquivalent)}
-            </span>
-            .
-          </p>
-        )}
+        {/* Rate + summary in one compact strip. */}
+        <div className="mt-2 rounded-md border border-border-subtle bg-surface-2 px-3 py-2">
+          {rate ? (
+            <>
+              <p className="font-mono text-xs tabular text-accent-text">{rateDisplay}</p>
+              {idrDisplay && (
+                <p className="mt-0.5 text-xs text-text-muted">
+                  You get{" "}
+                  <span className="font-medium text-text-secondary">{fmtUsd(amountUsd)}</span>{" "}
+                  wallet credit for about{" "}
+                  <span className="font-medium text-text-secondary">{fmtIdr(idrDisplay)}</span>
+                  . Final rate confirmed at payment.
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="text-xs text-text-muted">{rateDisplay}</p>
+          )}
+        </div>
       </fieldset>
 
-      <ul className="mt-4 space-y-2 text-sm text-text-secondary">
-        <li className="flex items-center gap-2">
-          <Send className="h-4 w-4 shrink-0 text-accent" />
-          Continue on Telegram to arrange the payment
-        </li>
-        <li className="flex items-center gap-2">
-          <MessageCircle className="h-4 w-4 shrink-0 text-accent" />
-          Fast manual confirmation during business hours
-        </li>
-      </ul>
-
-      <div className="mt-auto pt-5">
+      <div className="mt-auto pt-4">
         <a
           href={telegramHref}
           target="_blank"
@@ -255,6 +241,10 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
           <Send className="mr-1.5 h-4 w-4" />
           Continue on Telegram
         </a>
+        <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-text-muted">
+          <Clock className="h-3.5 w-3.5" />
+          Manual confirmation during business hours
+        </p>
       </div>
     </div>
   );
