@@ -35,7 +35,9 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
   // idrDisplay keeps the Rupiah figure the user actually picked so the
   // summary shows round numbers instead of round-trip artifacts.
   const [amountUsd, setAmountUsd] = useState<number>(5);
-  const [idrDisplay, setIdrDisplay] = useState<number | null>(50000);
+  // Rupiah figure the user explicitly picked (IDR preset or custom IDR).
+  // Null until they do; the display value then derives from the live rate.
+  const [idrPicked, setIdrPicked] = useState<number | null>(null);
   const [customValue, setCustomValue] = useState("");
   const [customError, setCustomError] = useState<string | null>(null);
   // Focused (or filled) custom input deselects the presets, so the UI never
@@ -46,17 +48,21 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
     ? `1 USD = Rp${rate.toLocaleString("id-ID")}`
     : "Contact for current rate";
 
+  // The shown Rupiah figure: the user's explicit pick when there is one,
+  // otherwise the live conversion of the selected USD amount.
+  const idrDisplay = idrPicked ?? (rate ? Math.round(amountUsd * rate) : null);
+
   const selectUsd = (usd: number) => {
     setCustomActive(false);
     setCustomError(null);
     setAmountUsd(usd);
-    setIdrDisplay(rate ? Math.round(usd * rate) : null);
+    setIdrPicked(null);
     setCustomValue("");
   };
   const selectIdr = (idr: number) => {
     setCustomActive(false);
     setCustomError(null);
-    setIdrDisplay(idr);
+    setIdrPicked(idr);
     if (rate) {
       setAmountUsd(Math.round((idr / rate) * 100) / 100);
       setCustomValue("");
@@ -82,7 +88,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
         return;
       }
       setAmountUsd(Math.round(n * 100) / 100);
-      if (rate) setIdrDisplay(Math.round(n * rate));
+      setIdrPicked(null);
     } else {
       if (n < MIN_IDR) {
         setCustomError(`Minimum top-up is Rp${MIN_IDR.toLocaleString("id-ID")} (${fmtUsd(minUsd ?? 0)}).`);
@@ -90,13 +96,13 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
       }
       if (rate) {
         setAmountUsd(Math.round((n / rate) * 100) / 100);
-        setIdrDisplay(Math.round(n));
+        setIdrPicked(Math.round(n));
       }
     }
   };
 
   const telegramHref = useMemo(() => {
-    const idrPart = idrDisplay ? ` (sekitar Rp${idrDisplay.toLocaleString("id-ID")})` : "";
+    const idrPart = idrDisplay ? ` (Rp${idrDisplay.toLocaleString("id-ID")})` : "";
     const ratePart = rate ? ` Kurs saat ini: 1 USD = Rp${rate.toLocaleString("id-ID")}.` : "";
     const usdPart = amountUsd % 1 === 0 ? String(amountUsd) : amountUsd.toFixed(2);
     const text =
@@ -252,7 +258,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
                 <p className="mt-0.5 text-xs text-text-muted">
                   You get{" "}
                   <span className="font-medium text-text-secondary">{fmtUsd(amountUsd)}</span>{" "}
-                  wallet credit for about{" "}
+                  wallet credit for{" "}
                   <span className="font-medium text-text-secondary">{fmtIdr(idrDisplay)}</span>
                   . Final rate confirmed at payment.
                 </p>
