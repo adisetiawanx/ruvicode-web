@@ -37,17 +37,22 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
   const [amountUsd, setAmountUsd] = useState<number>(5);
   const [idrDisplay, setIdrDisplay] = useState<number | null>(50000);
   const [customValue, setCustomValue] = useState("");
+  // Focused (or filled) custom input deselects the presets, so the UI never
+  // shows a highlighted preset while the user is typing their own amount.
+  const [customActive, setCustomActive] = useState(false);
 
   const rateDisplay = rate
     ? `1 USD = Rp${rate.toLocaleString("id-ID")}`
     : "Contact for current rate";
 
   const selectUsd = (usd: number) => {
+    setCustomActive(false);
     setAmountUsd(usd);
     setIdrDisplay(rate ? Math.round(usd * rate) : null);
     setCustomValue("");
   };
   const selectIdr = (idr: number) => {
+    setCustomActive(false);
     setIdrDisplay(idr);
     if (rate) {
       setAmountUsd(Math.round((idr / rate) * 100) / 100);
@@ -83,8 +88,9 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
     return `${TELEGRAM_URL}?text=${encodeURIComponent(text)}`;
   }, [amountUsd, idrDisplay, rate, email]);
 
+  const customEngaged = customActive || customValue.length > 0;
   const presetMatches = (usd: number) =>
-    !customValue && Math.abs(usd - amountUsd) < 0.005;
+    !customEngaged && Math.abs(usd - amountUsd) < 0.005;
 
   return (
     <div className="flex flex-col rounded-lg border border-border-default bg-surface p-6">
@@ -166,7 +172,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
             {TOPUP_CHOICES_IDR.map((idr) => {
               const usd = rate ? Math.round((idr / rate) * 100) / 100 : null;
               const selected =
-                !customValue && usd !== null && Math.abs(usd - amountUsd) < 0.005;
+                !customEngaged && usd !== null && Math.abs(usd - amountUsd) < 0.005;
               return (
                 <button
                   key={idr}
@@ -193,9 +199,12 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
         )}
 
         {/* Custom amount input, follows the active perspective. */}
-        <div className="mt-2 flex items-center gap-2">
+        <p className="mt-3 mb-1.5 text-xs text-text-muted">
+          Or enter a custom amount
+        </p>
+        <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-text-muted">
+            <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 bg-transparent font-mono text-sm text-text-muted">
               {perspective === "usd" ? "$" : "Rp"}
             </span>
             <input
@@ -203,7 +212,9 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
               inputMode="decimal"
               value={customValue}
               onChange={(e) => applyCustom(e.target.value)}
-              placeholder={perspective === "usd" ? "Custom amount" : "Custom amount"}
+              onFocus={() => setCustomActive(true)}
+              onBlur={() => { if (!customValue) setCustomActive(false); }}
+              placeholder={perspective === "usd" ? "e.g. 7.50" : "e.g. 120000"}
               aria-label="Custom amount"
               className="h-9 w-full rounded-lg border border-border-default bg-surface-2 pl-8 pr-3 font-mono text-sm tabular text-text-primary outline-none transition-colors placeholder:font-sans placeholder:text-text-muted focus:border-accent hover:border-border-strong"
             />
@@ -239,7 +250,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
           className="inline-flex h-8 w-full shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-transparent bg-accent px-2.5 text-sm font-medium text-text-inverse transition-all hover:bg-accent-hover active:translate-y-px active:bg-accent-pressed"
         >
           <Send className="mr-1.5 h-4 w-4" />
-          Continue on Telegram
+          Pay on Telegram
         </a>
         <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-text-muted">
           <Clock className="h-3.5 w-3.5" />
