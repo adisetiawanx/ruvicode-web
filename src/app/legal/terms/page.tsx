@@ -53,7 +53,7 @@ export default function TermsOfService() {
 
         <h2>2. Service Description</h2>
         <p>
-          Ruvicode is a SaaS API product that provides unified access to
+          Ruvicode is an API service that provides unified access to
           multiple AI models through a single OpenAI-compatible endpoint.
           The Service is self-serve and automated, offering per-request
           billing through a prepaid wallet system.
