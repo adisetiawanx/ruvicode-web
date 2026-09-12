@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Send, Wallet, Clock } from "lucide-react";
+import { Send, Wallet, Clock, Landmark, ShieldCheck } from "lucide-react";
 
 const TELEGRAM_URL = "https://t.me/asvmv";
 
@@ -241,6 +241,53 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
           )}
         </div>
       </fieldset>
+
+      {/* How it works - mirrors the info box on the USDC card. */}
+      <div className="mt-4 space-y-2.5 rounded-md border border-border-subtle bg-surface-2 p-4">
+        <div className="flex items-start gap-2">
+          <Send className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <div>
+            <p className="text-xs font-medium text-text-primary">Pick and send</p>
+            <p className="text-xs text-text-muted">
+              Your amount and account email are pre-filled in the Telegram
+              message, so setup takes one tap.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-start gap-2">
+          <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <div>
+            <p className="text-xs font-medium text-text-primary">Local payment</p>
+            <p className="text-xs text-text-muted">
+              Pay by bank transfer, QRIS, or e-wallet (GoPay, OVO, DANA) in
+              Rupiah. No crypto, no card, no international fees.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-start gap-2">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <div>
+            <p className="text-xs font-medium text-text-primary">Fair rate, no fees</p>
+            <p className="text-xs text-text-muted">
+              The full amount lands in your wallet at the mid-market rate.
+              No processing fees, no rounding tricks.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Technical details, same strip style as the USDC card. */}
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs text-text-muted">
+        <span>
+          Payment: <span className="text-text-primary">Bank / QRIS / e-wallet</span>
+        </span>
+        <span>
+          Currency: <span className="text-text-primary">IDR (Rupiah)</span>
+        </span>
+        <span>
+          Minimum: <span className="text-text-primary">Rp10.000</span>
+        </span>
+      </div>
 
       <div className="mt-auto pt-4">
         <a
