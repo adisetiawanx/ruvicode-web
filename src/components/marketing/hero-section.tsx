@@ -83,7 +83,7 @@ export function HeroSection({ codeTabs }: HeroSectionProps) {
               className="flex flex-col gap-4 sm:flex-row"
             >
               <LinkButton href="/register" variant="primary" size="lg">
-                Get Started Free →
+                Get Started →
               </LinkButton>
               <LinkButton href="/models" variant="outline" size="lg">
                 Browse Models

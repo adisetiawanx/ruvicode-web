@@ -25,7 +25,7 @@ export function CtaSection() {
             or USDC and pay per request.
           </p>
           <LinkButton href="/register" variant="primary" size="lg">
-            Get Started Free →
+            Get Started →
           </LinkButton>
         </motion.div>
       </Container>

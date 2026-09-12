@@ -329,7 +329,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
         </a>
         <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-text-muted">
           <Clock className="h-3.5 w-3.5" />
-          Confirmed manually, usually within a few hours
+          Confirmed manually, usually within a few minutes
         </p>
       </div>
     </div>

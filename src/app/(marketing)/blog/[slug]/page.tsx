@@ -193,7 +193,7 @@ export default async function BlogPostPage({
             nativeButton={false}
             render={<Link href="/register" />}
           >
-            Get Started Free →
+            Get Started →
           </Button>
         </div>
 
