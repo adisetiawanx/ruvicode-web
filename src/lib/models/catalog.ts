@@ -65,6 +65,7 @@ export const CURATED_MODELS: CuratedModel[] = [
   c("claude-sonnet-4.5", "Claude Sonnet 4.5", "Anthropic", ["text", "vision", "reasoning", "tools", "code"], 200_000, 64_000),
   c("claude-haiku-4.5", "Claude Haiku 4.5", "Anthropic", ["text", "vision", "tools", "code"], 200_000, 64_000),
   c("claude-fable-5", "Claude Fable 5", "Anthropic", ["text", "vision", "reasoning", "tools", "code"], 1_000_000, 128_000),
+  c("claude-fable-5.1", "Claude Fable 5.1", "Anthropic", ["text", "vision", "reasoning", "tools", "code"], 1_000_000, 128_000),
 
   // ── OpenAI ──
   c("gpt-5.6-sol", "GPT-5.6 Sol", "OpenAI", ["text", "vision", "reasoning", "tools", "code"], 1_050_000, 128_000),
@@ -73,6 +74,7 @@ export const CURATED_MODELS: CuratedModel[] = [
   c("gpt-5.6-terra-pro", "GPT-5.6 Terra Pro", "OpenAI", ["text", "vision", "reasoning", "tools", "code"], 1_050_000, 128_000),
   c("gpt-5.6-luna", "GPT-5.6 Luna", "OpenAI", ["text", "vision", "reasoning", "tools", "code"], 1_050_000, 128_000),
   c("gpt-5.6-luna-pro", "GPT-5.6 Luna Pro", "OpenAI", ["text", "vision", "reasoning", "tools", "code"], 1_050_000, 128_000),
+  c("gpt-6-astra", "GPT-6 Astra", "OpenAI", ["text", "vision", "reasoning", "tools", "code"], 1_050_000, 128_000),
   c("gpt-5.5", "GPT-5.5", "OpenAI", ["text", "vision", "reasoning", "tools", "code"], 1_050_000, 128_000),
   c("gpt-5.4", "GPT-5.4", "OpenAI", ["text", "vision", "tools", "code"], 1_050_000, 128_000),
   c("gpt-5.4-mini", "GPT-5.4 Mini", "OpenAI", ["text", "vision", "tools", "code"], 400_000, 128_000),

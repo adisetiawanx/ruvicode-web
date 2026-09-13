@@ -14,8 +14,8 @@ import { ModelTag } from "@/components/shared/model-tag";
 // One flagship per brand: the showcase is a story about coverage across
 // frontier labs, not a price-sorted list.
 const SHOWCASE_ORDER = [
-  "claude-opus-5",
-  "gpt-5.6-sol",
+  "claude-fable-5.1",
+  "gpt-6-astra",
   "grok-4.5",
   "glm-5.3",
   "kimi-k3",
