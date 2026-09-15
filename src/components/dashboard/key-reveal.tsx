@@ -34,21 +34,26 @@ export function KeyReveal({ apiKey }: KeyRevealProps) {
           <strong>Save this key securely.</strong> It will not be shown again.
         </p>
       </div>
-      <div className="flex items-center gap-2 rounded-md border border-border-default bg-canvas p-3">
-        <code className="flex-1 truncate font-mono text-sm text-text-primary">
-          {apiKey}
-        </code>
-        <button
-          onClick={handleCopy}
-          className="shrink-0 text-text-muted transition-colors hover:text-text-primary"
-          aria-label="Copy API key"
-        >
-          {copied ? (
-            <Check className="h-4 w-4 text-success" />
-          ) : (
-            <Copy className="h-4 w-4" />
-          )}
-        </button>
+      <div className="rounded-md border border-border-default bg-canvas p-3">
+        <div className="flex items-start gap-2">
+          <code
+            className="min-w-0 flex-1 break-all font-mono text-[13px] leading-relaxed text-text-primary"
+            style={{ userSelect: "all" }}
+          >
+            {apiKey}
+          </code>
+          <button
+            onClick={handleCopy}
+            className="shrink-0 p-1 text-text-muted transition-colors hover:text-text-primary"
+            aria-label="Copy API key"
+          >
+            {copied ? (
+              <Check className="h-4 w-4 text-success" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
