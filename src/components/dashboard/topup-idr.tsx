@@ -4,6 +4,16 @@ import { useMemo, useState } from "react";
 import { Send, Wallet, Clock, Landmark, ShieldCheck } from "lucide-react";
 
 const TELEGRAM_URL = "https://t.me/asvmv";
+const FACEBOOK_URL = "https://www.messenger.com/t/ruvicode";
+
+/** Facebook "f" brand mark (inline to avoid pulling it from lucide). */
+function FacebookIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="#1877F2" className={className} aria-hidden="true">
+      <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46H15.2c-1.24 0-1.63.77-1.63 1.57v1.88h2.78l-.45 2.9h-2.33V22c4.78-.76 8.43-4.92 8.43-9.94Z" />
+    </svg>
+  );
+}
 
 // Presets from both perspectives. IDR picks are round local numbers; the
 // USD grid carries the values people usually top up. Rp10k (~$0.64) is the
@@ -101,15 +111,28 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
     }
   };
 
-  const telegramHref = useMemo(() => {
+  // One pre-filled message for both channels; only the greeting differs.
+  const buildMessageHref = (channel: "telegram" | "facebook") => {
     const idrPart = idrDisplay ? ` (Rp${idrDisplay.toLocaleString("id-ID")})` : "";
     const ratePart = rate ? ` Kurs saat ini: 1 USD = Rp${rate.toLocaleString("id-ID")}.` : "";
     const usdPart = amountUsd % 1 === 0 ? String(amountUsd) : amountUsd.toFixed(2);
+    const greeting = channel === "facebook" ? "Halo admin Ruvicode" : "Halo";
     const text =
-      `Halo, saya mau top up wallet Ruvicode sebesar $${usdPart}${idrPart} ` +
+      `${greeting}, saya mau top up wallet Ruvicode sebesar $${usdPart}${idrPart} ` +
       `pakai transfer bank/QRIS.${ratePart} Email akun saya: ${email}`;
-    return `${TELEGRAM_URL}?text=${encodeURIComponent(text)}`;
-  }, [amountUsd, idrDisplay, rate, email]);
+    const base = channel === "facebook" ? FACEBOOK_URL : TELEGRAM_URL;
+    return `${base}?text=${encodeURIComponent(text)}`;
+  };
+  const telegramHref = useMemo(
+    () => buildMessageHref("telegram"),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [amountUsd, idrDisplay, rate, email],
+  );
+  const facebookHref = useMemo(
+    () => buildMessageHref("facebook"),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [amountUsd, idrDisplay, rate, email],
+  );
 
   const customEngaged = customActive || customValue.length > 0;
   const presetMatches = (usd: number) =>
@@ -318,15 +341,26 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
       </div>
 
       <div className="mt-auto pt-4">
-        <a
-          href={telegramHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex h-8 w-full shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-transparent bg-accent px-2.5 text-sm font-medium text-text-inverse transition-all hover:bg-accent-hover active:translate-y-px active:bg-accent-pressed"
-        >
-          <Send className="mr-1.5 h-4 w-4" />
-          Pay on Telegram
-        </a>
+        <div className="grid grid-cols-2 gap-2">
+          <a
+            href={telegramHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-transparent bg-accent px-2.5 text-sm font-medium text-text-inverse transition-all hover:bg-accent-hover active:translate-y-px active:bg-accent-pressed"
+          >
+            <Send className="mr-1.5 h-4 w-4" />
+            Pay on Telegram
+          </a>
+          <a
+            href={facebookHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-border-default bg-surface-2 px-2.5 text-sm font-medium text-text-primary transition-all hover:border-accent/60 hover:bg-accent/5 active:translate-y-px"
+          >
+            <FacebookIcon className="mr-1.5 h-4 w-4" />
+            Pay on Facebook
+          </a>
+        </div>
         <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-text-muted">
           <Clock className="h-3.5 w-3.5" />
           Confirmed manually, usually within a few minutes
