@@ -82,11 +82,15 @@ export const CURATED_MODELS: CuratedModel[] = [
   // ── Google ──
   c("gemini-3-5-flash", "Gemini 3.5 Flash", "Google", ["text", "vision", "reasoning", "tools", "code"], 1_048_576, 64_000),
   c("gemini-3.1-pro-preview", "Gemini 3.1 Pro", "Google", ["text", "vision", "reasoning", "tools", "code"], 1_048_576, 64_000),
+  c("gemini-3.8-flash", "Gemini 3.8 Flash", "Google", ["text", "vision", "reasoning", "tools", "code"], 1_048_576, 64_000),
+  c("gemini-3.7-flash", "Gemini 3.7 Flash", "Google", ["text", "vision", "reasoning", "tools", "code"], 1_048_576, 64_000),
 
   // ── DeepSeek ──
   c("deepseek-v4-flash", "DeepSeek V4 Flash", "DeepSeek", ["text", "reasoning", "tools", "code"], 1_048_576, 384_000),
+  c("deepseek-v4.1-flash", "DeepSeek V4.1 Flash", "DeepSeek", ["text", "vision", "reasoning", "tools", "code"], 1_000_000, 384_000),
   c("deepseek-v4-flash-0731", "DeepSeek V4 Flash 0731", "DeepSeek", ["text", "reasoning", "tools", "code"], 1_048_576, 384_000),
   c("deepseek-v4-pro", "DeepSeek V4 Pro", "DeepSeek", ["text", "reasoning", "tools", "code"], 1_048_576, 384_000),
+  c("deepseek-v4-pro-0813", "DeepSeek V4 Pro 0813", "DeepSeek", ["text", "reasoning", "tools", "code"], 1_000_000, 384_000),
 
   // ── Z.ai ──
   c("glm-5.1", "GLM 5.1", "Z.ai", ["text", "reasoning", "tools", "code"], 200_000, 128_000),
@@ -96,6 +100,7 @@ export const CURATED_MODELS: CuratedModel[] = [
 
   // ── xAI ──
   c("grok-4.5", "Grok 4.5", "xAI", ["text", "vision", "reasoning", "tools", "code"], 500_000, 128_000),
+  c("grok-4.6", "Grok 4.6", "xAI", ["text", "vision", "reasoning", "tools", "code"], 500_000, 128_000),
   c("grok-4.3", "Grok 4.3", "xAI", ["text", "vision", "reasoning", "tools", "code"], 1_000_000, 128_000),
 
   // ── Moonshot ──

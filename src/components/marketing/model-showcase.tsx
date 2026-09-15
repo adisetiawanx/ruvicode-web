@@ -16,10 +16,10 @@ import { ModelTag } from "@/components/shared/model-tag";
 const SHOWCASE_ORDER = [
   "claude-fable-5.1",
   "gpt-6-astra",
-  "grok-4.5",
+  "grok-4.6",
   "glm-5.3",
-  "kimi-k3",
-  "deepseek-v4-flash-0731",
+  "gemini-3.8-flash",
+  "deepseek-v4.1-flash",
 ];
 
 export async function ModelShowcase() {

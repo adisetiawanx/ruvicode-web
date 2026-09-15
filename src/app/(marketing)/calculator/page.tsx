@@ -11,7 +11,7 @@ import {
 export const metadata: Metadata = {
   title: "AI API Cost Calculator - See Your Savings",
   description:
-    "Calculate exactly how much you'll save with Ruvicode vs official provider pricing. Compare per-token costs across 30+ AI models.",
+    "Calculate exactly how much you'll save with Ruvicode vs official provider pricing. Compare per-token costs across 40+ AI models.",
   alternates: { canonical: "https://ruvicode.com/calculator" },
   openGraph: {
     title: "AI API Cost Calculator",
