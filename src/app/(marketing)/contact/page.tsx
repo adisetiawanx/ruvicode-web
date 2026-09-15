@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mail } from "lucide-react";
+import { Mail, Send } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import {
   PageEntrance,
@@ -46,6 +46,50 @@ export default function ContactPage() {
               </span>
               <span className="block font-mono text-lg text-text-primary">
                 support@ruvicode.com
+              </span>
+            </span>
+          </a>
+        </PageEntranceItem>
+
+        <PageEntranceItem>
+          <a
+            href="https://t.me/asvmv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-6 transition-colors hover:border-accent/40"
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-surface-2">
+              <Send className="h-5 w-5 text-accent-text" />
+            </span>
+            <span>
+              <span className="block text-sm text-text-secondary">
+                Chat with us on Telegram
+              </span>
+              <span className="block font-mono text-lg text-text-primary">
+                @asvmv
+              </span>
+            </span>
+          </a>
+        </PageEntranceItem>
+
+        <PageEntranceItem>
+          <a
+            href="https://www.facebook.com/ruvicode"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-6 transition-colors hover:border-accent/40"
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-surface-2">
+              <svg viewBox="0 0 24 24" fill="#1877F2" className="h-5 w-5" aria-hidden="true">
+                <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46H15.2c-1.24 0-1.63.77-1.63 1.57v1.88h2.78l-.45 2.9h-2.33V22c4.78-.76 8.43-4.92 8.43-9.94Z" />
+              </svg>
+            </span>
+            <span>
+              <span className="block text-sm text-text-secondary">
+                Message us on Facebook
+              </span>
+              <span className="block font-mono text-lg text-text-primary">
+                facebook.com/ruvicode
               </span>
             </span>
           </a>

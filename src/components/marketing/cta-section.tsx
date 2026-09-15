@@ -21,8 +21,8 @@ export function CtaSection() {
             Start building with one key.
           </h2>
           <p className="mb-8 text-text-secondary">
-            No subscription, no lock-in. Top up what you need with a card
-            or USDC and pay per request.
+            No subscription, no lock-in. Top up what you need with IDR
+            bank transfer or USDC and pay per request.
           </p>
           <LinkButton href="/register" variant="primary" size="lg">
             Get Started →

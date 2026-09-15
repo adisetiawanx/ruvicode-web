@@ -187,7 +187,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
         </div>
 
         {perspective === "usd" ? (
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {TOPUP_CHOICES_USD.map((usd) => {
               const idr = rate ? Math.round(usd * rate) : null;
               const selected = presetMatches(usd);
@@ -214,7 +214,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
             })}
           </div>
         ) : (
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {TOPUP_CHOICES_IDR.map((idr) => {
               const usd = rate ? Math.round((idr / rate) * 100) / 100 : null;
               const selected =
@@ -341,7 +341,7 @@ export function TopUpIDR({ rate, email }: { rate: number | null; email: string }
       </div>
 
       <div className="mt-auto pt-4">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <a
             href={telegramHref}
             target="_blank"
