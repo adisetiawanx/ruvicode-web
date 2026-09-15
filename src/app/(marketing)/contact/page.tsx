@@ -33,9 +33,10 @@ export default function ContactPage() {
         </PageEntranceItem>
 
         <PageEntranceItem>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <a
             href="mailto:support@ruvicode.com"
-            className="inline-flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-6 transition-colors hover:border-accent/40"
+            className="flex flex-col items-start gap-3 rounded-xl border border-border-subtle bg-surface p-6 transition-colors hover:border-accent/40"
           >
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-surface-2">
               <Mail className="h-5 w-5 text-accent-text" />
@@ -49,14 +50,12 @@ export default function ContactPage() {
               </span>
             </span>
           </a>
-        </PageEntranceItem>
 
-        <PageEntranceItem>
           <a
             href="https://t.me/asvmv"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-6 transition-colors hover:border-accent/40"
+            className="flex flex-col items-start gap-3 rounded-xl border border-border-subtle bg-surface p-6 transition-colors hover:border-accent/40"
           >
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-surface-2">
               <Send className="h-5 w-5 text-accent-text" />
@@ -70,14 +69,12 @@ export default function ContactPage() {
               </span>
             </span>
           </a>
-        </PageEntranceItem>
 
-        <PageEntranceItem>
           <a
             href="https://www.facebook.com/ruvicode"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-4 rounded-xl border border-border-subtle bg-surface p-6 transition-colors hover:border-accent/40"
+            className="flex flex-col items-start gap-3 rounded-xl border border-border-subtle bg-surface p-6 transition-colors hover:border-accent/40"
           >
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-surface-2">
               <svg viewBox="0 0 24 24" fill="#1877F2" className="h-5 w-5" aria-hidden="true">
@@ -93,6 +90,7 @@ export default function ContactPage() {
               </span>
             </span>
           </a>
+        </div>
         </PageEntranceItem>
       </PageEntrance>
     </Container>
